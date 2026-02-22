@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .invoice {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        padding: 30px;
+        border-radius: 10px;
+      }
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
+      .seller-info,
+      .invoice-details {
+        flex: 1;
+      }
+      .buyer-info {
+        margin-bottom: 30px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .totals {
+        text-align: right;
+      }
+      .totals table {
+        width: auto;
+        margin-left: auto;
+      }
+      .print-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice">
+      <h1>TAX INVOICE</h1>
+
+      <div class="invoice-header">
+        <div class="seller-info">
+          <strong>Cutting Edge Enterprises</strong>
+          <div>39, Doulataba, Khanyar,Srinagar</div>
+          <div>J&K, 190003</div>
+          <div>GSTIN: 01ABCDE1234F1Z5</div>
+        </div>
+        <div class="invoice-details">
+          <div>Invoice No: INV-123456</div>
+          <div>Date: 2024-01-20</div>
+        </div>
+      </div>
+
+      <div class="buyer-info">
+        <strong>Bill To:</strong>
+        <div>John Doe</div>
+        <div>456 Oak Avenue, Residential Area</div>
+        <div>Mumbai, 400001</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Item</th>
+            <th>HSN</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Laptop</td>
+            <td>8471</td>
+            <td>1</td>
+            <td>50000</td>
+            <td>50000</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Mouse</td>
+            <td>8471</td>
+            <td>2</td>
+            <td>500</td>
+            <td>1000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <table>
+          <tbody>
+            <tr>
+              <td>Taxable Amount</td>
+              <td>₹51000.00</td>
+            </tr>
+            <tr>
+              <td>CGST (9%)</td>
+              <td>₹4590.00</td>
+            </tr>
+            <tr>
+              <td>SGST (9%)</td>
+              <td>₹4590.00</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>₹60180.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="text-align: center; color: #666; font-size: 12px">
+        This is a system generated invoice. No signature required.
+      </p>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">Print Invoice</button>
+  </body>
+</html>
