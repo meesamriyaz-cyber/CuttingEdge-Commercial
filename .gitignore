@@ -10,6 +10,9 @@ frontend/web/public/assets/images copy
 
 # Environment files
 .env
+frontend/web/.env.development
+frontend/web/.env.production
+frontend/web/.gitignore
 
 # Build outputs
 dist/
