@@ -121,7 +121,13 @@ export const useCartStore = create((set, get) => ({
 
       // Handle 401 - session expired
       if (res.status === 401) {
-        localStorage.removeItem("session");
+        // Clear auth store and localStorage properly
+        try {
+          useAuthStore.getState().logout();
+        } catch (e) {
+          // Fallback if logout fails
+          localStorage.removeItem("session");
+        }
         window.location.href = "/login?expired=true";
         return;
       }

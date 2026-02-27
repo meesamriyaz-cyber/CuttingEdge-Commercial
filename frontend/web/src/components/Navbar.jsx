@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import { motion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { heroTextVariants, containerVariants } from "../utils/animations";
 
 export default function Navbar() {
@@ -81,7 +81,7 @@ export default function Navbar() {
           {user && user.clientType === "PRIVATE" && (
             <button
               onClick={() => navigate("/cart")}
-              className="relative group"
+              className="relative group focus:outline-none focus:ring-0 cursor-pointer"
               aria-label="Cart"
             >
               <ShoppingCart className="w-6 h-6 text-text group-hover:scale-110 transition" />
@@ -90,6 +90,17 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
+            </button>
+          )}
+
+          {/* Wishlist — PRIVATE authenticated users only */}
+          {user && user.clientType === "PRIVATE" && (
+            <button
+              onClick={() => navigate("/wishlist")}
+              className="relative group focus:outline-none focus:ring-0 cursor-pointer"
+              aria-label="Wishlist"
+            >
+              <Heart className="w-6 h-6 text-text group-hover:scale-110 transition" />
             </button>
           )}
 
@@ -107,7 +118,7 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm btn-theme-primary rounded-xl font-semibold"
+                className="px-4 py-2 text-sm btn-theme-primary rounded-xl font-semibold focus:outline-none focus:ring-0 cursor-pointer"
               >
                 Logout
               </button>

@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 import { getProducts } from "../../api/products";
+import { getWishlist, addToWishlist, removeFromWishlist } from "../../api/wishlist";
 import LayoutContainer from "../../components/LayoutContainer";
 import { containerVariants, fadeInVariants } from "../../utils/animations";
 import {
@@ -39,6 +40,8 @@ export default function ProductListByCategory() {
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("newest");
   const [addedItems, setAddedItems] = useState(new Set());
+  const [wishlistItems, setWishlistItems] = useState(new Set());
+  const [togglingWishlist, setTogglingWishlist] = useState(null);
 
   const clientType = user?.clientType;
   const isGovt = clientType === "PUBLIC";
@@ -56,6 +59,50 @@ export default function ProductListByCategory() {
     }
     loadProducts();
   }, [decodedCategory]);
+
+  // Load wishlist on mount
+  useEffect(() => {
+    async function loadWishlist() {
+      try {
+        const data = await getWishlist();
+        if (data.wishlist) {
+          const wishlistIds = new Set(data.wishlist.map(item => item.product?._id || item.product));
+          setWishlistItems(wishlistIds);
+        }
+      } catch (err) {
+        // User might not be logged in or wishlist doesn't exist
+      }
+    }
+    loadWishlist();
+  }, []);
+
+  const handleToggleWishlist = async (productId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (togglingWishlist === productId) return;
+    
+    setTogglingWishlist(productId);
+    try {
+      if (wishlistItems.has(productId)) {
+        await removeFromWishlist(productId);
+        setWishlistItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(productId);
+          return newSet;
+        });
+        toast.success("Removed from wishlist");
+      } else {
+        await addToWishlist(productId);
+        setWishlistItems(prev => new Set([...prev, productId]));
+        toast.success("Added to wishlist");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to update wishlist");
+    } finally {
+      setTogglingWishlist(null);
+    }
+  };
 
   const filteredProducts = products
     .filter((p) =>
@@ -359,15 +406,17 @@ export default function ProductListByCategory() {
 
                       {/* Wishlist Button */}
                       <button
-                        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm 
-                          flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 
-                          transition-all duration-300 hover:bg-white hover:scale-110"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Wishlist functionality can be added here
-                        }}
+                        className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm 
+                          flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110
+                          ${togglingWishlist === product._id ? 'opacity-50' : 'opacity-100'}`}
+                        onClick={(e) => handleToggleWishlist(product._id, e)}
+                        disabled={togglingWishlist === product._id}
                       >
-                        <Heart className="w-4 h-4 text-slate-600 hover:text-red-500 transition-colors" />
+                        {wishlistItems.has(product._id) ? (
+                          <Heart className="w-4 h-4 fill-red-500 text-red-500 transition-colors" />
+                        ) : (
+                          <Heart className="w-4 h-4 text-slate-600 hover:text-red-500 transition-colors" />
+                        )}
                       </button>
                     </Link>
 

@@ -14,6 +14,7 @@ import ProductList from "../pages/products/ProductList";
 import ProductDetails from "../pages/products/ProductDetails";
 
 import Cart from "../pages/private/Cart";
+import Wishlist from "../pages/private/Wishlist";
 import Checkout from "../pages/private/Checkout";
 import MyOrders from "../pages/private/MyOrders";
 import OrderDetails from "../pages/private/OrderDetails";
@@ -122,6 +123,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <Cart />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <Wishlist />
           </ProtectedRoute>
         }
       />

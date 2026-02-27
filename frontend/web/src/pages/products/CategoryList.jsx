@@ -38,24 +38,7 @@ const categoryIcons = {
 };
 
 // Category image mapping using Unsplash (fallback only)
-const categoryImages = {
-  laptops: "https://source.unsplash.com/400x300/?business,laptop",
-  phones: "https://source.unsplash.com/400x300/?smartphone,modern",
-  accessories: "https://source.unsplash.com/400x300/?computer,accessories",
-  servers: "https://source.unsplash.com/400x300/?data,server,rack",
-  workstations: "https://source.unsplash.com/400x300/?desktop,workstation",
-  printers: "https://source.unsplash.com/400x300/?office,printer",
-  monitors: "https://source.unsplash.com/400x300/?computer,monitor,office",
-  storage: "https://source.unsplash.com/400x300/?ssd,harddrive,storage",
-  networking: "https://source.unsplash.com/400x300/?networking,router,switch",
-  software: "https://source.unsplash.com/400x300/?software,code,development",
-  computers: "https://source.unsplash.com/400x300/?desktop,computer,office",
-  tablets: "https://source.unsplash.com/400x300/?tablet,device",
-  cameras: "https://source.unsplash.com/400x300/?professional,camera",
-  audio: "https://source.unsplash.com/400x300/?headphones,audio",
-  video: "https://source.unsplash.com/400x300/?video,camera,production",
-  default: "https://source.unsplash.com/400x300/?technology,business",
-};
+
 
 // Category gradient colors - Kashmiri palette
 const categoryGradients = [

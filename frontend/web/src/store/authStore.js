@@ -90,7 +90,6 @@ export const useAuthStore = create((set, get) => ({
 
       return newAccessToken;
     } catch (error) {
-      console.error("Token refresh failed:", error);
       get().logout();
       throw error;
     }
@@ -109,7 +108,7 @@ export const useAuthStore = create((set, get) => ({
         credentials: "include",
       });
     } catch (e) {
-      console.warn("Logout API call failed:", e);
+      // Logout API call failed, continue with local cleanup
     }
 
     // Clear localStorage and state
