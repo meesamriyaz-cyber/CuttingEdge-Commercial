@@ -133,33 +133,55 @@ export default function ProductListGuest() {
           />
         </div>
 
-        {/* CATEGORIES */}
+        {/* CATEGORIES - Dropdown on mobile, buttons on desktop */}
         {!loadingCategories && categories.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory("")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                selectedCategory === ""
-                  ? "btn-theme-primary"
-                  : "bg-surface-alt text-slate-600 hover:bg-indigo-50"
-              }`}
-            >
-              All ({categories.reduce((acc, c) => acc + c.count, 0)})
-            </button>
-            {categories.map((cat) => (
+          <div className="w-full">
+            {/* Mobile Dropdown */}
+            <div className="md:hidden w-full">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-surface-alt border border-slate-200 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              >
+                <option value="">
+                  All Categories (
+                  {categories.reduce((acc, c) => acc + c.count, 0)})
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat.name} value={cat.name}>
+                    {cat.name} ({cat.count})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Desktop Buttons */}
+            <div className="hidden md:flex flex-wrap gap-2">
               <button
-                key={cat.name}
-                onClick={() => setSelectedCategory(cat.name)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                  selectedCategory === cat.name
+                onClick={() => setSelectedCategory("")}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCategory === ""
                     ? "btn-theme-primary"
                     : "bg-surface-alt text-slate-600 hover:bg-indigo-50"
                 }`}
               >
-                {cat.name}
-                <span className="text-xs opacity-70">({cat.count})</span>
+                All ({categories.reduce((acc, c) => acc + c.count, 0)})
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button
+                  key={cat.name}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                    selectedCategory === cat.name
+                      ? "btn-theme-primary"
+                      : "bg-surface-alt text-slate-600 hover:bg-indigo-50"
+                  }`}
+                >
+                  {cat.name}
+                  <span className="text-xs opacity-70">({cat.count})</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
