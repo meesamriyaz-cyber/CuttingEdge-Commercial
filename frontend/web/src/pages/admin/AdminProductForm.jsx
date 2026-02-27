@@ -6,6 +6,19 @@ import {
   fetchProduct,
 } from "../../api/adminProducts";
 
+const CATEGORIES = [
+  "Networking equipment",
+  "Computers",
+  "Laptops",
+  "Printers",
+  "IT Accessories",
+  "Software",
+  "Storage",
+  "Electronic Appliances",
+  "Furniture",
+  "Stationary",
+];
+
 export default function AdminProductForm({ mode }) {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -18,9 +31,10 @@ export default function AdminProductForm({ mode }) {
     price: "",
     sku: "",
     segment: "CONSUMER",
-    category: ""
+    category: "",
   });
 
+  const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -102,7 +116,7 @@ export default function AdminProductForm({ mode }) {
   // Remove existing image (for edit mode)
   const removeExistingImage = (publicId) => {
     const newExistingImages = existingImages.filter(
-      (img) => img.publicId !== publicId
+      (img) => img.publicId !== publicId,
     );
     setExistingImages(newExistingImages);
   };
@@ -207,20 +221,44 @@ export default function AdminProductForm({ mode }) {
             className="w-full border rounded px-3 py-2"
           />
         </div>
+        <div className="space-y-2">
           <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          className="w-full border rounded px-3 py-2"
-          required
-        >
-          <option value="">Select Category</option>
-          <option value="Networking">Networking</option>
-          <option value="Computers">Computers</option>
-          <option value="Printers">Printers</option>
-          <option value="Accessories">IT Accessories</option>
-          <option value="Accessories">Electronic Appliances</option>
-        </select>
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+            required
+          >
+            <option value="">Select Category</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+            <option value="custom">+ Add New Category</option>
+          </select>
+          {form.category === "custom" && (
+            <input
+              type="text"
+              placeholder="Enter new category name"
+              className="w-full border rounded px-3 py-2"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              onBlur={(e) => {
+                if (e.target.value.trim()) {
+                  setForm((prev) => ({
+                    ...prev,
+                    category: e.target.value.trim(),
+                  }));
+                  setNewCategory("");
+                } else {
+                  setForm((prev) => ({ ...prev, category: "" }));
+                }
+              }}
+              autoFocus
+            />
+          )}
+        </div>
 
         {/* Allow selecting segment only when creating */}
         <select
@@ -250,10 +288,10 @@ export default function AdminProductForm({ mode }) {
             {saving
               ? "Saving…"
               : isProcessingImages
-              ? "Processing Images..."
-              : isEdit
-              ? "Save Changes"
-              : "Create Product"}
+                ? "Processing Images..."
+                : isEdit
+                  ? "Save Changes"
+                  : "Create Product"}
           </button>
         </div>
         <div>

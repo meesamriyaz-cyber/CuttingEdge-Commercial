@@ -17,7 +17,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// Category icon mapping
+// Category icon mapping (fallback when no image)
 const categoryIcons = {
   laptops: "💻",
   phones: "📱",
@@ -35,6 +35,26 @@ const categoryIcons = {
   audio: "🔊",
   video: "📹",
   default: "📦",
+};
+
+// Category image mapping using Unsplash (fallback only)
+const categoryImages = {
+  laptops: "https://source.unsplash.com/400x300/?business,laptop",
+  phones: "https://source.unsplash.com/400x300/?smartphone,modern",
+  accessories: "https://source.unsplash.com/400x300/?computer,accessories",
+  servers: "https://source.unsplash.com/400x300/?data,server,rack",
+  workstations: "https://source.unsplash.com/400x300/?desktop,workstation",
+  printers: "https://source.unsplash.com/400x300/?office,printer",
+  monitors: "https://source.unsplash.com/400x300/?computer,monitor,office",
+  storage: "https://source.unsplash.com/400x300/?ssd,harddrive,storage",
+  networking: "https://source.unsplash.com/400x300/?networking,router,switch",
+  software: "https://source.unsplash.com/400x300/?software,code,development",
+  computers: "https://source.unsplash.com/400x300/?desktop,computer,office",
+  tablets: "https://source.unsplash.com/400x300/?tablet,device",
+  cameras: "https://source.unsplash.com/400x300/?professional,camera",
+  audio: "https://source.unsplash.com/400x300/?headphones,audio",
+  video: "https://source.unsplash.com/400x300/?video,camera,production",
+  default: "https://source.unsplash.com/400x300/?technology,business",
 };
 
 // Category gradient colors - Kashmiri palette
@@ -276,21 +296,31 @@ export default function CategoryList() {
                     />
 
                     <div className="p-6">
-                      {/* Icon Container */}
+                      {/* Image Container */}
                       <div className="relative mb-5">
-                        <div
-                          className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${categoryGradients[index % categoryGradients.length]}
-                          flex items-center justify-center text-3xl
-                          group-hover:scale-110 group-hover:shadow-lg
-                          transition-all duration-300 shadow-md`}
-                        >
-                          {categoryIcons[cat.name.toLowerCase()] ||
-                            categoryIcons.default}
+                        <div className="w-full h-40 rounded-2xl overflow-hidden group-hover:scale-105 transition-all duration-300 shadow-md">
+                          {cat.image ? (
+                            <img
+                              src={cat.image}
+                              alt={cat.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div
+                              className={`w-full h-full bg-gradient-to-br ${categoryGradients[index % categoryGradients.length]} flex items-center justify-center`}
+                            >
+                              <span className="text-4xl">
+                                {categoryIcons[cat.name.toLowerCase()] ||
+                                  categoryIcons.default}
+                              </span>
+                            </div>
+                          )}
                         </div>
                         {/* Product count badge */}
                         <div
                           className="absolute -top-2 -right-2 px-2.5 py-1 rounded-full bg-gradient-to-r from-kashmiri-dal-500 to-kashmiri-pashmina-500
-                          text-white text-xs font-bold shadow-lg shadow-kashmiri-dal-500/30"
+                        text-white text-xs font-bold shadow-lg shadow-kashmiri-dal-500/30"
                         >
                           {cat.count}
                         </div>
@@ -343,12 +373,24 @@ export default function CategoryList() {
                     transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1
                     hover:border-blue-300 dark:hover:border-blue-700 text-center"
                   >
-                    <div
-                      className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${categoryGradients[index % categoryGradients.length]}
-                      flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform duration-300 shadow-md`}
-                    >
-                      {categoryIcons[cat.name.toLowerCase()] ||
-                        categoryIcons.default}
+                    <div className="w-full h-24 rounded-xl overflow-hidden mb-3 group-hover:scale-105 transition-transform duration-300 shadow-md">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div
+                          className={`w-full h-full bg-gradient-to-br ${categoryGradients[index % categoryGradients.length]} flex items-center justify-center`}
+                        >
+                          <span className="text-2xl">
+                            {categoryIcons[cat.name.toLowerCase()] ||
+                              categoryIcons.default}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <h3
                       className="text-sm font-semibold text-slate-900 dark:text-white 
