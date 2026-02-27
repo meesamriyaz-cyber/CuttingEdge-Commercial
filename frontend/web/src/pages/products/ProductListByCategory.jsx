@@ -120,7 +120,6 @@ export default function ProductListByCategory() {
         { duration: 4000, position: "bottom-right" },
       );
     } catch (err) {
-      console.error("Add to cart error:", err);
       toast.error("Failed to add item to cart");
     } finally {
       setAddingToCart(null);
@@ -430,8 +429,8 @@ export default function ProductListByCategory() {
                       <div className="flex gap-2 mt-auto">
                         <Link
                           to={`/products/${product._id}`}
-                          className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 
-                            text-center py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                          className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white
+                            text-center py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
                         >
                           View Details
                         </Link>
@@ -559,8 +558,8 @@ export default function ProductListByCategory() {
                         <div className="flex gap-2">
                           <Link
                             to={`/products/${product._id}`}
-                            className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 
-                              rounded-xl text-sm font-semibold transition-colors"
+                            className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white
+                              rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
                           >
                             View
                           </Link>

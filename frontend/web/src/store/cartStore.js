@@ -15,7 +15,7 @@ const getToken = () => {
     const storeToken = useAuthStore.getState().accessToken;
     if (storeToken) return storeToken;
   } catch (e) {
-    console.warn("[cartStore] Could not get token from store:", e);
+    // Could not get token from store
   }
 
   try {

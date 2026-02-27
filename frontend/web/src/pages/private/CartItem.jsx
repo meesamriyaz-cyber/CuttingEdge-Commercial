@@ -2,21 +2,24 @@ import { Plus, Minus, Trash, AlertTriangle } from "lucide-react";
 
 export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
   const { product, quantity } = item;
-  console.log(product)
   const lowStock =
     typeof product?.stock === "number" &&
     product.stock > 0 &&
     product.stock <= 5;
 
-  const outOfStock =
-    typeof product?.stock === "number" && product.stock === 0;
+  const outOfStock = typeof product?.stock === "number" && product.stock === 0;
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex-1">
         <h3 className="font-semibold text-lg">{product.name}</h3>
         <p className="text-sm text-slate-500">₹{product.price}</p>
-        <img src={product?.images?.[0].url} alt={product.name} width="70" height="70"/>
+        <img
+          src={product?.images?.[0].url}
+          alt={product.name}
+          width="70"
+          height="70"
+        />
         {lowStock && (
           <p className="text-xs text-orange-600 flex items-center gap-1 mt-1">
             <AlertTriangle size={12} />
