@@ -30,11 +30,25 @@ export const getCategories = async (req, res) => {
       }
     }
 
-    // Get distinct categories with product count
+    // Get distinct categories with product count and first product image
     const categories = await Product.aggregate([
       { $match: query },
-      { $group: { _id: "$category", count: { $sum: 1 } } },
-      { $project: { name: "$_id", count: 1, _id: 0 } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+          firstProductImage: { $first: "$images" },
+        },
+      },
+      {
+        $project: {
+          name: "$_id",
+          count: 1,
+          image: { $arrayElemAt: ["$firstProductImage.url", 0] },
+          _id: 0,
+        },
+      },
       { $sort: { name: 1 } },
     ]);
 

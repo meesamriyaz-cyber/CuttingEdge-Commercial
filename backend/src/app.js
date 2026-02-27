@@ -69,4 +69,14 @@ app.use("/reviews", reviewRoutes);
 app.use("/services", serviceRoutes);
 app.use("/payments", paymentRoutes);
 
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    message: "Backend is running",
+    version: "1.0.0",
+    timestamp: new Date().toISOString()
+  });
+});
+
 export default app;
