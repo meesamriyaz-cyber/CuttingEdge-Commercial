@@ -15,6 +15,7 @@ import adminServiceRoutes from "./routes/admin.services.route.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 const app = express();
 
 // CORS configuration - allow credentials (cookies)
@@ -38,7 +39,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Refresh-Token"],
-  })
+  }),
 );
 
 app.use(express.json({ limit: "10mb" }));
@@ -65,17 +66,18 @@ app.use("/cart", cartRoutes);
 app.use("/orders", orderRoutes);
 app.use("/addresses", addressRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/wishlist", wishlistRoutes);
 
 app.use("/services", serviceRoutes);
 app.use("/payments", paymentRoutes);
 
 // Health check endpoint
 app.get("/", (req, res) => {
-  res.json({ 
-    status: "ok", 
+  res.json({
+    status: "ok",
     message: "Backend is running",
     version: "1.0.0",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

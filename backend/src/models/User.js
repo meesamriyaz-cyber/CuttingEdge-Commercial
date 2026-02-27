@@ -67,6 +67,14 @@ const userSchema = new mongoose.Schema(
         isDefault: { type: Boolean, default: false },
       },
     ],
+
+    // User's wishlist
+    wishlist: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true },
 );
