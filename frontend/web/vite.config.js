@@ -55,6 +55,13 @@ export default defineConfig({
       "/services": {
         target: "http://localhost:5000",
         changeOrigin: true,
+        bypass: (req) => {
+          // Don't proxy if it's a browser page request (accepts HTML)
+          const accept = req.headers.accept || "";
+          if (accept.includes("text/html")) {
+            return req.url; // Return the URL to serve index.html instead
+          }
+        },
       },
       "/public": {
         target: "http://localhost:5000",
