@@ -21,6 +21,9 @@ const app = express();
 // CORS configuration - allow credentials (cookies)
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:5176",
   "https://commerce.cuttingedge-enterprises.in",
 ];
 
