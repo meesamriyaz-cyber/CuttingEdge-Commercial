@@ -61,6 +61,7 @@ export default function AppRoutes() {
       <Route path="/products-guest" element={<ProductListGuest />} />
       <Route path="/products-guest/:id" element={<ProductDetailsGuest />} />
       <Route path="/services" element={<ServiceList />} />
+
       <Route
         path="/services/enquiry/:slug"
         element={
@@ -70,7 +71,7 @@ export default function AppRoutes() {
         }
       />
       {/* Note: :slug route must come after specific routes like /services/enquiry */}
-      <Route path="/services/:slug" element={<ServiceList />} />
+      
       <Route
         path="/verify-account"
         element={

@@ -23,15 +23,11 @@ export default function ServicesList() {
         console.log("Attempting to fetch services from /api/services");
         const res = await fetch("/api/services");
         console.log("Response status:", res.status, res.statusText);
-        console.log("Response headers:", Object.fromEntries(res.headers.entries()));
+      //  console.log("Response headers:", Object.fromEntries(res.headers.entries()));
         
-        const text = await res.text();
-        console.log("Response text:", text);
-        
-        const data = JSON.parse(text);
+       const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to load services");
         setServices(data);
-        console.log("Services loaded successfully:", data);
       } catch (err) {
         console.error("Error loading services:", err);
         setError(err.message);
@@ -134,7 +130,7 @@ export default function ServicesList() {
         <div className="space-y-4">
           {loading
             ? [...Array(4)].map((_, i) => <ServiceCardSkeleton key={i} />)
-            : filteredServices.map((service, idx) => (
+            : filteredServices?.map((service, idx) => (
                 <ServiceCard
                   key={service.slug}
                   service={service}

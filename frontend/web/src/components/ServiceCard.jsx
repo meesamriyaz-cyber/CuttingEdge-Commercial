@@ -24,7 +24,6 @@ const GRADIENT_MAP = {
 
 export default function ServiceCard({ service, index, isAuthenticated }) {
   const navigate = useNavigate();
-
   const Icon = ICON_MAP[service.slug] || Building2;
   const gradient = GRADIENT_MAP[service.slug] || "from-emerald-600 to-teal-500";
 
@@ -60,8 +59,7 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
       "
     >
       {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
+<div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       {/* LEFT ICON */}
       <div className="shrink-0 mb-4 sm:mb-0 sm:absolute sm:top-6 sm:left-6">
         <div

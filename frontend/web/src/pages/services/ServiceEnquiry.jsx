@@ -23,7 +23,7 @@ export default function ServiceEnquiry() {
       }
       
       try {
-        const res = await fetch(`${API_URL}/api/services/${slug}`);
+        const res = await fetch(`${API_URL}/services/${slug}`);
         const data = await res.json();
         
         if (res.ok) {

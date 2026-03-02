@@ -24,9 +24,9 @@ export default function BrandTrustStrip({ clientType, page }) {
 
   return (
     <div
-      className={
+       className={
         page !== "services"
-          ? "w-full mt-6 sm:mt-8 overflow-hidden"
+          ? "w-full mt-20 sm:mt-24 overflow-hidden"
           : "w-full mt-8 sm:mt-12 overflow-hidden"
       }
     >

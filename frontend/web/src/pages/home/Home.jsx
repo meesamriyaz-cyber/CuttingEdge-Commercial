@@ -96,7 +96,7 @@ export default function Home() {
         {/* HERO */}
         <motion.section
           data-section
-          className="min-h-[75vh] sm:min-h-[65vh] flex items-center bg-white dark:bg-slate-900 rounded-3xl mt-3 w-[95%] sm:w-[90%] max-w-7xl mx-auto overflow-hidden shadow-xl"
+          className="min-h-[75vh] sm:min-h-[65vh] flex items-center bg-white dark:bg-slate-900 rounded-3xl mt-16 w-[95%] sm:w-[90%] max-w-7xl mx-auto overflow-hidden"
           variants={containerVariants}
         >
           {/* Background decoration */}
