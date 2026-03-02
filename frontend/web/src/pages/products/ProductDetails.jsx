@@ -276,7 +276,7 @@ export default function ProductDetails() {
                     onClick={() => setCurrentImageIndex(i)}
                     className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                       i === currentImageIndex
-                        ? "border-blue-500 shadow-lg shadow-blue-500/20"
+                        ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
                         : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                     }`}
                   >
@@ -333,7 +333,7 @@ export default function ProductDetails() {
 
               <button
                 onClick={() => setShowDetailsModal(true)}
-                className="mt-4 text-blue-600 dark:text-blue-400 font-medium hover:underline inline-flex items-center gap-1"
+                className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium hover:underline inline-flex items-center gap-1"
               >
                 View Full Details
                 <ChevronRight size={16} />
@@ -387,7 +387,7 @@ export default function ProductDetails() {
                     {/* Add to Cart Button */}
                     <motion.button
                       onClick={handleAddToCart}
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 flex items-center justify-center gap-2"
+                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2"
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
@@ -402,9 +402,9 @@ export default function ProductDetails() {
               <RoleGate allow={["PUBLIC"]}>
                 {product.segment === "COMMERCIAL" && (
                   <>
-                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-200 dark:border-purple-800 rounded-2xl p-5 mb-6">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-5 mb-6">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
                           <Building2 className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -422,7 +422,7 @@ export default function ProductDetails() {
 
                     <motion.button
                       onClick={handleSubmitEnquiry}
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300"
+                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300"
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
@@ -454,7 +454,7 @@ export default function ProductDetails() {
                     setEditingReview(null);
                     setShowReviewForm(true);
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -473,7 +473,7 @@ export default function ProductDetails() {
 
             {reviewsLoading ? (
               <div className="flex justify-center py-12">
-                <div className="w-10 h-10 rounded-xl border-2 border-blue-500 border-t-transparent animate-spin" />
+                <div className="w-10 h-10 rounded-xl border-2 border-emerald-500 border-t-transparent animate-spin" />
               </div>
             ) : (
               <ReviewsList

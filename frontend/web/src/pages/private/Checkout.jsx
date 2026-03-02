@@ -172,11 +172,16 @@ export default function Checkout() {
 
   return (
     <RoleGate allow={["PRIVATE"]}>
-      <div className="min-h-screen bg-surface py-8">
+      <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+        </div>
         <div className="max-w-5xl mx-auto px-4 grid md:grid-cols-3 gap-6">
           {/* LEFT: ITEMS */}
           <div className="md:col-span-2 space-y-4">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
               Checkout
             </h2>
 
@@ -202,20 +207,20 @@ export default function Checkout() {
                 </h3>
                 <button
                   onClick={() => setShowAddressModal(true)}
-                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                  className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
                 >
                   {selectedAddress ? "Change" : "+ Add New Address"}
                 </button>
               </div>
 
               {selectedAddress ? (
-                <div className="border-2 border-indigo-500 bg-indigo-50 rounded-lg p-4">
+                <div className="border-2 border-emerald-500 bg-emerald-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-semibold text-gray-900">
                       {selectedAddress.label}
                     </span>
                     {selectedAddress.isDefault && (
-                      <span className="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
                         Default
                       </span>
                     )}
@@ -268,7 +273,7 @@ export default function Checkout() {
                   <p>Please select a delivery address</p>
                   <button
                     onClick={() => setShowAddressModal(true)}
-                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium"
+                    className="mt-2 text-emerald-600 hover:text-emerald-800 font-medium"
                   >
                     Select Address
                   </button>
@@ -286,7 +291,7 @@ export default function Checkout() {
                 <label
                   className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                     paymentMethod === "online"
-                      ? "border-indigo-600 bg-indigo-50"
+                      ? "border-emerald-600 bg-emerald-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -296,7 +301,7 @@ export default function Checkout() {
                     value="online"
                     checked={paymentMethod === "online"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                    className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                   />
                   <div className="ml-3 flex-1">
                     <div className="flex items-center justify-between">
@@ -317,7 +322,7 @@ export default function Checkout() {
                 <label
                   className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                     paymentMethod === "cod"
-                      ? "border-indigo-600 bg-indigo-50"
+                      ? "border-emerald-600 bg-emerald-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -327,7 +332,7 @@ export default function Checkout() {
                     value="cod"
                     checked={paymentMethod === "cod"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                    className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                   />
                   <div className="ml-3 flex-1">
                     <div className="flex items-center justify-between">

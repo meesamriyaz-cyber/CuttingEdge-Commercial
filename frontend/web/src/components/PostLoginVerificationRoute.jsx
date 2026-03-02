@@ -7,7 +7,7 @@ export default function PostLoginVerificationRoute({ children }) {
 
   // If no user, redirect to login
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // If user is admin, allow access (admins don't need verification)

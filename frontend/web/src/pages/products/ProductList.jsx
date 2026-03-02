@@ -49,7 +49,7 @@ export default function ProductList() {
   if (loading)
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin h-10 w-10 border-b-2 border-indigo-500 rounded-full" />
+        <div className="animate-spin h-10 w-10 border-b-2 border-emerald-500 rounded-full" />
       </div>
     );
 
@@ -61,8 +61,13 @@ export default function ProductList() {
     );
 
   return (
-    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+      </div>
+      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <h1 className="text-2xl sm:text-3xl font-bold hero-gradient-text">

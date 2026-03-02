@@ -93,7 +93,7 @@ export default function ProductDetailsGuest() {
   if (loading)
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-b-2 border-indigo-500 rounded-full" />
+        <div className="animate-spin h-12 w-12 border-b-2 border-emerald-500 rounded-full" />
       </div>
     );
 
@@ -116,8 +116,13 @@ export default function ProductDetailsGuest() {
     );
 
   return (
-    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+      </div>
+      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -164,7 +169,7 @@ export default function ProductDetailsGuest() {
                         onClick={() => setCurrentImageIndex(i)}
                         className={`w-20 h-20 rounded-xl overflow-hidden border-2 ${
                           i === currentImageIndex
-                            ? "border-indigo-500"
+                            ? "border-emerald-500"
                             : "border-white/30"
                         }`}
                       >
@@ -310,7 +315,7 @@ export default function ProductDetailsGuest() {
           {/* Reviews List */}
           {reviewsLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin h-8 w-8 border-b-2 border-indigo-500 rounded-full" />
+              <div className="animate-spin h-8 w-8 border-b-2 border-emerald-500 rounded-full" />
             </div>
           ) : reviews.length > 0 ? (
             <div className="space-y-4">
@@ -321,8 +326,8 @@ export default function ProductDetailsGuest() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <span className="text-indigo-700 font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <span className="text-emerald-700 font-semibold">
                           {review.user?.name?.charAt(0).toUpperCase() || "U"}
                         </span>
                       </div>

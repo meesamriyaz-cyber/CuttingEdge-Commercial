@@ -30,26 +30,27 @@ export default function BrandTrustStrip({ clientType, page }) {
           : "w-full mt-8 sm:mt-12 overflow-hidden"
       }
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full max-w-full px-2 sm:px-4 lg:px-8 mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-4 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
+            className="overflow-hidden"
           >
-            <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+            <span className="inline-block px-3 py-1 mb-3 sm:mb-4 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
               Trusted Partners
             </span>
           </motion.div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-3">
+          <h2 className="text-lg sm:text-3xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
             {clientType === "PUBLIC" || clientType === "PRIVATE"
               ? "Leading Brands"
               : "Authorized Services For"}
           </h2>
-          <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          <p className="text-xs sm:text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
             {clientType === "PUBLIC" || clientType === "PRIVATE"
               ? "We partner with industry-leading brands to deliver quality products and services."
               : "Our authorized service centers ensure your devices receive expert care."}
@@ -58,30 +59,30 @@ export default function BrandTrustStrip({ clientType, page }) {
 
         {/* Brand Logo Container */}
         <motion.div
-          className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg"
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           {/* Subtle gradient overlay */}
-          <div className="absolute inset-y-0 left-0 w-12 sm:w-16 bg-gradient-to-r from-white dark:from-slate-900 z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-12 sm:w-16 bg-gradient-to-l from-white dark:from-slate-900 z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-8 sm:w-16 bg-gradient-to-r from-white dark:from-slate-900 z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-8 sm:w-16 bg-gradient-to-l from-white dark:from-slate-900 z-10 pointer-events-none" />
 
           {/* Scrolling brand logos */}
-          <div className="overflow-hidden py-4 sm:py-6 lg:py-8">
+          <div className="overflow-hidden py-3 sm:py-6 lg:py-8">
             <motion.div
-              className="flex items-center gap-4 sm:gap-6 lg:gap-8"
+              className="flex items-center gap-3 sm:gap-6 lg:gap-8"
               animate={{ x: ["0%", "-50%"] }}
               transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
             >
               {[...brands, ...brands].map((src, i) => (
-                <div key={i} className="flex-shrink-0 px-2 sm:px-3">
-                  <div className="relative px-3 sm:px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 shadow-sm hover:shadow-lg">
+                <div key={i} className="flex-shrink-0 px-1 sm:px-3">
+                  <div className="relative px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 shadow-sm hover:shadow-md">
                     <img
                       src={src}
                       alt="Brand partner"
-                      className="object-contain w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 opacity-70 hover:opacity-100 transition-opacity duration-300"
+                      className="object-contain w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 opacity-70 hover:opacity-100 transition-opacity duration-300"
                     />
                   </div>
                 </div>
@@ -93,7 +94,8 @@ export default function BrandTrustStrip({ clientType, page }) {
         {/* Statistics Cards (only show on non-services pages) */}
         {page !== "services" && (
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-6 sm:mt-8 
+            "
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -107,13 +109,13 @@ export default function BrandTrustStrip({ clientType, page }) {
             ].map((stat, index) => (
               <motion.div
                 key={index}
-                className="text-center p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300"
+                className="text-center p-2 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300"
                 whileHover={{ y: -4 }}
               >
-                <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                <div className="text-xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                   {stat.value}
                 </div>
-                <div className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+                <div className="text-[10px] sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
                   {stat.label}
                 </div>
               </motion.div>

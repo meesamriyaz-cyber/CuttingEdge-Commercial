@@ -197,7 +197,7 @@ export default function OrderDetails() {
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-4xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
               <p className="text-slate-500">Loading order details...</p>
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function OrderDetails() {
               </p>
               <Link
                 to="/orders"
-                className="inline-flex items-center mt-4 font-medium text-indigo-600 hover:opacity-80 transition-colors"
+                className="inline-flex items-center mt-4 font-medium text-emerald-600 hover:opacity-80 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Orders

@@ -145,7 +145,7 @@ export default function Register() {
                     px-4 py-3 rounded-xl border font-medium
                     ${
                       clientType === "PRIVATE"
-                        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                         : "border-white/40 bg-surface"
                     }
                   `}
@@ -160,7 +160,7 @@ export default function Register() {
                     px-4 py-3 rounded-xl border font-medium
                     ${
                       clientType === "PUBLIC"
-                        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                         : "border-white/40 bg-surface"
                     }
                   `}
@@ -203,7 +203,7 @@ export default function Register() {
                 <p
                   className="
                     text-xs text-center italic
-                    bg-gradient-to-r from-indigo-600 via-cyan-600 to-pink-500
+                    bg-gradient-to-r from-emerald-600 via-teal-600 to-teal-500
                     bg-clip-text text-transparent
                   "
                 >
@@ -214,7 +214,7 @@ export default function Register() {
 
             <p className="mt-6 text-sm text-center text-slate-600">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-indigo-600">
+              <Link to="/login" className="font-semibold text-emerald-600">
                 Sign in
               </Link>
             </p>

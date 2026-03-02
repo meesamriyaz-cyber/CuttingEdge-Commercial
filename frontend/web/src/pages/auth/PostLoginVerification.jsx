@@ -58,7 +58,7 @@ export default function PostLoginVerification() {
           <motion.div className="text-center mb-6">
             <motion.h2
               className="text-2xl font-bold bg-gradient-to-r
-                         from-indigo-600 via-cyan-600 to-pink-600
+                         from-emerald-600 via-teal-600 to-teal-500
                          bg-clip-text text-transparent"
               variants={heroTextVariants}
             >
@@ -130,7 +130,7 @@ export default function PostLoginVerification() {
               type="submit"
               disabled={loading}
               className="w-full py-2 rounded-lg font-semibold
-                         bg-indigo-600 text-white hover:bg-indigo-700
+                         bg-emerald-600 text-white hover:bg-emerald-700
                          transition disabled:opacity-50"
             >
               {loading ? "Verifying..." : "Complete Verification"}
@@ -142,7 +142,7 @@ export default function PostLoginVerification() {
             Didn’t receive the code?{" "}
             <button
               onClick={() => navigate("/login")}
-              className="font-semibold text-indigo-600 hover:underline"
+              className="font-semibold text-emerald-600 hover:underline"
             >
               Logout
             </button>

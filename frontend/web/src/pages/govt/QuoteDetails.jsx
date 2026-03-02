@@ -107,7 +107,7 @@ export default function QuoteDetails() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
             Go Back
           </button>
@@ -164,7 +164,7 @@ export default function QuoteDetails() {
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition-colors"
           >
             <Printer className="w-4 h-4" />
             Print Quote
@@ -181,18 +181,18 @@ export default function QuoteDetails() {
         {/* Quote Container */}
         <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 print:bg-indigo-600 print:from-indigo-600 print:to-indigo-600">
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-8 print:bg-emerald-600 print:from-emerald-600 print:to-emerald-600">
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-3xl font-bold mb-2">QUOTATION</h1>
-                <p className="text-indigo-100">Official Government Quotation</p>
+                <p className="text-emerald-100">Official Government Quotation</p>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold">{seller.name}</div>
-                <div className="text-indigo-100 text-sm mt-1">
+                <div className="text-emerald-100 text-sm mt-1">
                   {seller.address}
                 </div>
-                <div className="text-indigo-100 text-sm">
+                <div className="text-emerald-100 text-sm">
                   GSTIN: {seller.gstin}
                 </div>
               </div>

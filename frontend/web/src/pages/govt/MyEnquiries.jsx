@@ -243,7 +243,12 @@ export default function MyEnquiries() {
 
   return (
     <RoleGate allow={["PUBLIC"]}>
-      <div className="min-h-screen bg-surface py-8">
+      <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+        </div>
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
           <motion.div

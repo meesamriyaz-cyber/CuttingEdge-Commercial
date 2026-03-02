@@ -57,7 +57,7 @@ export default function Wishlist() {
   if (loading) {
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function Wishlist() {
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors"
             >
               Browse Products
             </Link>
@@ -140,7 +140,7 @@ export default function Wishlist() {
                   {/* Product Info */}
                   <div className="p-4">
                     <Link to={`/products/${product._id}`}>
-                      <h3 className="font-semibold text-slate-900 line-clamp-2 hover:text-indigo-600 transition-colors mb-2">
+                      <h3 className="font-semibold text-slate-900 line-clamp-2 hover:text-emerald-600 transition-colors mb-2">
                         {product.name}
                       </h3>
                     </Link>
@@ -153,7 +153,7 @@ export default function Wishlist() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleAddToCart(product)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Add to Cart

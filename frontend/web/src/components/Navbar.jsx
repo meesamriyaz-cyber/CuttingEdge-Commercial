@@ -2,8 +2,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart } from "lucide-react";
-import { heroTextVariants, containerVariants } from "../utils/animations";
+import { ShoppingCart, Heart, Menu, X, Package, User } from "lucide-react";
+import { useState } from "react";
 
 export default function Navbar() {
   const user = useAuthStore((state) => state.user);
@@ -14,7 +14,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLandingPage = location.pathname === "/login";
-  // Prevent flicker before auth hydration
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   if (!isInit) return null;
 
   const handleLogout = () => {
@@ -29,113 +30,192 @@ export default function Navbar() {
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-surface"
-      initial={{ y: -40, opacity: 0 }}
+      className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+      initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
-      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        {!user ? (
-          <Link
-            to="/"
-            className="outline-none focus:ring-0 w-full sm:w-auto flex justify-center"
-          >
-            <motion.span
-              variants={heroTextVariants}
-              custom={0}
-              className="
-          inline-flex items-center gap-2
-          px-7 py-3 my-3
-          rounded-full
-          text-sm md:text-sm
-          font-semibold tracking-wider uppercase
-          bg-indigo-100 text-indigo-800
-          shadow-sm
-        "
-            >
-              {isLandingPage ? "Cutting-Edge Enterprises" : "Home"}
-            </motion.span>
-          </Link>
-        ) : (
-          <Link
-            to="/"
-            className="flex items-center gap-3 outline-none focus:ring-0"
-          >
-            <div className="w-10 h-10 btn-theme-primary flex items-center justify-center text-xs text-white font-bold rounded-xl">
-              Home
-            </div>
-            <div>
-              <div className="text-lg font-bold text-text">
-                Cutting Edge Enterprises
-              </div>
-              <div className="text-xs text-muted">
-                Business Solutions & Digital Services
-              </div>
-            </div>
-          </Link>
-        )}
-        {/* CENTER: Products & Services — GUEST ONLY */}
-
-        {/* RIGHT */}
-        <div className="flex items-center gap-6">
-          {/* Cart — PRIVATE authenticated users only */}
-          {user && user.clientType === "PRIVATE" && (
-            <button
-              onClick={() => navigate("/cart")}
-              className="relative group focus:outline-none focus:ring-0 cursor-pointer"
-              aria-label="Cart"
-            >
-              <ShoppingCart className="w-6 h-6 text-text group-hover:scale-110 transition" />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-          )}
-
-          {/* Wishlist — PRIVATE authenticated users only */}
-          {user && user.clientType === "PRIVATE" && (
-            <button
-              onClick={() => navigate("/wishlist")}
-              className="relative group focus:outline-none focus:ring-0 cursor-pointer"
-              aria-label="Wishlist"
-            >
-              <Heart className="w-6 h-6 text-text group-hover:scale-110 transition" />
-            </button>
-          )}
-
-          {/* AUTHENTICATED */}
-          {user ? (
-            <>
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full btn-theme-primary flex items-center justify-center text-white text-xs font-semibold">
-                  {user.name?.charAt(0)?.toUpperCase() || "U"}
-                </div>
-                <div className="text-sm font-semibold text-text">
-                  {user.name}
-                </div>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm btn-theme-primary rounded-xl font-semibold focus:outline-none focus:ring-0 cursor-pointer"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18">
+          {/* Logo */}
+          {!user ? (
+            <Link to="/" className="flex items-center">
+              <span
+                className="
+                inline-flex items-center gap-2
+                px-5 py-2.5
+                rounded-xl
+                text-sm md:text-base
+                font-bold
+                bg-gradient-to-r from-emerald-600 to-teal-600
+                text-white
+                shadow-lg shadow-emerald-500/30
+                hover:shadow-xl hover:shadow-emerald-500/40
+                transition-all duration-300
+              "
               >
-                Logout
-              </button>
-            </>
+                {isLandingPage ? "Cutting-Edge Enterprises " : "Home"}
+              </span>
+            </Link>
           ) : (
-            /* GUEST: show Login ONLY if not already on auth page */
-            !isAuthPage && (
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm btn-theme-primary rounded-xl font-semibold"
-              >
-                Login
-              </Link>
-            )
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold rounded-xl shadow-lg">
+                <Package size={20} />
+              </div>
+              <div className="hidden sm:block">
+                <div className="text-base font-bold text-slate-800 dark:text-white">
+                  Cutting Edge Enterprises
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  Business Solutions
+                </div>
+              </div>
+            </Link>
           )}
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
+            {/* Cart */}
+            {user && user.clientType === "PRIVATE" && (
+              <button
+                onClick={() => navigate("/cart")}
+                className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                aria-label="Cart"
+              >
+                <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs font-bold rounded-full min-w-[20px] h-[20px] flex items-center justify-center px-1">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* Wishlist */}
+            {user && (user.clientType === "PRIVATE" || user.clientType === "PUBLIC") && (
+              <button
+                onClick={() => navigate("/wishlist")}
+                className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                aria-label="Wishlist"
+              >
+                <Heart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+              </button>
+            )}
+
+            {/* User Menu */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                    {user.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200 hidden lg:block">
+                    {user.name}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-xl transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              !isAuthPage && (
+                <Link
+                  to="/login"
+                  className="px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  Login
+                </Link>
+              )
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+        >
+          <div className="px-4 py-4 space-y-3">
+            {user && user.clientType === "PRIVATE" && (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/cart");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                >
+                  <ShoppingCart size={20} />
+                  <span className="font-medium">Cart</span>
+                  {cartCount > 0 && (
+                    <span className="ml-auto bg-emerald-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/wishlist");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                >
+                  <Heart size={20} />
+                  <span className="font-medium">Wishlist</span>
+                </button>
+              </>
+            )}
+
+            {user && user.clientType === "PUBLIC" && (
+              <button
+                onClick={() => {
+                  navigate("/wishlist");
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+              >
+                <Heart size={20} />
+                <span className="font-medium">Wishlist</span>
+              </button>
+            )}
+
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+              >
+                <User size={20} />
+                <span className="font-medium">Logout</span>
+              </button>
+            ) : (
+              !isAuthPage && (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full p-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold shadow-lg"
+                >
+                  Login
+                </Link>
+              )
+            )}
+          </div>
+        </motion.div>
+      )}
     </motion.header>
   );
 }

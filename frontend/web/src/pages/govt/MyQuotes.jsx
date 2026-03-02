@@ -88,9 +88,9 @@ export default function MyQuotes() {
         <div className="min-h-screen bg py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto">
             <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8 text-center">
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-8 h-8 text-indigo-600"
+                  className="w-8 h-8 text-emerald-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -182,9 +182,9 @@ export default function MyQuotes() {
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg
-                              className="w-6 h-6 text-indigo-600"
+                              className="w-6 h-6 text-emerald-600"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -280,7 +280,7 @@ export default function MyQuotes() {
                       {hasEnquiry ? (
                         <a
                           href={`/quotes/enquiry/${quote.enquiry._id}`}
-                          className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                          className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors"
                         >
                           <svg
                             className="w-4 h-4 mr-2"

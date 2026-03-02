@@ -167,7 +167,7 @@ export default function AdminServiceEnquiryDetails() {
         {quote && (
           <button
             onClick={() => navigate(`/admin/service-quotes/${quote._id}`)}
-            className="h-fit px-4 py-2 rounded bg-indigo-600 text-white text-sm"
+            className="h-fit px-4 py-2 rounded bg-emerald-600 text-white text-sm"
           >
             View Quote
           </button>

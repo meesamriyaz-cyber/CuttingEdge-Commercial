@@ -39,7 +39,7 @@ export default function AdminServiceEnquiries() {
       case "QUOTED":
         return "bg-green-100 text-green-800 border border-green-200";
       case "COMPLETED":
-        return "bg-purple-100 text-purple-800 border border-purple-200";
+        return "bg-emerald-100 text-emerald-800 border border-emerald-200";
       case "CLOSED":
         return "bg-gray-100 text-gray-800 border border-gray-200";
       default:

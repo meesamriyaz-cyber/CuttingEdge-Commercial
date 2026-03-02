@@ -44,7 +44,7 @@ const ORDER_STATUSES = [
     value: "SHIPPED",
     label: "Shipped",
     icon: Truck,
-    color: "bg-purple-100 text-purple-700 border-purple-200",
+    color: "bg-teal-100 text-teal-700 border-teal-200",
   },
   {
     value: "DELIVERED",
@@ -83,7 +83,7 @@ const statusConfig = {
   },
   SHIPPED: {
     label: "Shipped",
-    color: "bg-purple-100/80 text-purple-700 border-purple-200",
+    color: "bg-teal-100/80 text-teal-700 border-teal-200",
     icon: Truck,
   },
   DELIVERED: {
@@ -141,7 +141,7 @@ export default function AdminOrderDetails() {
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
             <p className="text-slate-500">Loading order details...</p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function AdminOrderDetails() {
             </p>
             <Link
               to="/admin/orders"
-              className="inline-flex items-center mt-4 font-medium text-indigo-600 hover:opacity-80"
+              className="inline-flex items-center mt-4 font-medium text-emerald-600 hover:opacity-80"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back to Orders
@@ -195,7 +195,7 @@ export default function AdminOrderDetails() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <p className="text-sm text-slate-500">Order ID</p>
-                <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
                   Admin
                 </span>
               </div>

@@ -20,11 +20,20 @@ export default function ServicesList() {
   useEffect(() => {
     async function loadServices() {
       try {
-        const res = await fetch(`${API_URL}/services`);
-        const data = await res.json();
+        console.log("Attempting to fetch services from /api/services");
+        const res = await fetch("/api/services");
+        console.log("Response status:", res.status, res.statusText);
+        console.log("Response headers:", Object.fromEntries(res.headers.entries()));
+        
+        const text = await res.text();
+        console.log("Response text:", text);
+        
+        const data = JSON.parse(text);
         if (!res.ok) throw new Error(data.message || "Failed to load services");
         setServices(data);
+        console.log("Services loaded successfully:", data);
       } catch (err) {
+        console.error("Error loading services:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -41,8 +50,13 @@ export default function ServicesList() {
   });
 
   return (
-    <section className="bg-surface dark:bg-surface-alt min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
+    <section className="bg-surface dark:bg-surface-alt min-h-screen relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -50,7 +64,7 @@ export default function ServicesList() {
           transition={{ duration: 0.4 }}
           className="text-center"
         >
-          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
             Professional Services
           </span>
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3">
@@ -92,7 +106,7 @@ export default function ServicesList() {
                 placeholder="Search services..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200"
               />
             </div>
 
@@ -104,7 +118,7 @@ export default function ServicesList() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200 appearance-none cursor-pointer"
+                className="w-full pl-12 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200 appearance-none cursor-pointer"
               >
                 <option value="ALL">All categories</option>
                 <option value="Networking">Networking</option>

@@ -69,7 +69,7 @@ const mockQuickActions = [
     id: 1,
     title: "Create New Product",
     icon: PlusCircle,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-emerald-500 to-teal-500",
     href: "/admin/products",
   },
   {
@@ -83,7 +83,7 @@ const mockQuickActions = [
     id: 3,
     title: "Product Enquiries",
     icon: MessageSquare,
-    color: "from-purple-500 to-pink-500",
+    color: "from-emerald-500 to-teal-500",
     href: "/admin/enquiries",
   },
   {
@@ -315,9 +315,9 @@ export default function AdminDashboard() {
     const getTypeColor = (type) => {
       switch (type) {
         case "order":
-          return "text-blue-600 bg-blue-100";
+          return "text-emerald-600 bg-emerald-100";
         case "enquiry":
-          return "text-purple-600 bg-purple-100";
+          return "text-emerald-600 bg-emerald-100";
         case "quote":
           return "text-green-600 bg-green-100";
         case "customer":
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
           return "bg-yellow-100 text-yellow-700 border border-yellow-200";
         case "new":
         case "placed":
-          return "bg-blue-100 text-blue-700 border border-blue-200";
+          return "bg-emerald-100 text-emerald-700 border border-emerald-200";
         default:
           return "bg-gray-100 text-gray-700 border border-gray-200";
       }
@@ -399,7 +399,7 @@ export default function AdminDashboard() {
             <div className="mt-4 flex items-center justify-between">
               <span className="text-xs text-gray-500">Click to proceed</span>
               <motion.div
-                className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300"
+                className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-emerald-500 transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
               >
                 <svg
@@ -424,13 +424,18 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-surface py-8">
-      <div className="space-y-6 animate-fade-in max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+      </div>
+      <div className="space-y-6 animate-fade-in max-w-7xl mx-auto px-4 relative z-10">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row gap-6 w-full">
           <div className="flex-1">
             <BounceIn delay={0.1}>
-              <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 rounded-2xl p-8 text-white relative overflow-hidden">
+              <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-600 rounded-2xl p-8 text-white relative overflow-hidden">
                 <FloatingElement delay={0}>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl" />
                   <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-xl" />
@@ -442,12 +447,12 @@ export default function AdminDashboard() {
                       <h1 className="text-3xl font-bold mb-2">
                         Admin Dashboard
                       </h1>
-                      <p className="text-blue-100">
+                      <p className="text-emerald-100">
                         Welcome back, Administrator
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-blue-100">Last updated</div>
+                      <div className="text-sm text-emerald-100">Last updated</div>
                       <div className="text-lg font-semibold">
                         {time.toLocaleTimeString()}
                       </div>
@@ -459,19 +464,19 @@ export default function AdminDashboard() {
                       <div className="text-2xl font-bold">
                         {stats.totalOrders}
                       </div>
-                      <div className="text-sm text-blue-100">Total Orders</div>
+                      <div className="text-sm text-emerald-100">Total Orders</div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                       <div className="text-2xl font-bold">
                         ₹{stats.totalRevenue.toLocaleString()}
                       </div>
-                      <div className="text-sm text-blue-100">Total Revenue</div>
+                      <div className="text-sm text-emerald-100">Total Revenue</div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                       <div className="text-2xl font-bold">
                         {stats.pendingEnquiries}
                       </div>
-                      <div className="text-sm text-blue-100">
+                      <div className="text-sm text-emerald-100">
                         Product Enquiries
                       </div>
                     </div>
@@ -479,7 +484,7 @@ export default function AdminDashboard() {
                       <div className="text-2xl font-bold">
                         {stats.pendingServiceEnquiries}
                       </div>
-                      <div className="text-sm text-blue-100">
+                      <div className="text-sm text-emerald-100">
                         Service Enquiries
                       </div>
                     </div>
@@ -528,11 +533,11 @@ export default function AdminDashboard() {
             </BounceIn>
 
             <BounceIn delay={0.3}>
-              <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-6 text-white">
+              <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">System Status</h3>
-                    <p className="text-purple-100 text-sm">
+                    <p className="text-emerald-100 text-sm">
                       All systems operational
                     </p>
                   </div>
@@ -551,7 +556,7 @@ export default function AdminDashboard() {
             icon={ShoppingCart}
             trend="up"
             trendValue="+12%"
-            color="from-blue-500 to-cyan-500"
+            color="from-emerald-500 to-teal-500"
           />
           <StatCard
             title="Total Revenue"
@@ -567,7 +572,7 @@ export default function AdminDashboard() {
             icon={MessageSquare}
             trend="down"
             trendValue="-3"
-            color="from-purple-500 to-pink-500"
+            color="from-emerald-500 to-teal-500"
           />
           <StatCard
             title="Active Quotes"
@@ -614,7 +619,7 @@ export default function AdminDashboard() {
                 <div className="p-4 border-t border-gray-200">
                   <Link
                     to="/admin/enquiries"
-                    className="w-full block text-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="w-full block text-center text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                   >
                     View All Enquiries
                   </Link>
@@ -674,8 +679,8 @@ export default function AdminDashboard() {
             <Link to="/admin/enquiries">
               <div className="bg-surface rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-shadow shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-purple-100">
-                    <MessageSquare className="w-6 h-6 text-purple-600" />
+                  <div className="p-3 rounded-lg bg-emerald-100">
+                    <MessageSquare className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">

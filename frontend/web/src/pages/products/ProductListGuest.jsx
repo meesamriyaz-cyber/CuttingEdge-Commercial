@@ -98,7 +98,7 @@ export default function ProductListGuest() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface">
-        <div className="animate-spin h-10 w-10 border-b-2 border-indigo-500 rounded-full" />
+        <div className="animate-spin h-10 w-10 border-b-2 border-emerald-500 rounded-full" />
       </div>
     );
   }
@@ -114,8 +114,13 @@ export default function ProductListGuest() {
   /* ================= PAGE ================= */
 
   return (
-    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+      </div>
+      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold hero-gradient-text">
@@ -142,7 +147,7 @@ export default function ProductListGuest() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 text-indigo-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none cursor-pointer pr-10"
+                  className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none cursor-pointer pr-10"
                 >
                   <option value="">
                     All Categories (
@@ -155,7 +160,7 @@ export default function ProductListGuest() {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
@@ -169,7 +174,7 @@ export default function ProductListGuest() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === ""
                     ? "btn-theme-primary"
-                    : "bg-surface-alt text-slate-600 hover:bg-indigo-50"
+                    : "bg-surface-alt text-slate-600 hover:bg-emerald-50"
                 }`}
               >
                 All ({categories.reduce((acc, c) => acc + c.count, 0)})
@@ -181,7 +186,7 @@ export default function ProductListGuest() {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                     selectedCategory === cat.name
                       ? "btn-theme-primary"
-                      : "bg-surface-alt text-slate-600 hover:bg-indigo-50"
+                      : "bg-surface-alt text-slate-600 hover:bg-emerald-50"
                   }`}
                 >
                   {cat.name}
@@ -220,7 +225,7 @@ export default function ProductListGuest() {
                     px-2 py-1 rounded-full
                     ${
                       p.segment === "CONSUMER"
-                        ? "bg-indigo-100 text-indigo-700"
+                        ? "bg-emerald-100 text-emerald-700"
                         : "bg-emerald-100 text-emerald-700"
                     }
                   `}

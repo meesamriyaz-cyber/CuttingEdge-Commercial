@@ -41,7 +41,7 @@ const statusConfig = {
   },
   SHIPPED: {
     label: "Shipped",
-    color: "bg-purple-100/80 text-purple-700 border-purple-200",
+    color: "bg-teal-100/80 text-teal-700 border-teal-200",
     icon: Truck,
   },
   DELIVERED: {
@@ -103,7 +103,7 @@ export default function AdminOrders() {
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
             <p className="text-slate-500">Loading orders...</p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function AdminOrders() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-3xl font-bold bg-linear-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
               All Orders
             </h2>
             <span className="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
@@ -132,7 +132,7 @@ export default function AdminOrders() {
           <div className="rounded-2xl p-6 theme-card bg-surface border border-white/40 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-100">
-                <Package className="w-6 h-6 text-indigo-600" />
+                <Package className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">

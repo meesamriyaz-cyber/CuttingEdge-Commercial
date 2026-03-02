@@ -20,7 +20,7 @@ export default function InvoicePrint() {
           <p className="text-gray-600 mb-4">Invoice data not found.</p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
             Go Back
           </button>

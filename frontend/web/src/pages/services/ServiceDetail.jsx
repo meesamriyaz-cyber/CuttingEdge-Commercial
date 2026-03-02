@@ -48,7 +48,7 @@ export default function ServiceDetail() {
 
         {user && (
           <Link
-            to={`/enquiry?service=${service.slug}`}
+            to={`/services/enquiry?service=${service.slug}`}
             className="inline-flex rounded-xl bg-primary px-6 py-3
                        text-white font-medium hover:bg-primary/90"
           >

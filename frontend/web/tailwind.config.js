@@ -6,12 +6,10 @@ export default {
   theme: {
     extend: {
       /* ================================
-         🎨 Design Token Color Mapping
+         🎨 Calm Serene Color Palette
       =================================*/
       colors: {
-        /* Semantic surface + text tokens
-           These map to CSS variables from :root / .dark
-           and automatically switch theme */
+        /* Surface + Text - Mapped to CSS variables */
         bg: "var(--bg)",
         surface: "var(--surface)",
         "surface-alt": "var(--surface-alt)",
@@ -21,57 +19,56 @@ export default {
 
         text: "var(--text)",
         muted: "var(--text-muted)",
-        icon: "var(--icon)",
+        subtle: "var(--text-subtle)",
 
         /* CTA + Action tokens */
         cta: "var(--cta-bg)",
         "cta-hover": "var(--cta-bg-hover)",
         "cta-text": "var(--cta-text)",
 
-
-        /* ================================
-           🌿 Your Existing Brand Palettes
-           (preserved — still usable directly)
-        =================================*/
+        /* Primary - Serene Sage */
         primary: {
-          50: "#fef7f0",
-          100: "#fde8d5",
-          200: "#fbd0b0",
-          300: "#f8ac7a",
-          400: "#f58444",
-          500: "#C84C0C",
-          600: "#a33f0a",
-          700: "#8a3508",
-          800: "#732b06",
-          900: "#5d2205",
+          50: "var(--primary-50)",
+          100: "var(--primary-100)",
+          200: "var(--primary-200)",
+          300: "var(--primary-300)",
+          400: "var(--primary-400)",
+          500: "var(--primary-500)",
+          600: "var(--primary-600)",
+          700: "var(--primary-700)",
+          800: "var(--primary-800)",
+          900: "var(--primary-900)",
         },
 
-        secondary: {
-          50: "#f1f3f4",
-          100: "#e3e7ea",
-          200: "#c7cfd5",
-          300: "#a0b0bd",
-          400: "#7e94a7",
-          500: "#4E6A7E",
-          600: "#405567",
-          700: "#334450",
-          800: "#293744",
-          900: "#212f3a",
-        },
-
+        /* Accent - Deep Teal */
         accent: {
-          50: "#f7f7f7",
-          100: "#eeeeee",
-          200: "#dddddd",
-          300: "#c1c1c1",
-          400: "#999999",
-          500: "#666666",
-          600: "#525252",
-          700: "#404040",
-          800: "#2f2f2f",
-          900: "#1f1f1f",
+          50: "#E8F0F0",
+          100: "#D1E1E1",
+          200: "#A3C3C3",
+          300: "#75A5A5",
+          400: "#4A7566",
+          500: "var(--accent-500)",
+          600: "var(--accent-600)",
+          700: "#1E3A3A",
+          800: "#172D2D",
+          900: "#112222",
         },
 
+        /* Secondary - Warm Sand */
+        secondary: {
+          50: "var(--secondary-50)",
+          100: "var(--secondary-100)",
+          200: "var(--secondary-200)",
+          300: "var(--secondary-300)",
+          400: "var(--secondary-400)",
+          500: "var(--secondary-500)",
+          600: "#9A8670",
+          700: "#7A6B58",
+          800: "#5E5243",
+          900: "#4A4134",
+        },
+
+        /* Legacy brand colors (kept for compatibility) */
         brand: {
           50: "#f8f7f4",
           100: "#f0ede7",
@@ -139,24 +136,27 @@ export default {
       },
 
       /* ================================
-         🔳 Shadow tokens (mapped to CSS vars)
+         🔳 Shadow tokens
       =================================*/
       boxShadow: {
         sm: "var(--shadow-sm)",
         md: "var(--shadow-md)",
-
-        // your originals kept for compatibility
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        
+        // Legacy shadows kept for compatibility
         soft: "0 2px 15px -3px rgba(212, 175, 55, 0.1), 0 10px 20px -2px rgba(212, 175, 55, 0.04)",
-        medium:
-          "0 4px 25px -5px rgba(212, 175, 55, 0.15), 0 10px 10px -5px rgba(212, 175, 55, 0.04)",
-        strong:
-          "0 10px 40px -10px rgba(212, 175, 55, 0.2), 0 4px 25px -5px rgba(212, 175, 55, 0.1)",
-        glow: "0 0 20px rgba(212, 175, 55, 0.3)",
+        medium: "0 4px 25px -5px rgba(212, 175, 55, 0.15), 0 10px 10px -5px rgba(212, 175, 55, 0.04)",
+        strong: "0 10px 40px -10px rgba(212, 175, 55, 0.2), 0 4px 25px -5px rgba(212, 175, 55, 0.1)",
+        glow: '0 0 20px rgba(212, 175, 55, 0.3)',
       },
 
+      /* ================================
+         🔤 Typography
+      =================================*/
       fontFamily: {
-        sans: ["Poppins", "ui-sans-serif", "system-ui"],
-        roboto: ["Roboto", "ui-sans-serif", "system-ui"],
+        sans: ["DM Sans", "ui-sans-serif", "system-ui"],
+        display: ["Playfair Display", "serif"],
       },
 
       fontSize: {
@@ -172,16 +172,41 @@ export default {
         "6xl": ["3.75rem", { lineHeight: "1" }],
       },
 
+      /* ================================
+         📐 Spacing
+      =================================*/
       spacing: {
         18: "4.5rem",
         88: "22rem",
         128: "32rem",
       },
 
+      /* ================================
+         🔘 Border Radius
+      =================================*/
       borderRadius: {
         xl: "0.75rem",
         "2xl": "1rem",
         "3xl": "1.5rem",
+        "4xl": "2rem",
+      },
+
+      /* ================================
+         ✨ Animation
+      =================================*/
+      animation: {
+        "gentle-float": "gentle-float 4s ease-in-out infinite",
+        "subtle-pulse": "subtle-pulse 3s ease-in-out infinite",
+        "soft-glow": "soft-glow 3s ease-in-out infinite",
+        shimmer: "shimmer 2s infinite",
+        breathe: "breathe 4s ease-in-out infinite",
+      },
+
+      /* ================================
+         🎭 Transition
+      =================================*/
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
     },
   },
