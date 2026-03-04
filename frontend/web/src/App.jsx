@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AppRoutes from "./routes/AppRoutes";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ThemeProvider from "./components/ThemeProvider";
 import { pageVariants, pageTransition } from "./utils/animations";
 import { useAuthStore } from "./store/authStore";
@@ -75,13 +76,7 @@ export default function App() {
         </main>
 
         {/* Hide footer on invoice page */}
-        {!isInvoicePage && (
-          <footer className="bg-page border-0">
-            <div className="max-w-6xl mx-auto px-4 py-3 text-center text-sm text-muted">
-              © 2026 Cutting Edge Enterprises
-            </div>
-          </footer>
-        )}
+        {!isInvoicePage && <Footer />}
       </div>
     </ThemeProvider>
   );
