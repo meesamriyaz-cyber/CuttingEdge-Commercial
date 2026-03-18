@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import {
   heroTextVariants,
   containerVariants,
@@ -30,9 +29,9 @@ export default function HeroLeftContent({
       <motion.div
         variants={heroTextVariants}
         custom={0}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-semibold mb-6"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold mb-6"
       >
-        <Star size={14} className="text-emerald-500" fill="currentColor" />
+        <Star size={14} className="text-emerald-600" fill="currentColor" />
         Trusted Partner for Businesses
       </motion.div>
 
@@ -40,10 +39,10 @@ export default function HeroLeftContent({
       <motion.h1
         variants={heroTextVariants}
         custom={0.1}
-        className="mt-0 text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-800 dark:text-white leading-[1.1]"
+        className="mt-0 text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-800 leading-[1.1]"
       >
         Products & Services{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
           Made Simple
         </span>
       </motion.h1>
@@ -52,7 +51,7 @@ export default function HeroLeftContent({
       <motion.p
         variants={heroTextVariants}
         custom={0.2}
-        className="mt-6 max-w-lg text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed"
+        className="mt-6 max-w-lg text-base md:text-lg text-slate-600 leading-relaxed"
       >
         Discover quality products and professional services tailored for your business needs. 
         Trusted by enterprises across sectors.
@@ -76,7 +75,7 @@ export default function HeroLeftContent({
 
           <Link
             to="/services"
-            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-300"
+            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold bg-white text-slate-700 border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300"
           >
             <Wrench size={18} />
             Explore Services
@@ -88,7 +87,7 @@ export default function HeroLeftContent({
       <motion.div
         variants={heroTextVariants}
         custom={0.4}
-        className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 w-full max-w-lg"
+        className="mt-10 pt-6 border-t border-slate-200 w-full max-w-lg"
       >
         {clientType !== "PRIVATE" || clientType !== "PUBLIC" ? (
           <BrandMarquee />

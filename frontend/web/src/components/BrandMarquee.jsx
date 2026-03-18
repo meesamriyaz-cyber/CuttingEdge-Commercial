@@ -10,6 +10,7 @@ import rbSoporeImage from "../assets/images/R&B-sopore.jpg";
 import skaustImage from "../assets/images/skaust.jpg";
 import phq from "../assets/images/jk-phq.png";
 import rbsopore from "../assets/images/R&B-sopore.jpg";
+
 export default function BrandMarquee() {
   const brands = [
     { src: indianRailwayImage, alt: "Indian Railway" },
@@ -24,20 +25,16 @@ export default function BrandMarquee() {
     { src: phq, alt: "JK PHQ" },
     { src: rbsopore, alt: "R&B Sopore" },
   ];
+
   return (
     <div className="relative mt-6 overflow-hidden w-full max-w-md">
       <div className="text-xs uppercase tracking-wider text-center lg:text-left mb-3">
-        <h1
-          className="text-sm bg-linear-to-r from-indigo-600 via-cyan-600 to-pink-500
-          bg-clip-text text-transparent"
-        >
-          Our Clients
-        </h1>
+        <h1 className="text-sm font-semibold text-slate-500">Our Clients</h1>
       </div>
 
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-xl bg-slate-100 border border-slate-200 p-3">
         <motion.div
-          className="flex gap-8 items-center"
+          className="flex gap-6 items-center"
           animate={{ x: ["0%", "-50%"] }}
           transition={{
             repeat: Infinity,
@@ -54,10 +51,10 @@ export default function BrandMarquee() {
               className="
                 object-contain
                 hover:grayscale-0 hover:opacity-100
-                h-15 w-15
+                h-12 w-12
                 scale-90  
-                
-                transition
+                opacity-60 hover:opacity-100
+                transition-all duration-300
               "
             />
           ))}
