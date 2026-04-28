@@ -1,25 +1,44 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import {
   heroTextVariants,
   containerVariants,
 } from "../utils/animations";
-import BrandTrustStrip from "./BrandTrustStrip";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import {
   PackageSearch,
   Wrench,
   ArrowRight,
   Star,
+  Building2,
+  Headphones,
+  UserRound,
 } from "lucide-react";
-import BrandMarquee from "./BrandMarquee";
+import { Button } from "./ui";
+
+const AUTH_TRUST_POINTS = [
+  {
+    icon: UserRound,
+    title: "Private customers",
+    text: "Cart, checkout, orders, and post-purchase support.",
+  },
+  {
+    icon: Building2,
+    title: "Government customers",
+    text: "Product enquiries, quotations, and procurement tracking.",
+  },
+  {
+    icon: Headphones,
+    title: "Shared services",
+    text: "Installation, AMC, repairs, and support after login.",
+  },
+];
 
 export default function HeroLeftContent({
   hideCTA = true,
-  clientType = "PRIVATE",
 }) {
   const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
 
   return (
     <motion.section
@@ -30,9 +49,9 @@ export default function HeroLeftContent({
       <motion.div
         variants={heroTextVariants}
         custom={0}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-semibold mb-6"
+        className="signal-chip inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6"
       >
-        <Star size={14} className="text-emerald-500" fill="currentColor" />
+        <Star size={14} className="text-cyan-500" fill="currentColor" />
         Trusted Partner for Businesses
       </motion.div>
 
@@ -40,10 +59,10 @@ export default function HeroLeftContent({
       <motion.h1
         variants={heroTextVariants}
         custom={0.1}
-        className="mt-0 text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-800 dark:text-white leading-[1.1]"
+        className="mt-0 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 dark:text-white leading-[1.1]"
       >
         Products & Services{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
+        <span className="text-cyan-700 dark:text-cyan-300">
           Made Simple
         </span>
       </motion.h1>
@@ -52,52 +71,68 @@ export default function HeroLeftContent({
       <motion.p
         variants={heroTextVariants}
         custom={0.2}
-        className="mt-6 max-w-lg text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed"
+        className="mt-5 max-w-lg text-base text-slate-600 dark:text-slate-300 leading-relaxed"
       >
         Discover quality products and professional services tailored for your business needs. 
         Trusted by enterprises across sectors.
       </motion.p>
 
       {/* CTA */}
-      {!user && (
+      {!user && !hideCTA && (
         <motion.div
           variants={heroTextVariants}
           custom={0.3}
           className="mt-8 flex gap-4 flex-wrap justify-center lg:justify-start"
         >
-          <Link
-            to="/products-guest"
-            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-1 transition-all duration-300"
+          <Button
+            onClick={() => navigate("/products-guest")}
+            className="group gap-2"
           >
             <PackageSearch size={18} />
             Browse Products
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
+          </Button>
 
-          <Link
-            to="/services"
-            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-300"
+          <Button
+            variant="secondary"
+            onClick={() => navigate("/services")}
+            className="gap-2"
           >
             <Wrench size={18} />
             Explore Services
-          </Link>
+          </Button>
         </motion.div>
       )}
 
-      {/* Trust Strip */}
+      {/* Compact trust points for auth screens */}
       <motion.div
         variants={heroTextVariants}
         custom={0.4}
-        className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 w-full max-w-lg"
+        className="mt-8 grid gap-3 w-full max-w-lg"
       >
-        {clientType !== "PRIVATE" || clientType !== "PUBLIC" ? (
-          <BrandMarquee />
-        ) : (
-          <BrandTrustStrip clientType={clientType} />
-        )}
+        {AUTH_TRUST_POINTS.map((point) => {
+          const Icon = point.icon;
+          return (
+            <div
+              key={point.title}
+              className="tech-panel flex items-start gap-3 rounded-lg p-4 shadow-sm"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                <Icon size={19} className="text-cyan-700 dark:text-cyan-300" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  {point.title}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {point.text}
+                </p>
+              </div>
+            </div>
+          );
+        })}
       </motion.div>
 
-      {!hideCTA && <div className="mt-8" />}
     </motion.section>
   );
 }

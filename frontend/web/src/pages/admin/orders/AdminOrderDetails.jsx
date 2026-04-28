@@ -20,6 +20,7 @@ import {
   PackageCheck,
   Box,
 } from "lucide-react";
+import { Button } from "../../../components/ui";
 
 const ORDER_STATUSES = [
   {
@@ -299,10 +300,10 @@ export default function AdminOrderDetails() {
                 </option>
               ))}
             </select>
-            <button
+            <Button
               onClick={handleStatusChange}
               disabled={updating || status === order.status}
-              className="w-full px-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 btn-theme-primary animate-gradient"
+              className="w-full gap-2"
             >
               {updating ? (
                 <>
@@ -312,10 +313,10 @@ export default function AdminOrderDetails() {
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Update Status
+                  Save Status
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
 

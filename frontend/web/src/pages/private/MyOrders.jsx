@@ -14,6 +14,7 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
+import { Button } from "../../components/ui";
 
 const statusConfig = {
   PLACED: {
@@ -94,7 +95,7 @@ export default function MyOrders() {
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-5xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
               <p className="text-slate-500">Loading your orders...</p>
             </div>
           </div>
@@ -114,12 +115,12 @@ export default function MyOrders() {
                 Error Loading Orders
               </h3>
               <p className="text-slate-500">{error}</p>
-              <button
+              <Button
                 onClick={() => window.location.reload()}
-                className="mt-4 px-4 py-2 rounded-lg font-medium btn-theme-primary animate-gradient"
+                className="mt-4"
               >
                 Try Again
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -132,13 +133,13 @@ export default function MyOrders() {
       <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
         </div>
         <div className="max-w-5xl mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
               My Orders
             </h2>
             <p className="text-slate-600">Track and manage your orders</p>
@@ -156,13 +157,13 @@ export default function MyOrders() {
                 You haven't placed any orders yet. Start shopping to see your
                 orders here.
               </p>
-              <Link
-                to="/products"
-                className="inline-flex items-center px-6 py-3 rounded-xl font-medium btn-theme-primary animate-gradient"
+              <Button
+                onClick={() => navigate("/products")}
+                className="gap-2"
               >
                 <ShoppingBag className="w-5 h-5 mr-2" />
                 Start Shopping
-              </Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-6">
@@ -244,7 +245,7 @@ export default function MyOrders() {
                                 className="w-24 h-24 object-cover rounded-xl border border-slate-200"
                               />
                               {order.items?.length > 1 && (
-                                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shadow-md bg-emerald-600 text-white">
+                                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shadow-md bg-orange-600 text-white">
                                   +{order.items.length - 1}
                                 </div>
                               )}
@@ -291,7 +292,7 @@ export default function MyOrders() {
                           <div className="flex items-center gap-4">
                             <Link
                               to={`/orders/${order._id}`}
-                              className="inline-flex items-center font-medium text-sm group text-emerald-600 hover:opacity-80 transition-colors"
+                              className="inline-flex items-center font-medium text-sm group text-orange-600 hover:opacity-80 transition-colors"
                             >
                               View Order Details
                               <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />

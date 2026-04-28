@@ -1,19 +1,60 @@
 import { useEffect, useState } from "react";
-import { useAuthStore } from "../../store/authStore";
-import { API_URL } from "../../api/client";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Grid3X3,
+  LayoutList,
+  Loader2,
+  Package,
+  Search,
+  ShoppingCart,
+  SlidersHorizontal,
+  Star,
+} from "lucide-react";
+
+import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
+import { API_URL } from "../../api/client";
+import LayoutContainer from "../../components/LayoutContainer";
+import { fadeInVariants } from "../../utils/animations";
+import { Button } from "../../components/ui";
+
+const PRICE_FORMATTER = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+
+function RatingStars({ rating }) {
+  return [...Array(5)].map((_, index) => (
+    <Star
+      key={index}
+      className={`h-3.5 w-3.5 ${
+        index < Math.round(rating || 0)
+          ? "fill-amber-400 text-amber-400"
+          : "text-slate-300 dark:text-slate-600"
+      }`}
+    />
+  ));
+}
 
 export default function ProductList() {
   const { accessToken, user } = useAuthStore();
+  const { updateQuantity, fetchCart } = useCartStore();
   const isGovt = user?.clientType === "PUBLIC";
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const itemsPerPage = 10;
+  const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState("grid");
+  const [addingToCart, setAddingToCart] = useState(null);
+  const [addedItems, setAddedItems] = useState(new Set());
 
   useEffect(() => {
     async function loadProducts() {
@@ -22,7 +63,7 @@ export default function ProductList() {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        if (!res.ok) throw new Error(data.message || "Failed to load products");
         setProducts(data);
       } catch (err) {
         setError(err.message);
@@ -30,222 +71,398 @@ export default function ProductList() {
         setLoading(false);
       }
     }
+
     loadProducts();
   }, [accessToken]);
 
-  const filtered = products.filter((p) =>
-    [p.name, p.description, p.sku, p.category]
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase()),
-  );
+  const filteredProducts = products
+    .filter((product) =>
+      [product.name, product.description, product.sku, product.category]
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      if (!isGovt && sortBy === "price-low") {
+        return (a.price || 0) - (b.price || 0);
+      }
+      if (!isGovt && sortBy === "price-high") {
+        return (b.price || 0) - (a.price || 0);
+      }
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginated = filtered.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  async function handleAddToCart(productId, productName) {
+    if (isGovt) return;
 
-  if (loading)
+    setAddingToCart(productId);
+    try {
+      await updateQuantity(productId, 1);
+      await fetchCart();
+      setAddedItems((prev) => new Set([...prev, productId]));
+      toast.success(`${productName} added to cart`);
+    } catch (err) {
+      toast.error(err.message || "Failed to add item to cart");
+    } finally {
+      setAddingToCart(null);
+    }
+  }
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin h-10 w-10 border-b-2 border-emerald-500 rounded-full" />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#07111f] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-slate-950 dark:bg-cyan-500">
+            <Package className="h-7 w-7 text-white dark:text-slate-950 animate-pulse" />
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            Loading products...
+          </p>
+        </div>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center text-red-600">
-        {error}
+      <div className="min-h-screen bg-slate-50 dark:bg-[#07111f] flex items-center justify-center px-4">
+        <div className="max-w-md rounded-lg border border-red-200 dark:border-red-900/40 bg-white dark:bg-slate-900 p-6 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/20">
+            <Package className="h-7 w-7 text-red-500" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+            Unable to load products
+          </h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            {error}
+          </p>
+          <Button className="mt-5" onClick={() => window.location.reload()}>
+            Try again
+          </Button>
+        </div>
       </div>
     );
+  }
 
   return (
-    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
-      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <h1 className="text-2xl sm:text-3xl font-bold hero-gradient-text">
-            Products
-          </h1>
-
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search products..."
-            className="theme-input px-4 py-3 rounded-xl w-full md:w-72"
-          />
+    <LayoutContainer>
+      <motion.div
+        className="w-[92%] max-w-7xl mx-auto py-8 sm:py-10 space-y-8"
+        initial="hidden"
+        animate="visible"
+        variants={fadeInVariants}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-cyan-700 dark:text-slate-400 dark:hover:text-cyan-300"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to categories
+          </Link>
         </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block theme-card bg-surface rounded-3xl shadow-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-surface-alt">
-              <tr>
-                <th className="px-6 py-4 text-left">Product</th>
-                <th className="px-6 py-4 text-left">Category</th>
-                <th className="px-6 py-4 text-left">Name</th>
-                <th className="px-6 py-4 text-right">Price</th>
-                <th className="px-6 py-4 text-center">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {paginated.map((p) => (
-                <tr
-                  key={p._id}
-                  className="border-t border-white/30 hover:bg-surface-alt"
-                >
-                  <td className="px-6 py-4">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-surface-alt">
-                      {p.images?.[0]?.url ? (
-                        <img
-                          src={p.images[0].url}
-                          alt={p.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="text-xs text-slate-400 flex items-center justify-center h-full">
-                          N/A
-                        </div>
-                      )}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 font-medium">{p.category}</td>
-
-                  <td className="px-6 py-4 font-medium">{p.name}</td>
-
-                  <td className="px-6 py-4 text-right">
-                    {isGovt ? "Price on request" : `₹${p.price}`}
-                  </td>
-
-                  <td className="px-6 py-4 text-center">
-                    <Link
-                      to={`/products/${p._id}`}
-                      className="btn-theme-primary animate-gradient px-4 py-2 rounded-xl font-semibold"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile Grid View */}
-        <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {paginated.map((p) => (
-            <div
-              key={p._id}
-              className="theme-card bg-surface rounded-2xl shadow-lg border border-white/30 p-5 flex flex-col items-center cursor-pointer transition-all hover:shadow-xl"
-              onClick={() => setSelectedProduct(p)}
-            >
-              <div className="w-full h-32 rounded-xl bg-surface-alt flex items-center justify-center mb-4">
-                {p.images?.[0]?.url ? (
-                  <img
-                    src={p.images[0].url}
-                    alt={p.name}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                ) : (
-                  <span className="text-xs text-slate-400">No Image</span>
-                )}
-              </div>
-              <h3 className="text-sm font-semibold text-center text-text line-clamp-2 mb-3">
-                {p.name}
-              </h3>
-              <span className="text-xs text-slate-600">
-                {isGovt ? "Price on request" : `₹${p.price}`}
+        <section className="tech-panel rounded-lg p-6 sm:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div>
+              <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                {isGovt ? "Government product catalogue" : "Private product catalogue"}
               </span>
+              <h1 className="mt-4 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
+                All visible products
+              </h1>
+              <p className="mt-3 max-w-3xl text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                {isGovt
+                  ? "Browse every product currently visible to your government account and continue through the procurement enquiry workflow from product details."
+                  : "Browse every product currently visible to your private account and continue through product details, cart, and checkout."}
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-600">
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <div className="flex gap-3">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className="btn-theme-primary px-5 py-3 rounded-xl disabled:opacity-50"
-            >
-              Prev
-            </button>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className="btn-theme-primary px-5 py-3 rounded-xl disabled:opacity-50"
-            >
-              Next
-            </button>
+            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Visible products
+              </div>
+              <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                {filteredProducts.length}
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Product Details Modal */}
-        {selectedProduct && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="theme-card bg-surface rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-4 border-b border-border/60 flex justify-between items-center">
-                <h2 className="text-lg font-bold">{selectedProduct.name}</h2>
-                <button
-                  onClick={() => setSelectedProduct(null)}
-                  className="text-slate-500 hover:text-slate-700"
+        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4 justify-between">
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 pl-11 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
+                />
+              </div>
+
+              <div className="relative sm:w-52">
+                <SlidersHorizontal className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full appearance-none rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 pl-11 pr-10 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
                 >
-                  ×
+                  <option value="newest">Newest first</option>
+                  <option value="name">Name A-Z</option>
+                  {!isGovt && <option value="price-low">Price: low to high</option>}
+                  {!isGovt && <option value="price-high">Price: high to low</option>}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 justify-between lg:justify-end">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {filteredProducts.length}
+                </span>{" "}
+                {filteredProducts.length === 1 ? "product" : "products"}
+              </p>
+              <div className="flex items-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-950 p-1">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={`rounded-md p-2 transition-all ${
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("list")}
+                  className={`rounded-md p-2 transition-all ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  }`}
+                >
+                  <LayoutList className="h-4 w-4" />
                 </button>
               </div>
-              <div className="p-4 space-y-4">
-                <div className="w-full h-40 rounded-xl bg-surface-alt flex items-center justify-center">
-                  {selectedProduct.images?.[0]?.url ? (
-                    <img
-                      src={selectedProduct.images[0].url}
-                      alt={selectedProduct.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-xs text-slate-400">No Image</span>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-1">Category</h3>
-                  <p className="text-xs text-slate-600">
-                    {selectedProduct.category}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-1">Description</h3>
-                  <p className="text-xs text-slate-600">
-                    {selectedProduct.description}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-1">Price</h3>
-                  <p className="text-xs text-slate-600">
-                    {isGovt ? "Price on request" : `₹${selectedProduct.price}`}
-                  </p>
-                </div>
-                <Link
-                  to={`/products/${selectedProduct._id}`}
-                  className="btn-theme-primary w-full py-2 rounded-xl font-semibold text-sm"
-                  onClick={() => setSelectedProduct(null)}
-                >
-                  View Full Details
-                </Link>
-              </div>
             </div>
           </div>
+        </div>
+
+        {filteredProducts.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
+              <Package className="h-6 w-6 text-slate-400" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
+              {searchTerm ? "No matching products" : "No products available"}
+            </h3>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              {searchTerm
+                ? `No products match "${searchTerm}".`
+                : "Products visible to this account will appear here."}
+            </p>
+            {searchTerm && (
+              <Button variant="secondary" className="mt-5" onClick={() => setSearchTerm("")}>
+                Clear search
+              </Button>
+            )}
+          </div>
+        ) : viewMode === "grid" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(index * 0.03, 0.24), duration: 0.28 }}
+              >
+                <div className="group tech-panel flex h-full flex-col rounded-lg p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                  <Link to={`/products/${product._id}`} className="block">
+                    <div className="flex h-44 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-950 p-5">
+                      {product.images?.[0]?.url ? (
+                        <img
+                          src={product.images[0].url}
+                          alt={product.name}
+                          className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Package className="h-14 w-14 text-slate-300 dark:text-slate-600" />
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="mt-4 flex-1">
+                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {product.category || "Catalogue item"}
+                    </div>
+                    <Link to={`/products/${product._id}`}>
+                      <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-white line-clamp-2">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    {product.description && (
+                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
+                    <div className="mt-3 flex items-center gap-1">
+                      <RatingStars rating={product.rating?.average || 0} />
+                      <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">
+                        {product.rating?.count > 0
+                          ? `(${product.rating.average.toFixed(1)})`
+                          : "(No reviews)"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="text-lg font-bold text-slate-900 dark:text-white">
+                      {isGovt
+                        ? "Pricing via quotation"
+                        : PRICE_FORMATTER.format(product.price || 0)}
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      {isGovt
+                        ? "Continue from product details into the enquiry workflow."
+                        : "Open details or add directly to cart."}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 flex gap-2">
+                    <Button className="flex-1 gap-2" size="sm" to={`/products/${product._id}`}>
+                      View details
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                    {!isGovt && (
+                      <Button
+                        variant={addedItems.has(product._id) ? "primary" : "secondary"}
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleAddToCart(product._id, product.name)}
+                        disabled={addingToCart === product._id}
+                      >
+                        {addingToCart === product._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : addedItems.has(product._id) ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <ShoppingCart className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: Math.min(index * 0.03, 0.2), duration: 0.25 }}
+              >
+                <div className="tech-panel flex flex-col md:flex-row gap-5 rounded-lg p-4 sm:p-5">
+                  <Link to={`/products/${product._id}`} className="md:w-44 lg:w-52 shrink-0">
+                    <div className="flex h-40 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-950 p-5">
+                      {product.images?.[0]?.url ? (
+                        <img
+                          src={product.images[0].url}
+                          alt={product.name}
+                          className="max-h-full max-w-full object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Package className="h-14 w-14 text-slate-300 dark:text-slate-600" />
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {product.category || "Catalogue item"}
+                    </div>
+                    <Link to={`/products/${product._id}`}>
+                      <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white line-clamp-1">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    {product.description && (
+                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
+
+                    <div className="mt-3 flex items-center gap-1">
+                      <RatingStars rating={product.rating?.average || 0} />
+                      <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">
+                        {product.rating?.count > 0
+                          ? `(${product.rating.average.toFixed(1)})`
+                          : "(No reviews)"}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                      <div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white">
+                          {isGovt
+                            ? "Pricing via quotation"
+                            : PRICE_FORMATTER.format(product.price || 0)}
+                        </div>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {isGovt
+                            ? "Use product details to continue with enquiry."
+                            : "Add directly to cart or open full details."}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button size="sm" className="gap-2" to={`/products/${product._id}`}>
+                          View details
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                        {!isGovt && (
+                          <Button
+                            variant={addedItems.has(product._id) ? "primary" : "secondary"}
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => handleAddToCart(product._id, product.name)}
+                            disabled={addingToCart === product._id}
+                          >
+                            {addingToCart === product._id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : addedItems.has(product._id) ? (
+                              <>
+                                <Check className="h-4 w-4" />
+                                Added
+                              </>
+                            ) : (
+                              <>
+                                <ShoppingCart className="h-4 w-4" />
+                                Add
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </LayoutContainer>
   );
 }

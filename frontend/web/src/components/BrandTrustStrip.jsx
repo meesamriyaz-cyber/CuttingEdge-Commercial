@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 
-// PUBLIC brands
 import teachmint from "../assets/images/teachmint-x.webp";
 import microtek from "../assets/images/microtek.png";
 import ocimum from "../assets/images/ocimum.png";
@@ -8,121 +7,80 @@ import promark from "../assets/images/promark.png";
 import hp from "../assets/images/hp.jpg";
 import dell from "../assets/images/dell.png";
 import benq from "../assets/images/benq.png";
-
-// PRIVATE brands
 import lenovo from "../assets/images/lenovo.png";
 import asus from "../assets/images/asus.png";
 import realme from "../assets/images/realme.jpg";
 import mi from "../assets/images/mi.png";
 
-import { useAuthStore } from "../store/authStore";
-export default function BrandTrustStrip({ clientType, page }) {
-  const brands =
-    clientType === "PUBLIC"
-      ? [teachmint, microtek, ocimum, promark, hp, dell, benq]
-      : [hp, dell, lenovo, asus, realme, microtek, mi];
+const PUBLIC_BRANDS = [teachmint, microtek, ocimum, promark, hp, dell, benq];
+const PRIVATE_BRANDS = [hp, dell, lenovo, asus, realme, microtek, mi];
+
+const COPY_BY_TYPE = {
+  PUBLIC: {
+    heading: "Brands and supply partners",
+    description:
+      "Selected OEM and infrastructure partners used across procurement and service workflows.",
+  },
+  PRIVATE: {
+    heading: "Brands in our catalogue",
+    description:
+      "Selected brands customers can browse across devices, accessories, and infrastructure products.",
+  },
+  DEFAULT: {
+    heading: "Brands in our catalogue",
+    description:
+      "A focused set of brands across products, peripherals, and service-backed supply.",
+  },
+};
+
+export default function BrandTrustStrip({ clientType }) {
+  const brands = clientType === "PUBLIC" ? PUBLIC_BRANDS : PRIVATE_BRANDS;
+  const copy = COPY_BY_TYPE[clientType] || COPY_BY_TYPE.DEFAULT;
 
   return (
-    <div
-       className={
-        page !== "services"
-          ? "w-full mt-20 sm:mt-24 overflow-hidden"
-          : "w-full mt-8 sm:mt-12 overflow-hidden"
-      }
-    >
-      <div className="w-full max-w-full px-2 sm:px-4 lg:px-8 mx-auto">
-        {/* Section Header */}
-        <div className="text-center mb-4 sm:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="overflow-hidden"
-          >
-            <span className="inline-block px-3 py-1 mb-3 sm:mb-4 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
-              Trusted Partners
+    <section className="w-full mt-14 sm:mt-18">
+      <div className="w-[90%] max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
+          <div>
+            <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              Trusted brands
             </span>
-          </motion.div>
-
-          <h2 className="text-lg sm:text-3xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
-            {clientType === "PUBLIC" || clientType === "PRIVATE"
-              ? "Leading Brands"
-              : "Authorized Services For"}
-          </h2>
-          <p className="text-xs sm:text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            {clientType === "PUBLIC" || clientType === "PRIVATE"
-              ? "We partner with industry-leading brands to deliver quality products and services."
-              : "Our authorized service centers ensure your devices receive expert care."}
-          </p>
+            <h2 className="mt-3 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+              {copy.heading}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-300">
+              {copy.description}
+            </p>
+          </div>
         </div>
 
-        {/* Brand Logo Container */}
         <motion.div
-          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg"
+          className="tech-panel rounded-lg p-4 sm:p-6"
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.4 }}
         >
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-y-0 left-0 w-8 sm:w-16 bg-gradient-to-r from-white dark:from-slate-900 z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-8 sm:w-16 bg-gradient-to-l from-white dark:from-slate-900 z-10 pointer-events-none" />
-
-          {/* Scrolling brand logos */}
-          <div className="overflow-hidden py-3 sm:py-6 lg:py-8">
-            <motion.div
-              className="flex items-center gap-3 sm:gap-6 lg:gap-8"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-            >
-              {[...brands, ...brands].map((src, i) => (
-                <div key={i} className="flex-shrink-0 px-1 sm:px-3">
-                  <div className="relative px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 shadow-sm hover:shadow-md">
-                    <img
-                      src={src}
-                      alt="Brand partner"
-                      className="object-contain w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 opacity-70 hover:opacity-100 transition-opacity duration-300"
-                    />
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Statistics Cards (only show on non-services pages) */}
-        {page !== "services" && (
-          <motion.div
-            className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-6 sm:mt-8 
-            "
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {[
-              { value: "2+", label: "Years Experience" },
-              { value: "100+", label: "Happy Clients" },
-              { value: "20+", label: "Brand Partners" },
-              { value: "24/7", label: "Support Available" },
-            ].map((stat, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+            {brands.map((src, index) => (
               <motion.div
-                key={index}
-                className="text-center p-2 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300"
-                whileHover={{ y: -4 }}
+                key={`${src}-${index}`}
+                className="flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 min-h-24 p-4"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.25, delay: index * 0.04 }}
               >
-                <div className="text-xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                  {stat.value}
-                </div>
-                <div className="text-[10px] sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
-                  {stat.label}
-                </div>
+                <img
+                  src={src}
+                  alt="Brand partner"
+                  className="max-h-12 sm:max-h-14 w-auto object-contain opacity-85"
+                />
               </motion.div>
             ))}
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

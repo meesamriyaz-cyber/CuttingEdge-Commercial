@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import RoleGate from "../../components/RoleGate";
 import CartItem from "./CartItem";
 import { useCartStore } from "../../store/cartStore";
+import { Button } from "../../components/ui";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -29,25 +30,23 @@ export default function Cart() {
       <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
         </div>
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
             Shopping Cart
           </h1>
 
           {!cart?.items?.length && (
             <div className="bg-white p-10 rounded-xl shadow text-center">
               <p className="text-gray-600">Your cart is empty.</p>
-              <Link
-                  to="/products"
-                  className="mt-6 inline-flex items-center justify-center
-                            btn-theme-primary animate-gradient
-                            px-6 py-3 rounded-xl font-semibold"
-                >
-                  Browse Products
-            </Link>
+              <Button
+                onClick={() => navigate("/products")}
+                className="mt-6"
+              >
+                Browse Products
+              </Button>
             </div>
           )}
 
@@ -65,19 +64,18 @@ export default function Cart() {
 
           {cart?.items?.length > 0 && (
             <div className="mt-8 flex flex-wrap gap-4">
-              <button
+              <Button
+                variant="secondary"
                 onClick={clearCart}
-                className="btn-theme-primary px-6 py-2"
               >
                 Clear Cart
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={() => navigate("/checkout")}
-                className="btn-theme-primary px-6 py-2"
               >
                 Proceed to Checkout
-              </button>
+              </Button>
             </div>
           )}
         </div>

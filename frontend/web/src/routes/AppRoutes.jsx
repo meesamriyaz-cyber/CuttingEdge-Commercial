@@ -84,11 +84,7 @@ export default function AppRoutes() {
       {/* Protected Routes - Use ProtectedRoute for general protection */}
       <Route
         path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
+        element={<Home />}
       />
 
       <Route

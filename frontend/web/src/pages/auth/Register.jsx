@@ -4,14 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { registerApi } from "../../api/auth";
 
 import HeroLeftContent from "../../components/HeroLeftContent";
+import { Button, Input } from "../../components/ui";
 
 import {
   authPageVariants,
   heroSideVariants,
   formSideVariants,
-  cardHoverVariants,
-  buttonHoverVariants,
 } from "../../utils/animations";
+import { Building2, UserRound, ShieldCheck } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -52,43 +52,48 @@ export default function Register() {
 
   return (
     <motion.div
-      className="min-h-screen bg-surface text-text flex items-center justify-center px-6"
+      className="min-h-screen bg-slate-50 dark:bg-[#07111f] text-text flex items-center justify-center px-4 sm:px-6 py-10"
       variants={authPageVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
         {/* HERO */}
-        <motion.div variants={heroSideVariants}>
+        <motion.div variants={heroSideVariants} className="hidden lg:block">
           <HeroLeftContent hideCTA />
         </motion.div>
 
         {/* FORM */}
-        <motion.div className="flex justify-center" variants={formSideVariants}>
+        <motion.div className="flex justify-center lg:justify-end" variants={formSideVariants}>
           <motion.div
             className="
               w-full max-w-md
-              theme-card bg-surface
-              rounded-3xl
-              border border-white/40
-              shadow-2xl
-              p-8
+              tech-panel
+              rounded-lg
+              shadow-sm
+              p-6 sm:p-8
             "
-            variants={cardHoverVariants}
-            whileHover="hover"
           >
-            <h2 className="text-2xl font-bold text-center hero-gradient-text">
-              Create your account
-            </h2>
-
-            <p className="text-sm text-center text-slate-600">
-              Register as a private customer or government user
-            </p>
+            <div className="mb-7">
+              <div className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide mb-4">
+                <ShieldCheck size={13} />
+                Create account
+              </div>
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-slate-950 dark:bg-cyan-500 rounded-lg shadow-sm mb-5">
+                <UserRound className="w-6 h-6 text-white dark:text-slate-950" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                Create your account
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                Set up your access and choose the account type that matches your organization.
+              </p>
+            </div>
 
             <AnimatePresence>
               {error && (
                 <motion.div
-                  className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3"
+                  className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3"
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -99,7 +104,7 @@ export default function Register() {
 
               {success && (
                 <motion.div
-                  className="mt-4 text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3"
+                  className="mt-4 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3"
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -109,112 +114,113 @@ export default function Register() {
               )}
             </AnimatePresence>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div className="rounded-lg border border-slate-200 dark:border-cyan-950/50 bg-white/70 dark:bg-slate-950/40 p-4 sm:p-5">
               <div className="grid md:grid-cols-2 gap-4">
-                <input
-                  placeholder="Full Name"
+                <Input
+                  label="Full name"
+                  placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="theme-input w-full px-4 py-3 rounded-xl border-0 shadow-2xl"
                 />
-                <input
-                  placeholder="Email"
+                <Input
+                  label="Email address"
+                  type="email"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="theme-input w-full px-4 py-3 rounded-xl border-0 shadow-2xl"
                 />
               </div>
+              </div>
 
-              <input
+              <Input
+                label="Password"
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="theme-input w-full px-4 py-3 rounded-xl border-0 shadow-2xl"
               />
 
               {/* Client Type */}
-              <div className="grid grid-cols-2 gap-4">
-                <button
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Account type
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                <Button
                   type="button"
+                  variant={clientType === "PRIVATE" ? "primary" : "secondary"}
                   onClick={() => setClientType("PRIVATE")}
-                  className={`
-                    px-4 py-3 rounded-xl border font-medium
-                    ${
-                      clientType === "PRIVATE"
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                        : "border-white/40 bg-surface"
-                    }
-                  `}
+                  className="justify-center min-h-14"
                 >
+                  <UserRound size={16} />
                   Private
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
+                  variant={clientType === "PUBLIC" ? "primary" : "secondary"}
                   onClick={() => setClientType("PUBLIC")}
-                  className={`
-                    px-4 py-3 rounded-xl border font-medium
-                    ${
-                      clientType === "PUBLIC"
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                        : "border-white/40 bg-surface"
-                    }
-                  `}
+                  className="justify-center min-h-14"
                 >
+                  <Building2 size={16} />
                   Government
-                </button>
+                </Button>
+                </div>
               </div>
 
               {clientType === "PUBLIC" && (
+                <div className="rounded-lg border border-cyan-200/60 dark:border-cyan-900/40 bg-cyan-50/70 dark:bg-cyan-950/20 p-4 sm:p-5">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                      Procurement contact details
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      These details are used for verification and quotation workflows.
+                    </p>
+                  </div>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <input
+                  <Input
+                    label="Department / organization"
                     placeholder="Department / Organization"
                     value={orgName}
                     onChange={(e) => setOrgName(e.target.value)}
                     required
-                    className="theme-input px-4 py-3 rounded-xl border-0 shadow-2xl"
                   />
-                  <input
+                  <Input
+                    label="Official email"
+                    type="email"
                     placeholder="Official Email"
                     value={officialEmail}
                     onChange={(e) => setOfficialEmail(e.target.value)}
                     required
-                    className="theme-input px-4 py-3 rounded-xl border-0 shadow-2xl"
                   />
+                </div>
                 </div>
               )}
 
-              <motion.button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 btn-theme-primary rounded-xl font-semibold animate-gradient"
-                variants={buttonHoverVariants}
-                whileHover="hover"
-                whileTap="tap"
+                isLoading={loading}
+                className="w-full mt-2"
               >
                 {loading ? "Creating account..." : "Create Account"}
-              </motion.button>
+              </Button>
 
               {clientType === "PUBLIC" && (
-                <p
-                  className="
-                    text-xs text-center italic
-                    bg-gradient-to-r from-emerald-600 via-teal-600 to-teal-500
-                    bg-clip-text text-transparent
-                  "
-                >
+                <p className="text-xs text-center text-slate-500 dark:text-slate-400">
                   Government accounts require verification before activation.
                 </p>
               )}
             </form>
 
-            <p className="mt-6 text-sm text-center text-slate-600">
+            <p className="mt-7 pt-5 border-t border-slate-200 dark:border-slate-700 text-sm text-center text-slate-600 dark:text-slate-400">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-emerald-600">
+              <Link to="/login" className="font-semibold text-orange-600">
                 Sign in
               </Link>
             </p>

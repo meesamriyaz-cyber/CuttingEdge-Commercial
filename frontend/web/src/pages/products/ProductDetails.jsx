@@ -22,6 +22,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ReviewsList from "../../components/ReviewsList";
 import ReviewForm from "../../components/ReviewForm";
+import { Button } from "../../components/ui";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -194,14 +195,11 @@ export default function ProductDetails() {
           <p className="text-red-600 dark:text-red-400 font-semibold mb-2">
             Error Loading Product
           </p>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">{error}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-kashmiri-dal-500 to-kashmiri-pashmina-500 text-white font-semibold shadow-lg shadow-kashmiri-dal-500/25 hover:shadow-xl transition-all duration-200"
-          >
+           <p className="text-slate-500 dark:text-slate-400 mb-6">{error}</p>
+          <Button onClick={() => navigate(-1)} className="gap-2">
             <ArrowLeft size={18} />
             Go Back
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -276,7 +274,7 @@ export default function ProductDetails() {
                     onClick={() => setCurrentImageIndex(i)}
                     className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                       i === currentImageIndex
-                        ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
+                        ? "border-orange-500 shadow-lg shadow-orange-500/20"
                         : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                     }`}
                   >
@@ -333,7 +331,7 @@ export default function ProductDetails() {
 
               <button
                 onClick={() => setShowDetailsModal(true)}
-                className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium hover:underline inline-flex items-center gap-1"
+                className="mt-4 text-orange-600 dark:text-orange-400 font-medium hover:underline inline-flex items-center gap-1"
               >
                 View Full Details
                 <ChevronRight size={16} />
@@ -385,15 +383,14 @@ export default function ProductDetails() {
                     </div>
 
                     {/* Add to Cart Button */}
-                    <motion.button
+                    <Button
                       onClick={handleAddToCart}
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2"
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
+                      className="w-full gap-2"
+                      size="lg"
                     >
                       <ShoppingCart size={20} />
                       Add to Cart
-                    </motion.button>
+                    </Button>
                   </>
                 )}
               </RoleGate>
@@ -402,9 +399,9 @@ export default function ProductDetails() {
               <RoleGate allow={["PUBLIC"]}>
                 {product.segment === "COMMERCIAL" && (
                   <>
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-5 mb-6">
+                    <div className="bg-gradient-to-r from-orange-50 to-orange-50 dark:from-orange-950/30 dark:to-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-2xl p-5 mb-6">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
                           <Building2 className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -420,14 +417,13 @@ export default function ProductDetails() {
                       </div>
                     </div>
 
-                    <motion.button
+                    <Button
                       onClick={handleSubmitEnquiry}
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300"
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
+                      className="w-full"
+                      size="lg"
                     >
                       Submit Enquiry
-                    </motion.button>
+                    </Button>
                   </>
                 )}
               </RoleGate>
@@ -449,22 +445,20 @@ export default function ProductDetails() {
               </h2>
 
               {canReview.canReview && (
-                <motion.button
+                <Button
                   onClick={() => {
                     setEditingReview(null);
                     setShowReviewForm(true);
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  className="gap-2"
                 >
                   <MessageSquare size={18} />
                   Write a Review
-                </motion.button>
+                </Button>
               )}
 
               {canReview.reason === "already_reviewed" && (
-                <span className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                <span className="inline-flex items-center gap-2 text-orange-600 dark:text-orange-400 font-medium">
                   <CheckCircle2 size={18} />
                   You've reviewed this product
                 </span>
@@ -473,7 +467,7 @@ export default function ProductDetails() {
 
             {reviewsLoading ? (
               <div className="flex justify-center py-12">
-                <div className="w-10 h-10 rounded-xl border-2 border-emerald-500 border-t-transparent animate-spin" />
+                <div className="w-10 h-10 rounded-xl border-2 border-orange-500 border-t-transparent animate-spin" />
               </div>
             ) : (
               <ReviewsList

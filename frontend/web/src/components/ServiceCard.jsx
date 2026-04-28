@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock, Network, ShieldCheck, Wrench, Building2 } from "lucide-react";
 
@@ -12,31 +12,18 @@ const ICON_MAP = {
   "enterprise-it-solutions": Building2,
 };
 
-/**
- * Gradient color mapping for each service type
- */
-const GRADIENT_MAP = {
-  "office-network-installation": "from-emerald-500 to-teal-600",
-  "amc-maintenance": "from-emerald-500 to-teal-600",
-  "repairs-troubleshooting": "from-orange-500 to-amber-600",
-  "enterprise-it-solutions": "from-emerald-500 to-teal-600",
+const SERVICE_META = {
+  "office-network-installation": ["Site survey", "Secure setup", "Wi-Fi & LAN"],
+  "amc-maintenance": ["Preventive checks", "Priority support", "AMC reports"],
+  "repairs-troubleshooting": ["Diagnostics", "On-site support", "Parts guidance"],
+  "enterprise-it-solutions": ["Procurement", "Deployment", "Managed support"],
 };
 
 export default function ServiceCard({ service, index, isAuthenticated }) {
-  const navigate = useNavigate();
   const Icon = ICON_MAP[service.slug] || Building2;
-  const gradient = GRADIENT_MAP[service.slug] || "from-emerald-600 to-teal-500";
 
   const canShowRate = isAuthenticated || service.showRateToGuests;
-
-  const handleCardClick = (e) => {
-    // Don't navigate if clicking on any button or link inside the card
-    if (e.target.closest("a") || e.target.closest("button")) {
-      return;
-    }
-    // Navigate to service detail (disabled for now since route doesn't exist)
-    // navigate(`/services/${service.slug}`);
-  };
+  const serviceTags = SERVICE_META[service.slug] || ["Assessment", "Quotation", "Support"];
 
   return (
     <motion.div
@@ -44,34 +31,33 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      // onClick={handleCardClick}
-      className="
-        group relative overflow-hidden
-        bg-white dark:bg-slate-900
-        border border-slate-200 dark:border-slate-700
-        rounded-2xl
-        p-5 sm:p-6
-        cursor-pointer
-        shadow-lg hover:shadow-xl
-        hover:border-emerald-500/50 dark:hover:border-emerald-400/50
-        transition-all duration-300
-        hover:-translate-y-1
-      "
+       // onClick={handleCardClick}
+       className="
+         group relative overflow-hidden
+         tech-panel
+         rounded-lg
+         p-5 sm:p-6
+         cursor-pointer
+         shadow-sm hover:shadow-md
+         hover:border-orange-500/50 dark:hover:border-orange-400/50
+         transition-all duration-300
+         hover:-translate-y-0.5
+       "
     >
       {/* Subtle gradient overlay on hover */}
-<div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 pointer-events-none bg-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       {/* LEFT ICON */}
       <div className="shrink-0 mb-4 sm:mb-0 sm:absolute sm:top-6 sm:left-6">
         <div
-          className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}
+          className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-lg bg-slate-950 dark:bg-cyan-500 shadow-sm"
         >
-          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white dark:text-slate-950" />
         </div>
       </div>
 
       {/* CONTENT */}
       <div className="sm:pl-20 flex-1 min-w-0">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
           {service.name}
         </h3>
 
@@ -79,16 +65,27 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
           {service.description}
         </p>
 
+        <div className="mt-4 flex flex-wrap gap-2">
+          {serviceTags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
         {/* RATE */}
         <div className="mt-4 flex items-center gap-3">
           {canShowRate ? (
-            <span className="inline-flex rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-4 py-1.5 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            <span className="inline-flex rounded-full bg-orange-100 dark:bg-orange-900/40 px-4 py-1.5 text-sm font-semibold text-orange-700 dark:text-orange-300">
               {service.rateLabel}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400">
               <Lock className="w-3.5 h-3.5" />
-              Login to view pricing
+              Pricing available after sign-in
             </span>
           )}
         </div>
@@ -98,26 +95,17 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
           {isAuthenticated ? (
             <Link
               to={`/services/enquiry/${service.slug}`}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm shadow-md hover:shadow-lg hover:shadow-emerald-500/25 hover:-translate-y-0.5 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-orange-600 text-white font-semibold text-sm shadow-sm hover:bg-orange-700 hover:shadow-md transition-all duration-200"
             >
-              Enquire Now
+              Request Service
             </Link>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-600 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:shadow-md transition-all duration-200"
-              >
-                Login
-              </Link>
-
-              <Link
-                to="/register"
-                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2.5 text-sm font-medium text-white hover:shadow-lg hover:shadow-emerald-500/25 hover:-translate-y-0.5 transition-all duration-200"
-              >
-                Register
-              </Link>
-            </>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-orange-700 hover:shadow-md transition-all duration-200"
+            >
+              Sign in to continue
+            </Link>
           )}
         </div>
       </div>

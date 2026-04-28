@@ -156,7 +156,7 @@ export default function ReviewsList({
                   {review.isVerifiedPurchase && (
                     <span
                       className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 
-                      rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium"
+                      rounded-full bg-orange-50 text-orange-700 text-xs font-medium"
                     >
                       <ThumbsUp className="w-3 h-3" />
                       Verified Purchase

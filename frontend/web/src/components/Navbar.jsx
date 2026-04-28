@@ -2,8 +2,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, Menu, X, Package, User } from "lucide-react";
+import { ShoppingCart, Heart, Menu, X, Package, User, ClipboardList, Wrench } from "lucide-react";
 import { useState } from "react";
+import { Button } from "./ui";
 
 export default function Navbar() {
   const user = useAuthStore((state) => state.user);
@@ -13,7 +14,6 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const isLandingPage = location.pathname === "/login";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (!isInit) return null;
@@ -27,10 +27,33 @@ export default function Navbar() {
 
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
+  const isHomePage = location.pathname === "/";
+  const productPath = user ? "/products" : "/products-guest";
+  const baseNavItems = user
+    ? [
+        { label: "Products", to: productPath, show: !isHomePage },
+        { label: "Services", to: "/services", show: !isHomePage },
+        { label: "Orders", to: "/orders", show: user.clientType === "PRIVATE" },
+        { label: "Enquiries", to: "/enquiries", show: user.clientType === "PUBLIC" },
+        { label: "Quotes", to: "/quotes", show: user.clientType === "PUBLIC" },
+        { label: "Service Requests", to: "/service-enquiries", show: true },
+      ].filter((item) => item.show)
+    : [
+        { label: "Products", to: "/products-guest", show: !isHomePage },
+        { label: "Services", to: "/services", show: !isHomePage },
+      ].filter((item) => item.show);
+  const navItems = isAuthPage ? [] : baseNavItems;
+
+  const navLinkClass = (to) =>
+    `text-sm font-semibold transition-colors ${
+      location.pathname === to || location.pathname.startsWith(`${to}/`)
+        ? "text-cyan-700 dark:text-cyan-300"
+        : "text-slate-700 hover:text-cyan-700 dark:text-slate-200 dark:hover:text-cyan-300"
+    }`;
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+      className="sticky top-0 z-50 bg-white/90 dark:bg-[#07111f]/95 backdrop-blur border-b border-slate-200 dark:border-cyan-950/60"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -44,22 +67,23 @@ export default function Navbar() {
                 className="
                 inline-flex items-center gap-2
                 px-5 py-2.5
-                rounded-xl
+                rounded-lg
                 text-sm md:text-base
                 font-bold
-                bg-gradient-to-r from-emerald-600 to-teal-600
+                bg-slate-950 dark:bg-cyan-500
                 text-white
-                shadow-lg shadow-emerald-500/30
-                hover:shadow-xl hover:shadow-emerald-500/40
+                dark:text-slate-950
+                shadow-sm
+                hover:bg-slate-800 dark:hover:bg-cyan-400
                 transition-all duration-300
               "
               >
-                {isLandingPage ? "Cutting-Edge Enterprises " : "Home"}
+                Cutting Edge Enterprises
               </span>
             </Link>
           ) : (
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold rounded-xl shadow-lg">
+              <div className="w-10 h-10 bg-slate-950 dark:bg-cyan-500 flex items-center justify-center text-white dark:text-slate-950 font-bold rounded-lg shadow-sm">
                 <Package size={20} />
               </div>
               <div className="hidden sm:block">
@@ -74,17 +98,25 @@ export default function Navbar() {
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-5">
+            {navItems.map((item) => (
+              <Link key={item.to} to={item.to} className={navLinkClass(item.to)}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
             {/* Cart */}
             {user && user.clientType === "PRIVATE" && (
               <button
                 onClick={() => navigate("/cart")}
-                className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                className="relative p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs font-bold rounded-full min-w-[20px] h-[20px] flex items-center justify-center px-1">
+                  <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full min-w-[20px] h-[20px] flex items-center justify-center px-1">
                     {cartCount}
                   </span>
                 )}
@@ -92,21 +124,23 @@ export default function Navbar() {
             )}
 
             {/* Wishlist */}
-            {user && (user.clientType === "PRIVATE" || user.clientType === "PUBLIC") && (
-              <button
-                onClick={() => navigate("/wishlist")}
-                className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
-                aria-label="Wishlist"
-              >
-                <Heart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-              </button>
-            )}
+            {user &&
+              (user.clientType === "PRIVATE" ||
+                user.clientType === "PUBLIC") && (
+                <button
+                  onClick={() => navigate("/wishlist")}
+                  className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                  aria-label="Wishlist"
+                >
+                  <Heart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                </button>
+              )}
 
             {/* User Menu */}
             {user ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  <div className="w-9 h-9 rounded-full bg-orange-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
                     {user.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-200 hidden lg:block">
@@ -114,21 +148,15 @@ export default function Navbar() {
                   </span>
                 </div>
 
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-xl transition-colors"
-                >
+                <Button variant="secondary" onClick={handleLogout}>
                   Logout
-                </button>
+                </Button>
               </div>
             ) : (
               !isAuthPage && (
-                <Link
-                  to="/login"
-                  className="px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300"
-                >
+                <Button onClick={() => navigate("/login")}>
                   Login
-                </Link>
+                </Button>
               )
             )}
           </div>
@@ -136,7 +164,7 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -151,6 +179,20 @@ export default function Navbar() {
           className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
         >
           <div className="px-4 py-4 space-y-3">
+            {navItems.map((item) => (
+              <button
+                key={item.to}
+                onClick={() => {
+                  navigate(item.to);
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors text-left"
+              >
+                {item.label === "Services" ? <Wrench size={20} /> : <ClipboardList size={20} />}
+                <span className="font-medium">{item.label}</span>
+              </button>
+            ))}
+
             {user && user.clientType === "PRIVATE" && (
               <>
                 <button
@@ -158,12 +200,12 @@ export default function Navbar() {
                     navigate("/cart");
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
                 >
                   <ShoppingCart size={20} />
                   <span className="font-medium">Cart</span>
                   {cartCount > 0 && (
-                    <span className="ml-auto bg-emerald-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                    <span className="ml-auto bg-orange-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
                       {cartCount}
                     </span>
                   )}
@@ -173,7 +215,7 @@ export default function Navbar() {
                     navigate("/wishlist");
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
                 >
                   <Heart size={20} />
                   <span className="font-medium">Wishlist</span>
@@ -187,7 +229,7 @@ export default function Navbar() {
                   navigate("/wishlist");
                   setMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
               >
                 <Heart size={20} />
                 <span className="font-medium">Wishlist</span>
@@ -195,22 +237,25 @@ export default function Navbar() {
             )}
 
             {user ? (
-              <button
+              <Button
+                variant="secondary"
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                className="w-full justify-start gap-3"
               >
                 <User size={20} />
                 <span className="font-medium">Logout</span>
-              </button>
+              </Button>
             ) : (
               !isAuthPage && (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full p-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold shadow-lg"
+                <Button
+                  onClick={() => {
+                    navigate("/login");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full justify-center gap-2"
                 >
                   Login
-                </Link>
+                </Button>
               )
             )}
           </div>

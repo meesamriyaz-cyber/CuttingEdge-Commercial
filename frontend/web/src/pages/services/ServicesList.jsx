@@ -1,12 +1,32 @@
 import { useEffect, useState } from "react";
 import ServiceCard from "../../components/ServiceCard";
 import ServiceCardSkeleton from "../../components/ServiceCardSkeleton";
-import BrandLogos from "../../components/BrandLogos";
 import { useAuthStore } from "../../store/authStore";
-import { API_URL } from "../../api/client";
-import BrandTrustStrip from "../../components/BrandTrustStrip";
 import { motion } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, ClipboardCheck, FileText, Wrench, CheckCircle2 } from "lucide-react";
+
+const SERVICE_STEPS = [
+  {
+    icon: ClipboardCheck,
+    title: "Submit Requirement",
+    text: "Share the issue, location, or installation need.",
+  },
+  {
+    icon: FileText,
+    title: "Receive Quote",
+    text: "Get a clear estimate or AMC proposal.",
+  },
+  {
+    icon: Wrench,
+    title: "Service Execution",
+    text: "Technician support, installation, or repair work.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Closure Support",
+    text: "Completion update and after-service assistance.",
+  },
+];
 
 export default function ServicesList() {
   const [services, setServices] = useState([]);
@@ -20,11 +40,7 @@ export default function ServicesList() {
   useEffect(() => {
     async function loadServices() {
       try {
-        console.log("Attempting to fetch services from /api/services");
         const res = await fetch("/api/services");
-        console.log("Response status:", res.status, res.statusText);
-      //  console.log("Response headers:", Object.fromEntries(res.headers.entries()));
-        
        const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to load services");
         setServices(data);
@@ -46,32 +62,66 @@ export default function ServicesList() {
   });
 
   return (
-    <section className="bg-surface dark:bg-surface-alt min-h-screen relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
+    <section className="bg-slate-50 dark:bg-[#07111f] min-h-screen relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-center"
+          className="tech-panel rounded-lg p-6 sm:p-8 text-center"
         >
-          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+          <span className="signal-chip inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest rounded-full">
             Professional Services
           </span>
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3">
             Our Professional Services
           </h1>
           <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-            Comprehensive IT solutions tailored to your business needs. From networking to maintenance, we've got you covered.
+            Reliable IT installation, maintenance, repair, and AMC support for homes, offices, and institutions.
           </p>
         </motion.div>
 
-        <BrandTrustStrip page="services" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {SERVICE_STEPS.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={step.title}
+                className="tech-panel rounded-lg p-5 shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-cyan-700 dark:text-cyan-300" />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-400">
+                    Step {index + 1}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-semibold text-slate-900 dark:text-white">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                  {step.text}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {!isAuthenticated && (
+          <div className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 p-4 shadow-sm">
+            <Search className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Browse first, continue after sign-in
+              </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Review services and support categories now. After sign-in, you can request service and continue with pricing or quote workflows.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Error Message */}
         {error && (
@@ -89,7 +139,7 @@ export default function ServicesList() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-800/50 p-4 sm:p-6"
+          className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 p-4 sm:p-6"
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search Input */}
@@ -102,7 +152,7 @@ export default function ServicesList() {
                 placeholder="Search services..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all duration-200"
               />
             </div>
 
@@ -114,7 +164,7 @@ export default function ServicesList() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200 appearance-none cursor-pointer"
+                className="w-full pl-12 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all duration-200 appearance-none cursor-pointer"
               >
                 <option value="ALL">All categories</option>
                 <option value="Networking">Networking</option>

@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Receipt,
 } from "lucide-react";
+import { Button } from "../../components/ui";
 
 const statusConfig = {
   PLACED: {
@@ -108,7 +109,7 @@ export default function OrderDetails() {
           credentials: "include", // Send cookies with the request
         });
         const data = await res.json();
-        
+
         // Handle 401 - session expired
         if (res.status === 401) {
           console.warn("[OrderDetails] 401 Unauthorized - clearing session");
@@ -121,7 +122,7 @@ export default function OrderDetails() {
           window.location.href = "/login?expired=true";
           return;
         }
-        
+
         if (!res.ok) throw new Error(data.message || "Failed to fetch order");
         setOrder(data);
       } catch (err) {
@@ -197,7 +198,7 @@ export default function OrderDetails() {
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-4xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
               <p className="text-slate-500">Loading order details...</p>
             </div>
           </div>
@@ -218,18 +219,17 @@ export default function OrderDetails() {
               </h3>
               <p className="text-slate-500">{error}</p>
               <div className="flex justify-center gap-3 mt-4">
-                <button
+                <Button
                   onClick={() => window.location.reload()}
-                  className="px-4 py-2 rounded-lg font-medium btn-theme-primary animate-gradient"
                 >
                   Try Again
-                </button>
-                <Link
-                  to="/orders"
-                  className="px-4 py-2 rounded-lg font-medium bg-slate-100 text-slate-900 border border-slate-200 hover:bg-slate-200 transition-colors"
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => navigate("/orders")}
                 >
                   Back to Orders
-                </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -251,13 +251,14 @@ export default function OrderDetails() {
               <p className="text-slate-500">
                 The order you're looking for doesn't exist.
               </p>
-              <Link
-                to="/orders"
-                className="inline-flex items-center mt-4 font-medium text-emerald-600 hover:opacity-80 transition-colors"
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/orders")}
+                className="mt-4 gap-1"
               >
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Orders
-              </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -275,13 +276,14 @@ export default function OrderDetails() {
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* Back Button */}
-          <Link
-            to="/orders"
-            className="inline-flex items-center mb-6 text-slate-500 hover:text-slate-700 transition-colors"
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/orders")}
+            className="mb-6 gap-1"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Orders
-          </Link>
+          </Button>
 
           {/* Order Header */}
           <div className="rounded-2xl p-6 mb-6 theme-card bg-surface border border-white/40 shadow-lg">
@@ -293,28 +295,29 @@ export default function OrderDetails() {
                 </h1>
               </div>
               <div className="flex gap-3">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() =>
                     navigate(`/orders/${order._id}/invoice`, {
                       state: { invoice: buildInvoice(order) },
                     })
                   }
-                  className="inline-flex items-center px-4 py-2 rounded-xl font-medium bg-slate-100 text-slate-900 border border-slate-200 hover:bg-slate-200 transition-colors"
+                  className="gap-2"
                 >
                   <Receipt className="w-4 h-4 mr-2" />
                   View Invoice
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() =>
                     navigate(`/orders/${order._id}/invoice`, {
                       state: { invoice: buildInvoice(order) },
                     })
                   }
-                  className="inline-flex items-center px-4 py-2 rounded-xl font-medium btn-theme-primary animate-gradient"
+                  className="gap-2"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download Invoice
-                </button>
+                </Button>
               </div>
             </div>
 

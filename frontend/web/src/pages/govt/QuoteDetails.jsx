@@ -107,7 +107,7 @@ export default function QuoteDetails() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
           >
             Go Back
           </button>
@@ -164,7 +164,7 @@ export default function QuoteDetails() {
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors"
           >
             <Printer className="w-4 h-4" />
             Print Quote
@@ -181,18 +181,18 @@ export default function QuoteDetails() {
         {/* Quote Container */}
         <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-8 print:bg-emerald-600 print:from-emerald-600 print:to-emerald-600">
+          <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white p-8 print:bg-orange-600 print:from-orange-600 print:to-orange-600">
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-3xl font-bold mb-2">QUOTATION</h1>
-                <p className="text-emerald-100">Official Government Quotation</p>
+                <p className="text-orange-100">Official Government Quotation</p>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold">{seller.name}</div>
-                <div className="text-emerald-100 text-sm mt-1">
+                <div className="text-orange-100 text-sm mt-1">
                   {seller.address}
                 </div>
-                <div className="text-emerald-100 text-sm">
+                <div className="text-orange-100 text-sm">
                   GSTIN: {seller.gstin}
                 </div>
               </div>
@@ -241,11 +241,15 @@ export default function QuoteDetails() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className={`font-semibold ${
-                      quote.status === "ACCEPTED" ? "text-green-600" :
-                      quote.status === "REJECTED" ? "text-red-600" :
-                      "text-blue-600"
-                    }`}>
+                    <span
+                      className={`font-semibold ${
+                        quote.status === "ACCEPTED"
+                          ? "text-green-600"
+                          : quote.status === "REJECTED"
+                            ? "text-red-600"
+                            : "text-blue-600"
+                      }`}
+                    >
                       {quote.status}
                     </span>
                   </div>
@@ -283,7 +287,9 @@ export default function QuoteDetails() {
                 <tr className="hover:bg-gray-50">
                   <td className="py-4 px-4 text-gray-900">1</td>
                   <td className="py-4 px-4 text-gray-900 font-medium">
-                    {product?.name || enquiry?.requirements || "Product / Service"}
+                    {product?.name ||
+                      enquiry?.requirements ||
+                      "Product / Service"}
                   </td>
                   <td className="py-4 px-4 text-center text-gray-600">
                     {product?.hsn || "N/A"}
@@ -310,7 +316,9 @@ export default function QuoteDetails() {
           {enquiry?.requirements && (
             <div className="px-8 pb-8">
               <div className="bg-gray-50 rounded-lg p-6">
-                <h4 className="font-bold text-gray-900 mb-3">Requirements / Specifications</h4>
+                <h4 className="font-bold text-gray-900 mb-3">
+                  Requirements / Specifications
+                </h4>
                 <p className="text-sm text-gray-600 whitespace-pre-line">
                   {enquiry.requirements}
                 </p>
@@ -323,9 +331,7 @@ export default function QuoteDetails() {
             <div className="px-8 pb-8">
               <div className="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
                 <h4 className="font-bold text-gray-900 mb-3">Remarks</h4>
-                <p className="text-sm text-gray-600">
-                  {quote.notes}
-                </p>
+                <p className="text-sm text-gray-600">{quote.notes}</p>
               </div>
             </div>
           )}
@@ -386,8 +392,7 @@ export default function QuoteDetails() {
                   </div>
                   <div className="text-xs text-gray-500 mt-2">
                     Amount in Words:{" "}
-                    {numberToWords(Math.round(pricing.grandTotal))} Rupees
-                    Only
+                    {numberToWords(Math.round(pricing.grandTotal))} Rupees Only
                   </div>
                 </div>
               </div>
@@ -403,7 +408,8 @@ export default function QuoteDetails() {
                   <span className="font-medium">Bank:</span> UCO Bank
                 </div>
                 <div>
-                  <span className="font-medium">Account No:</span> 01230210004975
+                  <span className="font-medium">Account No:</span>{" "}
+                  01230210004975
                 </div>
                 <div>
                   <span className="font-medium">IFSC:</span> UCBA0000123
@@ -457,11 +463,13 @@ export default function QuoteDetails() {
                 <span className="font-semibold">Terms & Conditions:</span>
               </p>
               <ol className="list-decimal list-inside space-y-1 ml-2">
-                <li>This quotation is valid until the expiry date mentioned above.</li>
                 <li>
-                  Prices are inclusive of all taxes as applicable.
+                  This quotation is valid until the expiry date mentioned above.
                 </li>
-                <li>Delivery timeline will be confirmed upon order confirmation.</li>
+                <li>Prices are inclusive of all taxes as applicable.</li>
+                <li>
+                  Delivery timeline will be confirmed upon order confirmation.
+                </li>
                 <li>Subject to Srinagar jurisdiction only.</li>
                 <li>
                   This is a computer generated quotation and does not require

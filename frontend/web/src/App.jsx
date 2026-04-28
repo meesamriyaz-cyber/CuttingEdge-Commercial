@@ -30,12 +30,13 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔹 Check if current route is invoice page (hide navbar/footer)
+  // Check if current route is invoice page (hide navbar/footer)
   const isInvoicePage = location.pathname.includes("/invoice");
 
-  // 🔹 Redirect unauthenticated users
+  // Redirect unauthenticated users away from protected application areas.
   useEffect(() => {
     const publicRoutes = [
+      "/",
       "/login",
       "/register",
       "/products-guest",
@@ -44,7 +45,7 @@ export default function App() {
     const currentPath = window.location.pathname;
 
     const isPublicRoute = publicRoutes.some((route) =>
-      currentPath.startsWith(route),
+      route === "/" ? currentPath === "/" : currentPath.startsWith(route),
     );
 
     if (!user && !isPublicRoute) {
@@ -78,7 +79,7 @@ export default function App() {
         {!isInvoicePage && (
           <footer className="bg-page border-0">
             <div className="max-w-6xl mx-auto px-4 py-3 text-center text-sm text-muted">
-              © 2026 Cutting Edge Enterprises
+              &copy; 2026 Cutting Edge Enterprises
             </div>
           </footer>
         )}

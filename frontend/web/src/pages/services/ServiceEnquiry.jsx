@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { API_URL } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
+import { Button } from "../../components/ui";
 
 export default function ServiceEnquiry() {
   const { slug } = useParams();
@@ -151,9 +152,12 @@ export default function ServiceEnquiry() {
             className="w-full rounded-xl border border-border px-4 py-3 text-sm"
           />
 
-          <button className="btn-theme-primary w-full">
+          <Button
+            type="submit"
+            className="w-full"
+          >
             Submit Enquiry
-          </button>
+          </Button>
         </form>
       </div>
     </section>

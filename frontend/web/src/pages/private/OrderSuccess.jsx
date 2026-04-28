@@ -67,7 +67,7 @@ export default function OrderSuccess() {
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
                     paymentMethod === "online"
-                      ? "bg-emerald-100 text-emerald-700"
+                      ? "bg-orange-100 text-orange-700"
                       : "bg-amber-100 text-amber-700"
                   }`}
                 >
@@ -123,7 +123,7 @@ export default function OrderSuccess() {
                   <span>
                     You can track your order in the{" "}
                     <span
-                      className="text-emerald-600 font-medium cursor-pointer hover:underline"
+                      className="text-orange-600 font-medium cursor-pointer hover:underline"
                       onClick={() => navigate("/orders")}
                     >
                       My Orders
@@ -154,7 +154,7 @@ export default function OrderSuccess() {
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 onClick={() => navigate("/orders")}
-                className="flex-1 bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors shadow-sm"
+                className="flex-1 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700 transition-colors shadow-sm"
               >
                 View My Orders
               </button>

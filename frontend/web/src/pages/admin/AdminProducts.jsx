@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   fetchAllProducts,
   deactivateProduct,
   updateProduct,
 } from "../../api/adminProducts";
+import { Button } from "../../components/ui";
 
 const PAGE_SIZES = [5, 10, 20];
 
@@ -109,12 +110,12 @@ export default function AdminProducts() {
             </p>
           </div>
 
-          <Link
-            to="/admin/products/new"
-            className="btn-theme-primary px-4 py-2 rounded-lg text-sm font-medium"
+          <Button
+            onClick={() => navigate("/admin/products/new")}
+            size="sm"
           >
             + New Product
-          </Link>
+          </Button>
         </div>
 
         {/* ================= Filters ================= */}

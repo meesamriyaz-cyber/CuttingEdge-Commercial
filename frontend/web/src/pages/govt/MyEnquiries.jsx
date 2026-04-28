@@ -162,14 +162,14 @@ export default function MyEnquiries() {
             >
               View Requirements
             </button>
-          {item.status === "QUOTED" && (
-            <a
-              href={`/quotes/enquiry/${item._id}`}
-              className="text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
-            >
-              View Quote
-            </a>
-          )}
+            {item.status === "QUOTED" && (
+              <a
+                href={`/quotes/enquiry/${item._id}`}
+                className="text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
+              >
+                View Quote
+              </a>
+            )}
           </div>
         ),
         className: "w-64",
@@ -246,8 +246,8 @@ export default function MyEnquiries() {
       <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
