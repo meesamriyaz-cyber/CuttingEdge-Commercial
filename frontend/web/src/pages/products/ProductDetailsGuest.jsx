@@ -1,7 +1,16 @@
-// src/pages/products/ProductDetailsGuest.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  LogIn,
+  Package,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
 import { API_URL } from "../../api/client";
+import { Button } from "../../components/ui";
 
 export default function ProductDetailsGuest() {
   const { id } = useParams();
@@ -11,8 +20,6 @@ export default function ProductDetailsGuest() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Reviews state
   const [reviews, setReviews] = useState([]);
   const [reviewSummary, setReviewSummary] = useState(null);
   const [reviewsLoading, setReviewsLoading] = useState(true);
@@ -38,7 +45,6 @@ export default function ProductDetailsGuest() {
     loadProduct();
   }, [id]);
 
-  // Load reviews
   useEffect(() => {
     async function loadReviews() {
       setReviewsLoading(true);
@@ -62,210 +68,263 @@ export default function ProductDetailsGuest() {
     loadReviews();
   }, [id, reviewPage, reviewSort]);
 
-  /* ================= IMAGE CONTROLS ================= */
   const hasImages = product?.images?.length > 0;
   const currentImage = hasImages ? product.images[currentImageIndex] : null;
 
   const nextImage = () =>
-    setCurrentImageIndex((i) => (i === product.images.length - 1 ? 0 : i + 1));
-
-  const prevImage = () =>
-    setCurrentImageIndex((i) => (i === 0 ? product.images.length - 1 : i - 1));
-
-  /* ================= RENDER STARS ================= */
-  const renderStars = (rating) => {
-    return [...Array(5)].map((_, i) => (
-      <svg
-        key={i}
-        className={`w-4 h-4 ${
-          i < Math.round(rating || 0)
-            ? "fill-amber-400 text-amber-400"
-            : "fill-slate-200 text-slate-200"
-        }`}
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-    ));
-  };
-
-  if (loading)
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-b-2 border-emerald-500 rounded-full" />
-      </div>
+    setCurrentImageIndex((index) =>
+      index === product.images.length - 1 ? 0 : index + 1,
     );
 
-  if (error)
+  const prevImage = () =>
+    setCurrentImageIndex((index) =>
+      index === 0 ? product.images.length - 1 : index - 1,
+    );
+
+  const renderStars = (rating) =>
+    [...Array(5)].map((_, index) => (
+      <Star
+        key={index}
+        className={`h-4 w-4 ${
+          index < Math.round(rating || 0)
+            ? "fill-amber-400 text-amber-400"
+            : "text-slate-200 dark:text-slate-700"
+        }`}
+      />
+    ));
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="theme-card bg-surface rounded-3xl p-6 text-center">
-          <p className="text-red-600 font-semibold mb-2">
-            Error Loading Product
-          </p>
-          <p className="text-slate-600">{error}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 btn-theme-primary px-4 py-2 rounded-xl"
-          >
-            Go Back
-          </button>
+      <div className="min-h-screen bg-page px-4 py-12">
+        <div className="mx-auto flex max-w-xl items-center justify-center">
+          <div className="theme-card w-full rounded-[24px] p-10 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] text-white">
+              <Package className="h-8 w-8 animate-pulse" />
+            </div>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              Loading product details...
+            </p>
+          </div>
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-page px-4 py-12">
+        <div className="mx-auto max-w-xl">
+          <div className="theme-card rounded-[24px] p-8 text-center">
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+              Error loading product
+            </h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{error}</p>
+            <Button onClick={() => navigate(-1)} className="mt-6 gap-2">
+              <ArrowLeft size={16} />
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-surface px-4 sm:px-6 py-10 sm:py-16 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-teal-100 to-emerald-100 dark:from-teal-900/20 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
-      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="btn-theme-primary px-6 py-3 rounded-xl font-semibold"
-        >
-          ← Back to Products
-        </button>
+    <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
+      <div className="mx-auto max-w-7xl">
+        <section className="hero-shell mb-8 rounded-[28px] p-6 sm:p-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:text-cyan-300"
+          >
+            <ArrowLeft size={16} />
+            Back to products
+          </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-          {/* ================= IMAGES ================= */}
-          {product.images?.length > 0 && (
-            <div className="theme-card bg-surface rounded-3xl shadow-2xl p-6">
-              <div className="relative">
-                <div className="aspect-square bg-surface-alt rounded-2xl overflow-hidden flex items-center justify-center">
-                  <img
-                    src={currentImage.url}
-                    alt={product.name}
-                    className="max-w-full max-h-full object-contain transition-transform duration-500 hover:scale-110"
-                  />
-                </div>
-
-                {hasImages && (
-                  <>
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 btn-theme-primary px-3 py-1 rounded-xl"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 btn-theme-primary px-3 py-1 rounded-xl"
-                    >
-                      ›
-                    </button>
-                  </>
-                )}
-
-                {hasImages && product.images.length > 1 && (
-                  <div className="flex gap-2 mt-4 overflow-x-auto">
-                    {product.images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentImageIndex(i)}
-                        className={`w-20 h-20 rounded-xl overflow-hidden border-2 ${
-                          i === currentImageIndex
-                            ? "border-emerald-500"
-                            : "border-white/30"
-                        }`}
-                      >
-                        <img
-                          src={img.url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ================= DETAILS ================= */}
-          <div className="space-y-6">
-            <div className="theme-card bg-surface rounded-3xl shadow-2xl p-6">
-              <h1 className="text-3xl font-bold hero-gradient-text mb-2">
-                {product.name}
-              </h1>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div>
               {product.category && (
-                <span className="inline-block text-xs font-semibold bg-surface-alt text-slate-700 px-3 py-1 rounded-full mb-2">
+                <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
                   {product.category}
                 </span>
               )}
 
-              {/* Rating Display */}
-              {(product.rating?.count > 0 ||
-                reviewSummary?.totalReviews > 0) && (
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center gap-1">
-                    {renderStars(
-                      product.rating?.average || reviewSummary?.averageRating,
-                    )}
-                  </div>
-                  <span className="text-lg font-semibold text-slate-900">
-                    {(
-                      product.rating?.average ||
-                      reviewSummary?.averageRating ||
-                      0
-                    ).toFixed(1)}
-                  </span>
-                  <span className="text-slate-500">
-                    ({product.rating?.count || reviewSummary?.totalReviews || 0}{" "}
-                    reviews)
-                  </span>
-                </div>
-              )}
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                {product.name}
+              </h1>
 
-              <p className="text-slate-600 leading-relaxed">
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
                 {product.description || "No description available."}
               </p>
             </div>
 
-            {/* ================= ACTIONS ================= */}
-            <div className="theme-card bg-surface rounded-3xl shadow-xl p-6">
-              <div className="bg-surface-alt border border-white/30 rounded-2xl p-4 mb-4">
-                <p className="text-sm text-slate-600">
-                  For pricing and purchase, please login or submit an enquiry.
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="panel-muted p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Public browsing
+                </p>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  Browse products, compare fit, and continue after sign-in.
+                </p>
+              </div>
+              <div className="panel-muted p-4">
+                <div className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                  <ShieldCheck size={16} className="mt-0.5 text-cyan-600 dark:text-cyan-300" />
+                  Listing information is available publicly. Pricing and order workflow begin after login.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="theme-card rounded-[24px] p-4 sm:p-6">
+            <div className="relative aspect-square overflow-hidden rounded-[20px] bg-slate-100/90 dark:bg-slate-900/60">
+              {hasImages ? (
+                <img
+                  src={currentImage.url}
+                  alt={product.name}
+                  className="h-full w-full object-contain p-6"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <Package className="h-24 w-24 text-slate-300 dark:text-slate-600" />
+                </div>
+              )}
+
+              {hasImages && product.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:text-cyan-300"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:text-cyan-300"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {hasImages && product.images.length > 1 && (
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                {product.images.map((img, index) => (
+                  <button
+                    key={img.url || index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border transition-all ${
+                      index === currentImageIndex
+                        ? "border-cyan-400 bg-cyan-50/70 dark:border-cyan-700 dark:bg-cyan-950/20"
+                        : "border-slate-200/80 bg-white/70 hover:border-cyan-200 dark:border-slate-800 dark:bg-slate-950/35"
+                    }`}
+                  >
+                    <img src={img.url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <div className="theme-card rounded-[24px] p-6 sm:p-8">
+              {(product.rating?.count > 0 || reviewSummary?.totalReviews > 0) && (
+                <div className="mb-5 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    {renderStars(product.rating?.average || reviewSummary?.averageRating)}
+                  </div>
+                  <span className="text-lg font-semibold text-slate-900 dark:text-white">
+                    {(product.rating?.average || reviewSummary?.averageRating || 0).toFixed(1)}
+                  </span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {(product.rating?.count || reviewSummary?.totalReviews || 0)} review
+                    {(product.rating?.count || reviewSummary?.totalReviews || 0) !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {product.sku && (
+                  <div className="panel-muted p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      SKU
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                      {product.sku}
+                    </p>
+                  </div>
+                )}
+                {product.category && (
+                  <div className="panel-muted p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      Category
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                      {product.category}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="theme-card rounded-[24px] p-6 sm:p-8">
+              <div className="panel-muted p-5">
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Sign in to continue
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                  Private customers unlock cart and checkout. Government customers unlock enquiry and quotation workflow after registration and sign-in.
                 </p>
               </div>
 
-              <button
-                onClick={() => navigate("/login")}
-                className="w-full btn-theme-primary py-3 rounded-xl font-semibold"
-              >
+              <Button onClick={() => navigate("/login")} className="mt-5 w-full gap-2" size="lg">
+                <LogIn size={18} />
                 Login to Continue
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* ================= REVIEWS SECTION ================= */}
-        <div className="theme-card bg-surface rounded-3xl shadow-2xl p-6">
-          <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        <section className="theme-card mt-10 rounded-[24px] p-6 sm:p-8">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                Customer reviews
+              </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Public review history from verified buyers.
+              </p>
+            </div>
 
-          {/* Review Summary */}
+            <select
+              value={reviewSort}
+              onChange={(e) => setReviewSort(e.target.value)}
+              className="theme-input max-w-[220px] text-sm"
+            >
+              <option value="newest">Newest</option>
+              <option value="highest">Highest Rating</option>
+              <option value="lowest">Lowest Rating</option>
+            </select>
+          </div>
+
           {reviewSummary && reviewSummary.totalReviews > 0 && (
-            <div className="flex flex-col md:flex-row gap-8 mb-8 p-4 bg-surface-alt rounded-2xl">
-              {/* Average Rating */}
-              <div className="text-center md:text-left">
-                <div className="text-4xl font-bold text-slate-900">
+            <div className="panel-muted mb-6 grid gap-6 p-5 md:grid-cols-[0.34fr_1fr]">
+              <div>
+                <div className="text-4xl font-bold text-slate-900 dark:text-white">
                   {reviewSummary.averageRating.toFixed(1)}
                 </div>
-                <div className="flex justify-center md:justify-start gap-1 my-2">
+                <div className="mt-2 flex items-center gap-1">
                   {renderStars(reviewSummary.averageRating)}
                 </div>
-                <div className="text-sm text-slate-500">
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                   Based on {reviewSummary.totalReviews} reviews
-                </div>
+                </p>
               </div>
 
-              {/* Rating Distribution */}
-              <div className="flex-1 space-y-1">
+              <div className="space-y-2">
                 {[5, 4, 3, 2, 1].map((star) => {
                   const count = reviewSummary.distribution?.[star] || 0;
                   const percentage =
@@ -273,22 +332,15 @@ export default function ProductDetailsGuest() {
                       ? (count / reviewSummary.totalReviews) * 100
                       : 0;
                   return (
-                    <div key={star} className="flex items-center gap-2">
-                      <span className="text-sm text-slate-600 w-8">{star}</span>
-                      <svg
-                        className="w-4 h-4 fill-amber-400 text-amber-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div key={star} className="flex items-center gap-3">
+                      <span className="w-4 text-sm text-slate-600 dark:text-slate-300">{star}</span>
+                      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                         <div
-                          className="h-full bg-amber-400 rounded-full"
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-orange-500"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-xs text-slate-500 w-8">
+                      <span className="w-8 text-right text-sm text-slate-500 dark:text-slate-400">
                         {count}
                       </span>
                     </div>
@@ -298,93 +350,63 @@ export default function ProductDetailsGuest() {
             </div>
           )}
 
-          {/* Sort Reviews */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm text-slate-600">Sort by:</span>
-            <select
-              value={reviewSort}
-              onChange={(e) => setReviewSort(e.target.value)}
-              className="theme-input px-3 py-2 rounded-lg text-sm"
-            >
-              <option value="newest">Newest</option>
-              <option value="highest">Highest Rating</option>
-              <option value="lowest">Lowest Rating</option>
-            </select>
-          </div>
-
-          {/* Reviews List */}
           {reviewsLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin h-8 w-8 border-b-2 border-emerald-500 rounded-full" />
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-600 border-t-transparent" />
             </div>
           ) : reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
-                <div
-                  key={review._id}
-                  className="border-b border-white/30 pb-4 last:border-0"
-                >
+                <div key={review._id} className="panel-muted p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <span className="text-emerald-700 font-semibold">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300">
+                        <span className="font-semibold">
                           {review.user?.name?.charAt(0).toUpperCase() || "U"}
                         </span>
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900">
+                        <div className="font-medium text-slate-900 dark:text-white">
                           {review.user?.name || "Anonymous"}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="mt-1 flex items-center gap-1">
                           {renderStars(review.rating)}
-                          <span className="text-xs text-slate-500 ml-1">
-                            {new Date(review.createdAt).toLocaleDateString()}
+                          <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
+                            {new Date(review.createdAt).toLocaleDateString("en-IN")}
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
+
                   {review.title && (
-                    <div className="font-semibold mt-2 text-slate-900">
+                    <div className="mt-3 font-semibold text-slate-900 dark:text-white">
                       {review.title}
                     </div>
                   )}
-                  <p className="text-sm text-slate-600 mt-2">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
                     {review.comment}
                   </p>
-                  {review.images && review.images.length > 0 && (
-                    <div className="flex gap-2 mt-3">
-                      {review.images.map((img, i) => (
-                        <img
-                          key={i}
-                          src={img.url}
-                          alt="Review"
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-slate-500">
-              No reviews yet. Be the first to review this product!
+            <div className="py-8 text-center text-slate-500 dark:text-slate-400">
+              No reviews yet. Be the first to review this product after purchase.
             </div>
           )}
 
-          {/* Load More Reviews */}
           {reviewSummary && reviewSummary.totalReviews > 5 && (
-            <div className="flex justify-center mt-6">
+            <div className="mt-6 flex justify-center">
               <button
-                onClick={() => setReviewPage((p) => p + 1)}
-                className="btn-theme-primary px-6 py-2 rounded-xl"
+                onClick={() => setReviewPage((page) => page + 1)}
+                className="btn-theme-primary rounded-xl px-6 py-2.5"
               >
                 Load More Reviews
               </button>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

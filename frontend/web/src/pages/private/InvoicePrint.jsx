@@ -313,10 +313,10 @@ export default function InvoicePrint() {
               </li>
             </ol>
           </div>
-          <div className="text-center mt-6 pt-4 border-t border-gray-200">
+          <div className="mt-6 border-t border-gray-200 pt-4 text-center">
             <p className="text-sm text-gray-600">
-              Thank you for your business! For any queries, contact us at
-              enquiry@cuttingedge-enterprises.in
+              Thank you for your business. For billing queries, contact
+              {" "}enquiry@cuttingedge-enterprises.in
             </p>
           </div>
         </div>

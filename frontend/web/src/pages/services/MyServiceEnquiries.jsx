@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../api/client";
 import RoleGate from "../../components/RoleGate";
+import { Button } from "../../components/ui";
 
 export default function MyServiceEnquiries() {
   const { accessToken } = useAuthStore();
@@ -33,21 +34,24 @@ export default function MyServiceEnquiries() {
     loadEnquiries();
   }, []);
 
+  const getStatusBadge = (status) => {
+    const styles = {
+      NEW: "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300",
+      IN_PROGRESS: "border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-900/50 dark:bg-cyan-950/20 dark:text-cyan-300",
+      QUOTED: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300",
+      COMPLETED: "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300",
+      CLOSED: "border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300",
+    };
+    return styles[status] || styles.NEW;
+  };
+
   if (loading) {
     return (
       <RoleGate allow={["PRIVATE", "PUBLIC"]}>
-        <div className="min-h-screen bg py-8 px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-surface rounded-lg p-6 shadow-sm">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
+        <div className="min-h-screen bg-page py-12">
+          <div className="mx-auto max-w-5xl px-4">
+            <div className="theme-card rounded-[24px] p-10 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Loading service enquiries...</p>
             </div>
           </div>
         </div>
@@ -58,23 +62,10 @@ export default function MyServiceEnquiries() {
   if (error) {
     return (
       <RoleGate allow={["PRIVATE", "PUBLIC"]}>
-        <div className="min-h-screen bg py-8 px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-              <svg
-                className="w-12 h-12 text-red-500 mx-auto mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-red-700">{error}</p>
+        <div className="min-h-screen bg-page py-12">
+          <div className="mx-auto max-w-5xl px-4">
+            <div className="theme-card rounded-[24px] p-8 text-center">
+              <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p>
             </div>
           </div>
         </div>
@@ -82,219 +73,93 @@ export default function MyServiceEnquiries() {
     );
   }
 
-  if (!enquiries.length)
-    return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
-        <div className="min-h-screen bg py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8 text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-orange-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                My Service Enquiries
-              </h2>
-              <p className="text-gray-600">
-                No service enquiries submitted yet.
-              </p>
-              <a
-                href="/services"
-                className="inline-flex items-center justify-center mt-4 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                Browse Services
-              </a>
-            </div>
-          </div>
-        </div>
-      </RoleGate>
-    );
-
-  const getStatusBadge = (status) => {
-    const styles = {
-      NEW: "bg-gray-100 text-gray-800",
-      IN_PROGRESS: "bg-blue-100 text-blue-800",
-      QUOTED: "bg-green-100 text-green-800",
-      COMPLETED: "bg-orange-100 text-orange-800",
-      CLOSED: "bg-red-100 text-red-800",
-    };
-    return styles[status] || "bg-gray-100 text-gray-800";
-  };
-
   return (
     <RoleGate allow={["PRIVATE", "PUBLIC"]}>
-      <div className="min-h-screen bg py-6 md:py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              My Service Enquiries
-            </h2>
-            <p className="text-gray-600 mt-1">
-              Track your service enquiries and quotes
-            </p>
-          </div>
+      <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
+        <div className="mx-auto max-w-5xl">
+          <section className="hero-shell rounded-[28px] p-6 sm:p-8">
+            <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+              <div>
+                <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Service workflow
+                </span>
+                <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
+                  My Service Enquiries
+                </h1>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+                  Track submitted service requirements, response progress, and issued quotes.
+                </p>
+              </div>
 
-          {/* Stats Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
-            <div className="bg-surface rounded-lg shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">
-                {enquiries.length}
+              <div className="panel-muted p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Total enquiries
+                </p>
+                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">
+                  {enquiries.length}
+                </p>
               </div>
-              <div className="text-sm text-gray-600">Total Enquiries</div>
             </div>
-            <div className="bg-surface rounded-lg shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {
-                  enquiries.filter(
-                    (e) => e.status === "NEW" || e.status === "IN_PROGRESS",
-                  ).length
-                }
-              </div>
-              <div className="text-sm text-gray-600">Pending</div>
-            </div>
-            <div className="bg-surface rounded-lg shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {enquiries.filter((e) => e.status === "QUOTED").length}
-              </div>
-              <div className="text-sm text-gray-600">Quoted</div>
-            </div>
-            <div className="bg-surface rounded-lg shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {enquiries.filter((e) => e.status === "COMPLETED").length}
-              </div>
-              <div className="text-sm text-gray-600">Completed</div>
-            </div>
-          </div>
+          </section>
 
-          {/* Enquiries List */}
-          <div className="space-y-4">
-            {enquiries.map((enq) => (
-              <div
-                key={enq._id}
-                className="bg-surface rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-4 md:p-6">
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    {/* Service Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <svg
-                            className="w-6 h-6 text-orange-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                          </svg>
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-lg font-semibold text-gray-900 truncate">
-                            {enq.serviceNameSnapshot ||
-                              enq.service?.name ||
-                              "Service Enquiry"}
-                          </h4>
-                          <p className="text-sm text-gray-500">
-                            Submitted:{" "}
-                            {new Date(enq.createdAt).toLocaleDateString(
-                              "en-IN",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}
-                          </p>
-                        </div>
-                      </div>
+          {enquiries.length === 0 ? (
+            <div className="theme-card mt-8 rounded-[24px] p-12 text-center">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                No service enquiries submitted yet
+              </h2>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">
+                Explore services to begin an enquiry.
+              </p>
+              <Button to="/services" className="mt-6">
+                Browse Services
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-8 space-y-4">
+              {enquiries.map((enquiry) => (
+                <div key={enquiry._id} className="theme-card rounded-[24px] p-5 sm:p-6">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                        {enquiry.serviceNameSnapshot || enquiry.service?.name || "Service Enquiry"}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Submitted{" "}
+                        {new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
                     </div>
 
-                    {/* Status Badge */}
-                    <div className="flex-shrink-0">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(enq.status)}`}
-                      >
-                        {enq.status}
-                      </span>
-                    </div>
+                    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${getStatusBadge(enquiry.status)}`}>
+                      {enquiry.status}
+                    </span>
                   </div>
 
-                  {/* Requirement Preview */}
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-sm text-gray-500 mb-1">Requirements:</p>
-                    <p className="text-sm text-gray-700 line-clamp-2">
-                      {enq.requirementDetails}
+                  <div className="mt-5 border-t border-slate-200/80 pt-5 dark:border-slate-800">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      Requirements
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                      {enquiry.requirementDetails}
                     </p>
                   </div>
 
-                  {/* Action Button */}
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    {enq.status === "QUOTED" ? (
-                      <a
-                        href={`/service-quotes/enquiry/${enq._id}`}
-                        className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
-                      >
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                        View Quote
-                      </a>
+                  <div className="mt-5 border-t border-slate-200/80 pt-5 dark:border-slate-800">
+                    {enquiry.status === "QUOTED" ? (
+                      <Button to={`/service-quotes/enquiry/${enquiry._id}`}>View Quote</Button>
                     ) : (
-                      <span className="inline-flex items-center text-sm text-gray-500">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        Awaiting admin response
-                      </span>
+                      <Button variant="secondary" disabled>
+                        Awaiting response
+                      </Button>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </RoleGate>

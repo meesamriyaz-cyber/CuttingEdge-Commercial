@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MapPin, CreditCard, Truck, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RoleGate from "../../components/RoleGate";
 import AddressManager from "../../components/AddressManager";
@@ -17,21 +18,18 @@ import { Button } from "../../components/ui";
 export default function Checkout() {
   const navigate = useNavigate();
   const { accessToken, user } = useAuthStore();
-
-  const { cart, pricing, fetchCart, clearCart } = useCartStore();
+  const { cart, fetchCart, clearCart } = useCartStore();
 
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cod"); // "cod" or "online"
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
 
-  // Ensure cart is loaded (in case user refreshes checkout page)
   useEffect(() => {
     if (!cart) fetchCart();
-  }, []);
+  }, [cart, fetchCart]);
 
-  // Handle Cash on Delivery order
   async function placeCODOrder() {
     if (!cart?.items?.length) return;
     if (!selectedAddress) {
@@ -70,7 +68,6 @@ export default function Checkout() {
     }
   }
 
-  // Handle Razorpay payment
   async function handleRazorpayPayment() {
     if (!cart?.items?.length) return;
     if (!selectedAddress) {
@@ -81,30 +78,22 @@ export default function Checkout() {
     setPlacing(true);
     setError("");
 
-    // Format shipping address
     const shippingAddress = `${selectedAddress.label}: ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}, Phone: ${selectedAddress.phone}`;
 
     try {
-      // Load Razorpay script
       const Razorpay = await loadRazorpayScript();
-
-      // Get Razorpay key
       const razorpayKey = await fetchRazorpayKey();
-
-      // Create order on server
       const orderData = await createRazorpayOrder();
 
-      // Configure Razorpay options
       const options = {
         key: razorpayKey,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "CuttingEdge Commercial",
+        name: "Cutting Edge Enterprises",
         description: "Order Payment",
         order_id: orderData.razorpayOrderId,
         handler: async function (response) {
           try {
-            // Verify payment on server
             const verifyData = await verifyRazorpayPayment(
               {
                 razorpay_payment_id: response.razorpay_payment_id,
@@ -114,7 +103,6 @@ export default function Checkout() {
               shippingAddress,
             );
 
-            // Clear cart and redirect to success
             clearCart();
             navigate("/order-success", {
               replace: true,
@@ -134,7 +122,7 @@ export default function Checkout() {
           contact: user?.phone || "",
         },
         theme: {
-          color: "#4f46e5", // Indigo-600
+          color: "#0f4c61",
         },
         modal: {
           ondismiss: function () {
@@ -143,7 +131,6 @@ export default function Checkout() {
         },
       };
 
-      // Open Razorpay checkout
       const rzp = new Razorpay(options);
 
       rzp.on("payment.failed", function (response) {
@@ -158,7 +145,6 @@ export default function Checkout() {
     }
   }
 
-  // Handle order placement based on payment method
   function handlePlaceOrder() {
     if (!selectedAddress) {
       setError("Please select a delivery address");
@@ -171,240 +157,215 @@ export default function Checkout() {
     }
   }
 
+  const checkoutSteps = [
+    { label: "Cart review", icon: CheckCircle2 },
+    { label: "Address", icon: MapPin },
+    { label: "Payment", icon: CreditCard },
+    { label: "Delivery", icon: Truck },
+  ];
+
   return (
     <RoleGate allow={["PRIVATE"]}>
-      <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
-        </div>
-        <div className="max-w-5xl mx-auto px-4 grid md:grid-cols-3 gap-6">
-          {/* LEFT: ITEMS */}
-          <div className="md:col-span-2 space-y-4">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-              Checkout
-            </h2>
-
-            {!cart?.items?.length && (
-              <p className="text-slate-600">Your cart is empty.</p>
-            )}
-
-            {cart?.items?.map((item) => (
-              <div
-                key={item.product._id}
-                className="bg-white shadow rounded p-4"
-              >
-                <p className="font-medium">{item.product.name}</p>
-                <p className="text-sm text-slate-500">Qty: {item.quantity}</p>
+      <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
+        <div className="mx-auto max-w-7xl">
+          <section className="hero-shell rounded-[28px] p-6 sm:p-8">
+            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+              <div>
+                <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Secure checkout
+                </span>
+                <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
+                  Checkout
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+                  Confirm address, choose payment, and complete your order from one guided workspace.
+                </p>
               </div>
-            ))}
 
-            {/* Delivery Address Section */}
-            <div className="bg-white shadow rounded p-4 mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Delivery Address
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowAddressModal(true)}
-                    className="text-orange-600 hover:text-orange-800"
-                  >
-                    {selectedAddress ? "Change" : "+ Add New Address"}
-                  </Button>
-                </div>
-
-              {selectedAddress ? (
-                <div className="border-2 border-orange-500 bg-orange-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-semibold text-gray-900">
-                      {selectedAddress.label}
-                    </span>
-                    {selectedAddress.isDefault && (
-                      <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded-full">
-                        Default
+              <div className="grid gap-3 sm:grid-cols-2">
+                {checkoutSteps.slice(1, 3).map((step) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.label} className="panel-muted flex items-center gap-3 p-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300">
+                        <Icon size={18} />
+                      </div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        {step.label}
                       </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {selectedAddress.street}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {selectedAddress.city}, {selectedAddress.state} -{" "}
-                    {selectedAddress.pincode}
-                  </p>
-                  <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
-                    {selectedAddress.phone}
-                  </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="space-y-4">
+              <div className="theme-card rounded-[24px] p-5 sm:p-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Items in this order
+                </h2>
+                <div className="mt-4 space-y-3">
+                  {!cart?.items?.length ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Your cart is empty.
+                    </p>
+                  ) : (
+                    cart.items.map((item) => (
+                      <div key={item.product._id} className="panel-muted flex items-center justify-between gap-4 p-4">
+                        <div>
+                          <p className="font-medium text-slate-900 dark:text-white">
+                            {item.product.name}
+                          </p>
+                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            Qty: {item.quantity}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-              ) : (
-                <div className="text-center py-6 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
-                  <svg
-                    className="w-12 h-12 mx-auto mb-2 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <p>Please select a delivery address</p>
-                  <Button
-                    variant="link"
-                    onClick={() => setShowAddressModal(true)}
-                    className="mt-2"
-                  >
-                    Select Address
+              </div>
+
+              <div className="theme-card rounded-[24px] p-5 sm:p-6">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                      Delivery address
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      Select the address for delivery and invoice communication.
+                    </p>
+                  </div>
+                  <Button variant="secondary" onClick={() => setShowAddressModal(true)}>
+                    {selectedAddress ? "Change" : "Add Address"}
                   </Button>
+                </div>
+
+                {selectedAddress ? (
+                  <div className="panel-muted p-5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {selectedAddress.label}
+                      </span>
+                      {selectedAddress.isDefault && (
+                        <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-950/20 dark:text-orange-300">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                      {selectedAddress.street}
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
+                      {selectedAddress.city}, {selectedAddress.state} - {selectedAddress.pincode}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                      Phone: {selectedAddress.phone}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="panel-muted border-dashed p-8 text-center">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Please select a delivery address to continue.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="theme-card rounded-[24px] p-5 sm:p-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Payment method
+                </h2>
+                <div className="mt-4 space-y-3">
+                  {[
+                    {
+                      value: "online",
+                      title: "Online payment",
+                      note: "Cards, UPI, net banking via Razorpay",
+                    },
+                    {
+                      value: "cod",
+                      title: "Cash on delivery",
+                      note: "Pay when your order arrives",
+                    },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-all ${
+                        paymentMethod === option.value
+                          ? "border-cyan-400 bg-cyan-50/70 dark:border-cyan-700 dark:bg-cyan-950/20"
+                          : "border-slate-200 bg-white/70 hover:border-cyan-200 dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-cyan-900"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={option.value}
+                        checked={paymentMethod === option.value}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-white">
+                          {option.title}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                          {option.note}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200">
+                  {error}
                 </div>
               )}
             </div>
 
-            {/* Payment Method Selection */}
-            <div className="bg-white shadow rounded p-4 mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Payment Method
-              </h3>
-              <div className="space-y-3">
-                {/* Online Payment Option */}
-                <label
-                  className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    paymentMethod === "online"
-                      ? "border-orange-600 bg-orange-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+            <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+              <OrderSummary />
+              <div className="theme-card rounded-[24px] p-5">
+                <Button
+                  disabled={placing || !cart?.items?.length || !selectedAddress}
+                  onClick={handlePlaceOrder}
+                  className="w-full"
                 >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="online"
-                    checked={paymentMethod === "online"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
-                  />
-                  <div className="ml-3 flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900">
-                        Online Payment
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        Cards, UPI, NetBanking
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Secure payment via Razorpay
-                    </p>
-                  </div>
-                </label>
-
-                {/* COD Option */}
-                <label
-                  className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    paymentMethod === "cod"
-                      ? "border-orange-600 bg-orange-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
-                  />
-                  <div className="ml-3 flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900">
-                        Cash on Delivery
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Pay when you receive your order
-                    </p>
-                  </div>
-                </label>
+                  {placing
+                    ? "Processing..."
+                    : paymentMethod === "cod"
+                      ? "Place Order (COD)"
+                      : "Pay Now"}
+                </Button>
               </div>
             </div>
-
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-          </div>
-
-          {/* RIGHT: SUMMARY */}
-          <div className="space-y-4">
-            <OrderSummary />
-
-            <Button
-              disabled={placing || !cart?.items?.length || !selectedAddress}
-              onClick={handlePlaceOrder}
-              className="w-full"
-            >
-              {placing
-                ? "Processing..."
-                : paymentMethod === "cod"
-                  ? "Place Order (COD)"
-                  : "Pay Now"}
-            </Button>
           </div>
         </div>
       </div>
 
-      {/* Address Selection Modal */}
       {showAddressModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Select Delivery Address
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAddressModal(false)}
-                  className="text-gray-400 hover:text-gray-600 p-1"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </Button>
-              </div>
-            <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="theme-card max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-[24px]">
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-4 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                Select delivery address
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAddressModal(false)}
+                className="px-2"
+              >
+                Close
+              </Button>
+            </div>
+            <div className="max-h-[calc(90vh-76px)] overflow-y-auto p-4">
               <AddressManager
-                showSelector={true}
+                showSelector
                 selectedAddressId={selectedAddress?._id}
                 onSelectAddress={(address) => {
                   setSelectedAddress(address);

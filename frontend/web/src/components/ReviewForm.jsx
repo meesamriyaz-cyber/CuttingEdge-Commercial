@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { Star, X, Loader2, Camera, Check } from "lucide-react";
 import { createReview, updateReview } from "../api/reviews";
@@ -28,8 +28,9 @@ export default function ReviewForm({
     const newErrors = {};
     if (rating === 0) newErrors.rating = "Please select a rating";
     if (!comment.trim()) newErrors.comment = "Please write a review";
-    if (comment.trim().length < 10)
+    if (comment.trim().length < 10) {
       newErrors.comment = "Review must be at least 10 characters";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -74,10 +75,10 @@ export default function ReviewForm({
       let result;
       if (isEditing) {
         result = await updateReview(existingReview._id, reviewData);
-        toast.success("Review updated successfully!");
+        toast.success("Review updated successfully");
       } else {
         result = await createReview(reviewData);
-        toast.success("Review submitted successfully!");
+        toast.success("Review submitted successfully");
       }
 
       onSuccess?.(result);
@@ -95,7 +96,7 @@ export default function ReviewForm({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -103,25 +104,23 @@ export default function ReviewForm({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="theme-card max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[24px]"
       >
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">
+        <div className="sticky top-0 flex items-center justify-between border-b border-slate-200/80 bg-white/85 px-6 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             {isEditing ? "Edit Review" : "Write a Review"}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-900"
           >
-            <X className="w-5 h-5 text-slate-500" />
+            <X className="h-5 w-5 text-slate-500" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Star Rating */}
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Rating *
             </label>
             <div className="flex items-center gap-1">
@@ -135,16 +134,16 @@ export default function ReviewForm({
                   className="p-1 transition-transform hover:scale-110"
                 >
                   <Star
-                    className={`w-8 h-8 transition-colors ${
+                    className={`h-8 w-8 transition-colors ${
                       star <= (hoveredRating || rating)
                         ? "fill-amber-400 text-amber-400"
-                        : "text-slate-200"
+                        : "text-slate-200 dark:text-slate-700"
                     }`}
                   />
                 </button>
               ))}
               {rating > 0 && (
-                <span className="ml-2 text-sm font-medium text-slate-600">
+                <span className="ml-2 text-sm font-medium text-slate-600 dark:text-slate-300">
                   {rating === 1 && "Poor"}
                   {rating === 2 && "Fair"}
                   {rating === 3 && "Good"}
@@ -154,13 +153,12 @@ export default function ReviewForm({
               )}
             </div>
             {errors.rating && (
-              <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
+              <p className="mt-1 text-sm text-red-500">{errors.rating}</p>
             )}
           </div>
 
-          {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Title (optional)
             </label>
             <input
@@ -168,17 +166,14 @@ export default function ReviewForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Summarize your review"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 
-                focus:outline-none focus:ring-2 focus:ring-kashmiri-dal-500/20 focus:border-kashmiri-dal-500
-                text-slate-900 placeholder:text-slate-400"
+              className="theme-input"
               maxLength={100}
             />
-            <p className="text-xs text-slate-400 mt-1">{title.length}/100</p>
+            <p className="mt-1 text-xs text-slate-400">{title.length}/100</p>
           </div>
 
-          {/* Comment */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Review *
             </label>
             <textarea
@@ -186,53 +181,42 @@ export default function ReviewForm({
               onChange={(e) => setComment(e.target.value)}
               placeholder="Share your experience with this product..."
               rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 
-                focus:outline-none focus:ring-2 focus:ring-kashmiri-dal-500/20 focus:border-kashmiri-dal-500
-                text-slate-900 placeholder:text-slate-400 resize-none"
+              className="theme-input resize-none"
               maxLength={1000}
             />
-            <div className="flex justify-between mt-1">
+            <div className="mt-1 flex justify-between">
               {errors.comment && (
-                <p className="text-red-500 text-xs">{errors.comment}</p>
+                <p className="text-xs text-red-500">{errors.comment}</p>
               )}
-              <p className="text-xs text-slate-400 ml-auto">
-                {comment.length}/1000
-              </p>
+              <p className="ml-auto text-xs text-slate-400">{comment.length}/1000</p>
             </div>
           </div>
 
-          {/* Images */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Photos (optional, max 5)
             </label>
             <div className="flex flex-wrap gap-3">
               {imagePreviews.map((preview, index) => (
-                <div key={index} className="relative group">
+                <div key={index} className="group relative">
                   <img
                     src={preview}
                     alt={`Preview ${index + 1}`}
-                    className="w-20 h-20 object-cover rounded-lg border border-slate-200"
+                    className="h-20 w-20 rounded-lg border border-slate-200 object-cover dark:border-slate-800"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white 
-                      rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100
-                      transition-opacity shadow-lg"
+                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="h-3 w-3" />
                   </button>
                 </div>
               ))}
               {imagePreviews.length < 5 && (
-                <label
-                  className="w-20 h-20 border-2 border-dashed border-slate-200 rounded-lg 
-                    flex flex-col items-center justify-center cursor-pointer 
-                    hover:border-kashmiri-dal-400 hover:bg-kashmiri-dal-50/50 transition-colors"
-                >
-                  <Camera className="w-6 h-6 text-slate-400" />
-                  <span className="text-xs text-slate-400 mt-1">Add</span>
+                <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-200 transition-colors hover:border-cyan-400 hover:bg-cyan-50/60 dark:border-slate-800 dark:hover:border-cyan-800 dark:hover:bg-cyan-950/20">
+                  <Camera className="h-6 w-6 text-slate-400" />
+                  <span className="mt-1 text-xs text-slate-400">Add</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -245,30 +229,27 @@ export default function ReviewForm({
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-xl border border-slate-200 
-                text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+              className="flex-1 rounded-xl border border-slate-200 px-6 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-900"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-gradient-to-r from-kashmiri-dal-500 to-kashmiri-pashmina-500 text-white px-6 py-3 rounded-xl font-semibold 
-                shadow-lg shadow-kashmiri-dal-200/50 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] px-6 py-3 font-semibold text-white shadow-[0_18px_40px_-26px_rgba(8,16,29,0.78)] disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Submitting...
                 </>
               ) : (
                 <>
-                  <Check className="w-4 h-4" />
+                  <Check className="h-4 w-4" />
                   {isEditing ? "Update Review" : "Submit Review"}
                 </>
               )}

@@ -40,7 +40,7 @@ export default function ServicesList() {
   useEffect(() => {
     async function loadServices() {
       try {
-        const res = await fetch("/api/services");
+        const res = await fetch(`${API_URL}/services`);
        const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to load services");
         setServices(data);

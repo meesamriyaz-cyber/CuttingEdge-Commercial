@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ThumbsUp, Flag, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Star, ThumbsUp, Flag, Edit, Trash2 } from "lucide-react";
 import { markReviewHelpful, deleteReview } from "../api/reviews";
 import toast from "react-hot-toast";
 
@@ -17,9 +17,7 @@ export default function ReviewsList({
     setHelpfulLoading(reviewId);
     try {
       await markReviewHelpful(reviewId, isHelpful);
-      // The parent component should refresh reviews
       if (onDeleteReview) {
-        // Reuse callback to trigger refresh
         onDeleteReview(null, true);
       }
     } catch (err) {
@@ -41,26 +39,23 @@ export default function ReviewsList({
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-IN", {
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
 
-  const renderStars = (rating) => {
-    return [...Array(5)].map((_, i) => (
+  const renderStars = (rating) =>
+    [...Array(5)].map((_, index) => (
       <Star
-        key={i}
-        className={`w-4 h-4 ${
-          i < rating ? "fill-amber-400 text-amber-400" : "text-slate-200"
+        key={index}
+        className={`h-4 w-4 ${
+          index < rating ? "fill-amber-400 text-amber-400" : "text-slate-200 dark:text-slate-700"
         }`}
       />
     ));
-  };
 
-  // Calculate percentage for rating bars
   const getPercentage = (count) => {
     if (!summary?.totalReviews) return 0;
     return Math.round((count / summary.totalReviews) * 100);
@@ -68,40 +63,36 @@ export default function ReviewsList({
 
   return (
     <div className="space-y-6">
-      {/* Rating Summary */}
       {summary && summary.totalReviews > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Average Rating */}
+        <div className="panel-muted p-6">
+          <div className="flex flex-col gap-8 md:flex-row">
             <div className="text-center md:text-left">
-              <div className="text-5xl font-bold text-slate-900 mb-2">
+              <div className="mb-2 text-5xl font-bold text-slate-900 dark:text-white">
                 {summary.averageRating.toFixed(1)}
               </div>
-              <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
+              <div className="mb-2 flex items-center justify-center gap-1 md:justify-start">
                 {renderStars(Math.round(summary.averageRating))}
               </div>
-              <p className="text-sm text-slate-500">
-                Based on {summary.totalReviews} review
-                {summary.totalReviews !== 1 ? "s" : ""}
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Based on {summary.totalReviews} review{summary.totalReviews !== 1 ? "s" : ""}
               </p>
             </div>
 
-            {/* Rating Distribution */}
             <div className="flex-1">
               {[5, 4, 3, 2, 1].map((star) => (
-                <div key={star} className="flex items-center gap-3 mb-2">
-                  <span className="text-sm text-slate-600 w-8">{star} ★</span>
-                  <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div key={star} className="mb-2 flex items-center gap-3">
+                  <span className="w-8 text-sm text-slate-600 dark:text-slate-300">
+                    {star}
+                  </span>
+                  <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{
-                        width: `${getPercentage(summary.distribution[star])}%`,
-                      }}
-                      transition={{ duration: 0.5, delay: star * 0.1 }}
-                      className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
+                      animate={{ width: `${getPercentage(summary.distribution[star])}%` }}
+                      transition={{ duration: 0.5, delay: star * 0.08 }}
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-orange-500"
                     />
                   </div>
-                  <span className="text-sm text-slate-500 w-10 text-right">
+                  <span className="w-10 text-right text-sm text-slate-500 dark:text-slate-400">
                     {summary.distribution[star]}
                   </span>
                 </div>
@@ -111,7 +102,6 @@ export default function ReviewsList({
         </div>
       )}
 
-      {/* Reviews List */}
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
           {reviews.map((review, index) => {
@@ -124,110 +114,91 @@ export default function ReviewsList({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6"
+                className="panel-muted p-5 sm:p-6"
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
+                <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    <div
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-kashmiri-dal-100 to-kashmiri-pashmina-100 
-                      flex items-center justify-center text-kashmiri-dal-600 font-semibold"
-                    >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 font-semibold text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300">
                       {review.user?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-900">
+                      <p className="font-semibold text-slate-900 dark:text-white">
                         {review.user?.name || "Anonymous"}
                       </p>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5">
                           {renderStars(review.rating)}
                         </div>
-                        <span className="text-xs text-slate-400">•</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-400">/</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {formatDate(review.createdAt)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Verified Purchase Badge */}
                   {review.isVerifiedPurchase && (
-                    <span
-                      className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 
-                      rounded-full bg-orange-50 text-orange-700 text-xs font-medium"
-                    >
-                      <ThumbsUp className="w-3 h-3" />
+                    <span className="hidden items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700 dark:bg-orange-950/20 dark:text-orange-300 sm:inline-flex">
+                      <ThumbsUp className="h-3 w-3" />
                       Verified Purchase
                     </span>
                   )}
 
-                  {/* Owner Actions */}
                   {isOwner && (
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onEditReview?.(review)}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-900"
                         title="Edit review"
                       >
-                        <Edit className="w-4 h-4 text-slate-500" />
+                        <Edit className="h-4 w-4 text-slate-500" />
                       </button>
                       <button
                         onClick={() => handleDelete(review._id)}
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20"
                         title="Delete review"
                       >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-red-500" />
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* Title */}
                 {review.title && (
-                  <h4 className="font-semibold text-slate-900 mb-2">
+                  <h4 className="mb-2 font-semibold text-slate-900 dark:text-white">
                     {review.title}
                   </h4>
                 )}
 
-                {/* Comment */}
-                <p className="text-slate-600 leading-relaxed mb-4">
+                <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-300">
                   {review.comment}
                 </p>
 
-                {/* Review Images */}
                 {review.images?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {review.images.map((img, idx) => (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {review.images.map((img, index) => (
                       <img
-                        key={idx}
+                        key={index}
                         src={img.url}
-                        alt={`Review image ${idx + 1}`}
-                        className="w-20 h-20 object-cover rounded-lg border border-slate-200 
-                          cursor-pointer hover:opacity-90 transition-opacity"
+                        alt={`Review image ${index + 1}`}
+                        className="h-20 w-20 cursor-pointer rounded-lg border border-slate-200 object-cover transition-opacity hover:opacity-90 dark:border-slate-800"
                         onClick={() => window.open(img.url, "_blank")}
                       />
                     ))}
                   </div>
                 )}
 
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between border-t border-slate-200/80 pt-4 dark:border-slate-800">
                   <button
                     onClick={() => handleHelpful(review._id, true)}
                     disabled={helpfulLoading === review._id}
-                    className="flex items-center gap-2 text-sm text-slate-600 
-                      hover:text-kashmiri-dal-600 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 text-sm text-slate-600 transition-colors hover:text-cyan-700 disabled:opacity-50 dark:text-slate-300 dark:hover:text-cyan-300"
                   >
-                    <ThumbsUp className="w-4 h-4" />
+                    <ThumbsUp className="h-4 w-4" />
                     Helpful ({review.helpfulVotes || 0})
                   </button>
-                  <button
-                    className="flex items-center gap-2 text-sm text-slate-500 
-                      hover:text-slate-700 transition-colors"
-                  >
-                    <Flag className="w-4 h-4" />
+                  <button className="flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <Flag className="h-4 w-4" />
                     Report
                   </button>
                 </div>
@@ -237,15 +208,15 @@ export default function ReviewsList({
         </AnimatePresence>
 
         {reviews.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <Star className="w-8 h-8 text-slate-300" />
+          <div className="py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-900">
+              <Star className="h-8 w-8 text-slate-300 dark:text-slate-600" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
               No reviews yet
             </h3>
-            <p className="text-slate-600">
-              Be the first to review this product!
+            <p className="text-slate-600 dark:text-slate-300">
+              Be the first to review this product.
             </p>
           </div>
         )}

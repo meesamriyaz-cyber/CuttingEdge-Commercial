@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 import RoleGate from "../../components/RoleGate";
+import { Button } from "../../components/ui";
 
 export default function OrderSuccess() {
   const navigate = useNavigate();
@@ -10,7 +12,6 @@ export default function OrderSuccess() {
   const paymentId = location.state?.paymentId;
 
   useEffect(() => {
-    // If no orderId, redirect to orders page
     if (!orderId) {
       navigate("/orders");
     }
@@ -18,156 +19,64 @@ export default function OrderSuccess() {
 
   return (
     <RoleGate allow={["PRIVATE"]}>
-      <div className="min-h-screen bg-surface py-12 px-4">
-        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Success Illustration */}
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-8 text-center">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <svg
-                className="w-10 h-10 text-green-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M5 13l4 4L19 7"
+      <div className="min-h-screen bg-page px-4 py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="hero-shell rounded-[28px] overflow-hidden">
+            <div className="bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#16a34a_100%)] px-8 py-10 text-center text-white">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white text-emerald-600 shadow-lg">
+                <CheckCircle2 className="h-10 w-10" />
+              </div>
+              <h1 className="text-3xl font-bold">Order placed successfully</h1>
+              <p className="mt-2 text-sm text-cyan-50 sm:text-base">
+                Thank you for your purchase. Your order is now being processed.
+              </p>
+            </div>
+
+            <div className="space-y-6 p-6 sm:p-8">
+              <div className="panel-muted space-y-3 p-5">
+                <Row label="Order ID" value={orderId} mono />
+                <Row label="Order date" value={new Date().toLocaleDateString("en-IN")} />
+                <Row
+                  label="Payment method"
+                  value={paymentMethod === "online" ? "Online Payment" : "Cash on Delivery"}
                 />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Order Placed Successfully!
-            </h1>
-            <p className="text-green-100">
-              Thank you for your purchase. Your order is being processed.
-            </p>
-          </div>
-
-          {/* Order Details */}
-          <div className="p-8 space-y-6">
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium">Order ID:</span>
-                <span className="text-gray-900 font-mono text-sm">
-                  {orderId}
-                </span>
+                {paymentId && <Row label="Payment ID" value={paymentId} mono />}
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium">Order Date:</span>
-                <span className="text-gray-900">
-                  {new Date().toLocaleDateString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium">
-                  Payment Method:
-                </span>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    paymentMethod === "online"
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-amber-100 text-amber-700"
-                  }`}
-                >
-                  {paymentMethod === "online"
-                    ? "Online Payment"
-                    : "Cash on Delivery"}
-                </span>
-              </div>
-              {paymentId && (
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 font-medium">Payment ID:</span>
-                  <span className="text-gray-900 font-mono text-sm">
-                    {paymentId}
-                  </span>
-                </div>
-              )}
-            </div>
 
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                What's Next?
-              </h2>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start">
-                  <svg
-                    className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>
-                    We've sent a confirmation email to your registered email
-                    address.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>
-                    You can track your order in the{" "}
-                    <span
-                      className="text-orange-600 font-medium cursor-pointer hover:underline"
-                      onClick={() => navigate("/orders")}
-                    >
-                      My Orders
-                    </span>{" "}
-                    section.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>
-                    For any queries, please contact our customer support.
-                  </span>
-                </li>
-              </ul>
-            </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  What happens next
+                </h2>
+                <ul className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                  <li>Order confirmation has been recorded against your account.</li>
+                  <li>Track delivery progress and status updates in the My Orders section.</li>
+                  <li>Reach out to support if you need help with delivery or billing.</li>
+                </ul>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <button
-                onClick={() => navigate("/orders")}
-                className="flex-1 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700 transition-colors shadow-sm"
-              >
-                View My Orders
-              </button>
-              <button
-                onClick={() => navigate("/")}
-                className="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm"
-              >
-                Continue Shopping
-              </button>
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <Button onClick={() => navigate("/orders")} className="flex-1">
+                  View My Orders
+                </Button>
+                <Button variant="secondary" onClick={() => navigate("/")} className="flex-1">
+                  Continue Shopping
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </RoleGate>
+  );
+}
+
+function Row({ label, value, mono = false }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</span>
+      <span className={`text-sm text-slate-900 dark:text-white ${mono ? "font-mono" : "font-medium"}`}>
+        {value}
+      </span>
+    </div>
   );
 }

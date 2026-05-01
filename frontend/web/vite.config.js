@@ -58,16 +58,9 @@ export default defineConfig({
          rewrite: (path) => path.replace(/^\/api\/services/, "/services"),
        },
        "/services": {
-         target: "http://localhost:5000",
-         changeOrigin: true,
-         bypass: (req) => {
-           // Don't proxy if it's a browser page request (accepts HTML)
-           const accept = req.headers.accept || "";
-           if (accept.includes("text/html")) {
-             return req.url; // Return the URL to serve index.html instead
-           }
-         },
-       },
+          target: "http://localhost:5000",
+          changeOrigin: true,
+        },
       "/public": {
         target: "http://localhost:5000",
         changeOrigin: true,

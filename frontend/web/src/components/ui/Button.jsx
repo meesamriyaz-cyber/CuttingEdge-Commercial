@@ -2,11 +2,16 @@ import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const variants = {
-  primary: "bg-orange-600 hover:bg-orange-700 text-white shadow-sm relative overflow-hidden group",
-  secondary: "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm",
-  ghost: "hover:bg-orange-50 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-400",
-  danger: "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg shadow-red-500/25",
-  link: "text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 underline-offset-4 hover:underline",
+  primary:
+    "bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] text-white shadow-[0_18px_40px_-26px_rgba(8,16,29,0.78)] hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-24px_rgba(14,116,144,0.42)]",
+  secondary:
+    "bg-white/80 dark:bg-slate-950/45 border border-slate-200/85 dark:border-cyan-950/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 hover:border-cyan-300 dark:hover:border-cyan-800 text-slate-700 dark:text-slate-100 shadow-[0_12px_28px_-24px_rgba(8,16,29,0.58)] backdrop-blur-sm",
+  ghost:
+    "hover:bg-cyan-50 dark:hover:bg-cyan-950/25 text-slate-700 dark:text-cyan-200",
+  danger:
+    "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-[0_18px_34px_-24px_rgba(239,68,68,0.55)]",
+  link:
+    "text-cyan-700 dark:text-cyan-300 hover:text-orange-600 dark:hover:text-orange-300 underline-offset-4 hover:underline",
 };
 
 const sizes = {
@@ -50,8 +55,7 @@ export const Button = forwardRef(
           inline-flex items-center justify-center gap-2
           font-semibold rounded-lg
           transition-all duration-200
-          hover:shadow-md
-          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
           ${variants[variant]}
           ${sizes[size]}

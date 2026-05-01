@@ -280,12 +280,26 @@ export default function CategoryList() {
                     className="group tech-panel flex h-full flex-col rounded-lg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                        <Icon className="h-6 w-6 text-cyan-700 dark:text-cyan-300" />
-                      </div>
                       <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                         {category.count} items
                       </span>
+                    </div>
+
+                    <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-40 items-center justify-center">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                            <Icon className="h-7 w-7 text-cyan-700 dark:text-cyan-300" />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-5 flex-1">
@@ -327,8 +341,21 @@ export default function CategoryList() {
                     to={`/products/category/${encodeURIComponent(category.name)}`}
                     className="group flex h-full flex-col rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                      <Icon className="h-5 w-5 text-cyan-700 dark:text-cyan-300" />
+                    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-24 items-center justify-center">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                            <Icon className="h-5 w-5 text-cyan-700 dark:text-cyan-300" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <h3 className="mt-4 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2">
                       {category.name}

@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 import RoleGate from "../../components/RoleGate";
 import { API_URL } from "../../api/client";
 import Pagination from "../../components/Pagination";
 import DataTable from "../../components/DataTable";
-import { motion } from "framer-motion";
 
 export default function MyEnquiries() {
   const { accessToken } = useAuthStore();
@@ -12,18 +12,12 @@ export default function MyEnquiries() {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
-
-  // Filter state
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
-
-  // Requirements modal state
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [showRequirements, setShowRequirements] = useState(false);
 
@@ -32,7 +26,6 @@ export default function MyEnquiries() {
       setLoading(true);
       setError("");
 
-      // Build query parameters
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: pageSize.toString(),
@@ -63,34 +56,26 @@ export default function MyEnquiries() {
     }
   }
 
-  // Reload enquiries when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-    loadEnquiries();
-  }, [searchTerm, statusFilter, dateRange]);
-
-  // Reload enquiries when page or page size changes
-  useEffect(() => {
-    loadEnquiries();
-  }, [currentPage, pageSize]);
-
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, dateRange]);
+
+  useEffect(() => {
+    loadEnquiries();
+  }, [currentPage, pageSize, searchTerm, statusFilter, dateRange]);
 
   const getStatusColor = (status = "NEW") => {
     switch (status) {
       case "NEW":
-        return "bg-blue-100 text-blue-800 border border-blue-200";
+        return "bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-950/20 dark:text-cyan-300 dark:border-cyan-900/50";
       case "IN_REVIEW":
-        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
+        return "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50";
       case "QUOTED":
-        return "bg-green-100 text-green-800 border border-green-200";
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/50";
       case "CLOSED":
-        return "bg-gray-100 text-gray-800 border border-gray-200";
+        return "bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800";
       default:
-        return "bg-gray-100 text-gray-800 border border-gray-200";
+        return "bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800";
     }
   };
 
@@ -129,11 +114,7 @@ export default function MyEnquiries() {
         header: "Status",
         accessor: (item) => item.status || "NEW",
         render: (item) => (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-              item.status,
-            )}`}
-          >
+          <span className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(item.status)}`}>
             {(item.status || "NEW").replace("_", " ")}
           </span>
         ),
@@ -143,7 +124,7 @@ export default function MyEnquiries() {
       {
         key: "createdAt",
         header: "Submitted",
-        accessor: (item) => new Date(item.createdAt).toLocaleDateString(),
+        accessor: (item) => new Date(item.createdAt).toLocaleDateString("en-IN"),
         className: "w-32",
         sortable: true,
       },
@@ -151,21 +132,21 @@ export default function MyEnquiries() {
         key: "actions",
         header: "Actions",
         render: (item) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedEnquiry(item);
                 setShowRequirements(true);
               }}
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
+              className="text-sm font-medium text-cyan-700 transition-colors hover:text-orange-600 dark:text-cyan-300 dark:hover:text-orange-300"
             >
               View Requirements
             </button>
             {item.status === "QUOTED" && (
               <a
                 href={`/quotes/enquiry/${item._id}`}
-                className="text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
+                className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-300"
               >
                 View Quote
               </a>
@@ -179,11 +160,6 @@ export default function MyEnquiries() {
     [],
   );
 
-  const handleRowClick = (item) => {
-    // Handle row click - could navigate to details or expand row
-    console.log("Row clicked:", item);
-  };
-
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
     setCurrentPage(1);
@@ -194,16 +170,12 @@ export default function MyEnquiries() {
   if (loading && currentPage === 1) {
     return (
       <RoleGate allow={["PUBLIC"]}>
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <motion.div
-            className="theme-card p-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="animate-spin h-8 w-8 border-b-2 border-primary-600 rounded-full mx-auto" />
-            <p className="mt-4 text-text-muted">Loading enquiries…</p>
-          </motion.div>
+        <div className="min-h-screen bg-page py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="theme-card rounded-[24px] p-10 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Loading enquiries...</p>
+            </div>
+          </div>
         </div>
       </RoleGate>
     );
@@ -212,30 +184,12 @@ export default function MyEnquiries() {
   if (error) {
     return (
       <RoleGate allow={["PUBLIC"]}>
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <motion.div
-            className="theme-card p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex items-center gap-3 text-red-600">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{error}</span>
+        <div className="min-h-screen bg-page py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="theme-card rounded-[24px] p-8 text-center">
+              <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p>
             </div>
-          </motion.div>
+          </div>
         </div>
       </RoleGate>
     );
@@ -243,65 +197,64 @@ export default function MyEnquiries() {
 
   return (
     <RoleGate allow={["PUBLIC"]}>
-      <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Header */}
-          <motion.div
-            className="mb-6"
+      <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
+        <div className="mx-auto max-w-7xl">
+          <motion.section
+            className="hero-shell rounded-[28px] p-6 sm:p-8"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
           >
-            <h2 className="text-2xl font-bold text-text">My Enquiries</h2>
-            <p className="text-text-muted mt-1">{totalItems} total enquiries</p>
-          </motion.div>
+            <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+              <div>
+                <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Procurement tracking
+                </span>
+                <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
+                  My Enquiries
+                </h1>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+                  Search submitted requirements, monitor status, and move into quote review when available.
+                </p>
+              </div>
 
-          {/* Filters */}
+              <div className="panel-muted p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Total enquiries
+                </p>
+                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">
+                  {totalItems}
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
           <motion.div
-            className="theme-card p-4 mb-6 space-y-4"
+            className="theme-card mt-8 rounded-[24px] p-5"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Search */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
-                <label className="block text-xs font-medium text-text-muted mb-1">
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                   Search
                 </label>
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by product, SKU, or status..."
-                  className="
-                  w-full px-3 py-2 rounded-lg border border-card-border
-                  bg-card-bg text-text text-sm
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                  transition-all duration-200
-                "
+                  placeholder="Search by product, SKU, or status"
+                  className="theme-input text-sm"
                 />
               </div>
 
-              {/* Status Filter */}
               <div>
-                <label className="block text-xs font-medium text-text-muted mb-1">
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                   Status
                 </label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="
-                  w-full px-3 py-2 rounded-lg border border-card-border
-                  bg-card-bg text-text text-sm
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                  transition-all duration-200
-                "
+                  className="theme-input text-sm"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="NEW">New</option>
@@ -311,31 +264,22 @@ export default function MyEnquiries() {
                 </select>
               </div>
 
-              {/* Date Range */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-text-muted mb-1">
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                     Start Date
                   </label>
                   <input
                     type="date"
                     value={dateRange.start}
                     onChange={(e) =>
-                      setDateRange((prev) => ({
-                        ...prev,
-                        start: e.target.value,
-                      }))
+                      setDateRange((prev) => ({ ...prev, start: e.target.value }))
                     }
-                    className="
-                    w-full px-3 py-2 rounded-lg border border-card-border
-                    bg-card-bg text-text text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                    transition-all duration-200
-                  "
+                    className="theme-input text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-text-muted mb-1">
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                     End Date
                   </label>
                   <input
@@ -344,17 +288,11 @@ export default function MyEnquiries() {
                     onChange={(e) =>
                       setDateRange((prev) => ({ ...prev, end: e.target.value }))
                     }
-                    className="
-                    w-full px-3 py-2 rounded-lg border border-card-border
-                    bg-card-bg text-text text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                    transition-all duration-200
-                  "
+                    className="theme-input text-sm"
                   />
                 </div>
               </div>
 
-              {/* Clear Filters */}
               <div className="flex items-end">
                 <button
                   onClick={() => {
@@ -362,12 +300,7 @@ export default function MyEnquiries() {
                     setStatusFilter("ALL");
                     setDateRange({ start: "", end: "" });
                   }}
-                  className="
-                  w-full px-4 py-2 rounded-lg border border-card-border
-                  bg-card-bg text-text text-sm
-                  hover:bg-surface-alt hover:border-surface
-                  transition-all duration-200
-                "
+                  className="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-cyan-200 hover:bg-cyan-50/60 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:bg-slate-900"
                 >
                   Clear Filters
                 </button>
@@ -375,113 +308,97 @@ export default function MyEnquiries() {
             </div>
           </motion.div>
 
-          {/* Table */}
           <motion.div
-            className="theme-card overflow-hidden"
+            className="theme-card mt-6 overflow-hidden rounded-[24px]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
           >
             <DataTable
               data={enquiries}
               columns={columns}
-              onRowClick={handleRowClick}
               isLoading={loading}
               emptyMessage="You have not submitted any enquiries yet."
-              sortable={true}
-              searchable={false} // We have our own search in filters
+              sortable
+              searchable={false}
               className="border-0"
             />
 
-            {/* Pagination */}
             {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                pageSize={pageSize}
-                onPageSizeChange={handlePageSizeChange}
-                totalItems={totalItems}
-              />
+              <div className="px-5 pb-5">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  pageSize={pageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                  totalItems={totalItems}
+                />
+              </div>
             )}
           </motion.div>
 
-          {/* Requirements Modal */}
           {showRequirements && selectedEnquiry && (
             <motion.div
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowRequirements(false)}
             >
               <motion.div
-                className="theme-card max-w-md w-full"
-                initial={{ scale: 0.9, opacity: 0 }}
+                className="theme-card w-full max-w-md rounded-[24px]"
+                initial={{ scale: 0.94, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
+                exit={{ scale: 0.94, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-text">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                       Requirements
                     </h3>
                     <button
                       onClick={() => setShowRequirements(false)}
-                      className="text-text-muted hover:text-text transition-colors"
+                      className="text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     >
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      Close
                     </button>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
+                      <label className="mb-1 block text-sm font-medium text-slate-500 dark:text-slate-400">
                         Product
                       </label>
-                      <p className="text-text">
+                      <p className="text-sm text-slate-900 dark:text-white">
                         {selectedEnquiry.product?.name || "Product"}
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
+                      <label className="mb-1 block text-sm font-medium text-slate-500 dark:text-slate-400">
                         Quantity
                       </label>
-                      <p className="text-text">
+                      <p className="text-sm text-slate-900 dark:text-white">
                         {selectedEnquiry.quantity || 1}
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
+                      <label className="mb-1 block text-sm font-medium text-slate-500 dark:text-slate-400">
                         Requirements
                       </label>
-                      <div className="bg-surface p-3 rounded-lg">
-                        <p className="text-text whitespace-pre-wrap">
-                          {selectedEnquiry.requirements ||
-                            "No additional requirements provided."}
+                      <div className="panel-muted p-3">
+                        <p className="whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-300">
+                          {selectedEnquiry.requirements || "No additional requirements provided."}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-card-border">
+                    <div className="flex justify-end border-t border-slate-200/80 pt-4 dark:border-slate-800">
                       <button
                         onClick={() => setShowRequirements(false)}
-                        className="px-4 py-2 rounded-lg border border-card-border bg-card-bg text-text hover:bg-surface-alt transition-colors"
+                        className="rounded-xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-cyan-200 hover:bg-cyan-50/60 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:bg-slate-900"
                       >
                         Close
                       </button>

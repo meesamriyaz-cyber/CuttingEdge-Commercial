@@ -69,7 +69,7 @@ export default function App() {
       {!isInvoicePage && <Navbar />}
 
       <div
-        className={`flex flex-col bg ${isInvoicePage ? "" : "min-h-screen"}`}
+        className={`flex flex-col bg-page ${isInvoicePage ? "" : "min-h-screen"}`}
       >
         <main className="flex-1">
           <AnimatedAppRoutes />
@@ -77,8 +77,8 @@ export default function App() {
 
         {/* Hide footer on invoice page */}
         {!isInvoicePage && (
-          <footer className="bg-page border-0">
-            <div className="max-w-6xl mx-auto px-4 py-3 text-center text-sm text-muted">
+          <footer className="border-t border-slate-200/70 dark:border-cyan-950/40 bg-white/55 dark:bg-slate-950/35 backdrop-blur-sm">
+            <div className="max-w-6xl mx-auto px-4 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
               &copy; 2026 Cutting Edge Enterprises
             </div>
           </footer>

@@ -53,7 +53,7 @@ export default function Navbar() {
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-white/90 dark:bg-[#07111f]/95 backdrop-blur border-b border-slate-200 dark:border-cyan-950/60"
+      className="sticky top-0 z-50 bg-white/78 dark:bg-[#07111f]/92 backdrop-blur-xl border-b border-slate-200/75 dark:border-cyan-950/45"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -70,11 +70,10 @@ export default function Navbar() {
                 rounded-lg
                 text-sm md:text-base
                 font-bold
-                bg-slate-950 dark:bg-cyan-500
+                bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)]
                 text-white
-                dark:text-slate-950
-                shadow-sm
-                hover:bg-slate-800 dark:hover:bg-cyan-400
+                shadow-[0_18px_40px_-26px_rgba(8,16,29,0.78)]
+                hover:-translate-y-0.5
                 transition-all duration-300
               "
               >
@@ -83,7 +82,7 @@ export default function Navbar() {
             </Link>
           ) : (
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-950 dark:bg-cyan-500 flex items-center justify-center text-white dark:text-slate-950 font-bold rounded-lg shadow-sm">
+              <div className="w-10 h-10 bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] flex items-center justify-center text-white font-bold rounded-lg shadow-[0_16px_34px_-24px_rgba(8,16,29,0.82)]">
                 <Package size={20} />
               </div>
               <div className="hidden sm:block">
@@ -111,7 +110,7 @@ export default function Navbar() {
             {user && user.clientType === "PRIVATE" && (
               <button
                 onClick={() => navigate("/cart")}
-                className="relative p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                className="relative p-2.5 rounded-lg bg-white/80 dark:bg-slate-900/65 border border-slate-200/80 dark:border-cyan-950/50 hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
@@ -129,7 +128,7 @@ export default function Navbar() {
                 user.clientType === "PUBLIC") && (
                 <button
                   onClick={() => navigate("/wishlist")}
-                  className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                  className="p-2.5 rounded-lg bg-white/80 dark:bg-slate-900/65 border border-slate-200/80 dark:border-cyan-950/50 hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
                   aria-label="Wishlist"
                 >
                   <Heart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
@@ -140,7 +139,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-orange-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                  <div className="w-9 h-9 rounded-full bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] flex items-center justify-center text-white text-sm font-bold shadow-[0_14px_28px_-22px_rgba(8,16,29,0.75)]">
                     {user.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-200 hidden lg:block">
@@ -164,7 +163,7 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-cyan-50 dark:hover:bg-slate-900 transition-colors"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -176,7 +175,7 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+          className="md:hidden border-t border-slate-200/75 dark:border-cyan-950/45 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl"
         >
           <div className="px-4 py-4 space-y-3">
             {navItems.map((item) => (
@@ -186,7 +185,7 @@ export default function Navbar() {
                   navigate(item.to);
                   setMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors text-left"
+                className="flex items-center gap-3 w-full p-3 rounded-lg border border-transparent hover:border-cyan-200 dark:hover:border-cyan-900/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 transition-colors text-left"
               >
                 {item.label === "Services" ? <Wrench size={20} /> : <ClipboardList size={20} />}
                 <span className="font-medium">{item.label}</span>
@@ -200,7 +199,7 @@ export default function Navbar() {
                     navigate("/cart");
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
+                  className="flex items-center gap-3 w-full p-3 rounded-lg border border-transparent hover:border-cyan-200 dark:hover:border-cyan-900/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 transition-colors"
                 >
                   <ShoppingCart size={20} />
                   <span className="font-medium">Cart</span>
@@ -215,7 +214,7 @@ export default function Navbar() {
                     navigate("/wishlist");
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
+                  className="flex items-center gap-3 w-full p-3 rounded-lg border border-transparent hover:border-cyan-200 dark:hover:border-cyan-900/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 transition-colors"
                 >
                   <Heart size={20} />
                   <span className="font-medium">Wishlist</span>
@@ -229,7 +228,7 @@ export default function Navbar() {
                   navigate("/wishlist");
                   setMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
+                className="flex items-center gap-3 w-full p-3 rounded-lg border border-transparent hover:border-cyan-200 dark:hover:border-cyan-900/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 transition-colors"
               >
                 <Heart size={20} />
                 <span className="font-medium">Wishlist</span>

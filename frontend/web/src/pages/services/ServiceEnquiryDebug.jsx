@@ -32,7 +32,7 @@ export default function ServiceEnquiryDebug() {
 
       try {
         console.log("DEBUG: Fetching service by slug:", slug);
-        const res = await fetch(`${API_URL}/api/services/${slug}`);
+        const res = await fetch(`${API_URL}/services/${slug}`);
         const data = await res.json();
         console.log("DEBUG: API Response:", res.status, data);
         
