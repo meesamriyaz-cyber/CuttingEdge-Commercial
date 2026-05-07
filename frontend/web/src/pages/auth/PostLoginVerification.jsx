@@ -40,8 +40,8 @@ export default function PostLoginVerification() {
     try {
       const data = await verifyGovtCodeApi({ code });
       updateUser(data.user);
-      setSuccess("Account verified. Opening your procurement workspace...");
-      setTimeout(() => navigate("/enquiries", { replace: true }), 500);
+      setSuccess("Account verified. Opening your dashboard...");
+      setTimeout(() => navigate("/", { replace: true }), 500);
     } catch (err) {
       setError(err.message || "Verification failed");
     } finally {
