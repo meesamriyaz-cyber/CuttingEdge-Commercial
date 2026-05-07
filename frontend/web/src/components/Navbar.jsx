@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart, Menu, X, Package, User, ClipboardList, Wrench } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui";
 
 export default function Navbar() {
@@ -11,10 +11,17 @@ export default function Navbar() {
   const logout = useAuthStore((state) => state.logout);
   const isInit = useAuthStore((state) => state.isInit);
   const cart = useCartStore((state) => state.cart);
+  const fetchCart = useCartStore((state) => state.fetchCart);
 
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (isInit && user?.clientType === "PRIVATE") {
+      fetchCart();
+    }
+  }, [fetchCart, isInit, user?._id, user?.clientType]);
 
   if (!isInit) return null;
 
@@ -23,7 +30,9 @@ export default function Navbar() {
     navigate("/login", { replace: true });
   };
 
-  const cartCount = cart?.items?.length || 0;
+  const cartCount =
+    cart?.items?.reduce((count, item) => count + Number(item.quantity || 0), 0) ||
+    0;
 
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
@@ -33,10 +42,10 @@ export default function Navbar() {
     ? [
         { label: "Products", to: productPath, show: !isHomePage },
         { label: "Services", to: "/services", show: !isHomePage },
-        { label: "Orders", to: "/orders", show: user.clientType === "PRIVATE" },
-        { label: "Enquiries", to: "/enquiries", show: user.clientType === "PUBLIC" },
-        { label: "Quotes", to: "/quotes", show: user.clientType === "PUBLIC" },
-        { label: "Service Requests", to: "/service-enquiries", show: true },
+        { label: "Orders", to: "/orders", show: !isHomePage && user.clientType === "PRIVATE" },
+        { label: "Enquiries", to: "/enquiries", show: !isHomePage && user.clientType === "PUBLIC" },
+        { label: "Quotes", to: "/quotes", show: !isHomePage && user.clientType === "PUBLIC" },
+        { label: "Service Requests", to: "/service-enquiries", show: !isHomePage },
       ].filter((item) => item.show)
     : [
         { label: "Products", to: "/products-guest", show: !isHomePage },

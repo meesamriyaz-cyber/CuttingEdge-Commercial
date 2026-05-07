@@ -172,6 +172,7 @@ export default function ServicesList() {
                 <option value="Maintenance">Maintenance</option>
                 <option value="Repairs">Repairs</option>
                 <option value="Enterprise">Enterprise</option>
+                <option value="Development">Development</option>
               </select>
             </div>
           </div>

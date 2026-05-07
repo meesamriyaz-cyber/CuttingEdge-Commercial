@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock, Network, ShieldCheck, Wrench, Building2 } from "lucide-react";
+import { Lock, Network, ShieldCheck, Wrench, Building2, Code2 } from "lucide-react";
 
 /**
  * Local icon mapping (UI concern, NOT DB)
@@ -10,6 +10,7 @@ const ICON_MAP = {
   "amc-maintenance": ShieldCheck,
   "repairs-troubleshooting": Wrench,
   "enterprise-it-solutions": Building2,
+  "web-development": Code2,
 };
 
 const SERVICE_META = {
@@ -17,6 +18,7 @@ const SERVICE_META = {
   "amc-maintenance": ["Preventive checks", "Priority support", "AMC reports"],
   "repairs-troubleshooting": ["Diagnostics", "On-site support", "Parts guidance"],
   "enterprise-it-solutions": ["Procurement", "Deployment", "Managed support"],
+  "web-development": ["Websites", "Web apps", "Deployment"],
 };
 
 export default function ServiceCard({ service, index, isAuthenticated }) {

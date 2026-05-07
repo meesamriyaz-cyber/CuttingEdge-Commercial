@@ -4,15 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  BadgeCheck,
+  Boxes,
   CheckCircle2,
-  ClipboardList,
-  FileCheck,
-  Heart,
-  Inbox,
+  Gauge,
+  LifeBuoy,
   PackageSearch,
-  Quote,
+  ReceiptText,
   ShieldCheck,
-  ShoppingCart,
   Star,
   Wrench,
 } from "lucide-react";
@@ -97,23 +96,35 @@ const GUEST_PROCESS_STEPS = [
   "Track delivery, quotes, or service updates",
 ];
 
-const CARD_TONES = {
+const HERO_TONES = {
   cyan: {
-    iconBg: "bg-cyan-100 dark:bg-cyan-900/30",
-    iconText: "text-cyan-700 dark:text-cyan-300",
-    arrowText: "text-cyan-700 dark:text-cyan-300",
+    panel: "bg-cyan-50/80 dark:bg-cyan-950/20 border-cyan-200/80 dark:border-cyan-900/50",
+    icon: "bg-cyan-600 text-white dark:bg-cyan-400 dark:text-slate-950",
+    text: "text-cyan-700 dark:text-cyan-300",
   },
   orange: {
-    iconBg: "bg-orange-100 dark:bg-orange-900/30",
-    iconText: "text-orange-700 dark:text-orange-300",
-    arrowText: "text-orange-700 dark:text-orange-300",
+    panel: "bg-orange-50/80 dark:bg-orange-950/20 border-orange-200/80 dark:border-orange-900/50",
+    icon: "bg-orange-600 text-white dark:bg-orange-400 dark:text-slate-950",
+    text: "text-orange-700 dark:text-orange-300",
   },
   emerald: {
-    iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
-    iconText: "text-emerald-700 dark:text-emerald-300",
-    arrowText: "text-emerald-700 dark:text-emerald-300",
+    panel: "bg-emerald-50/80 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/50",
+    icon: "bg-emerald-600 text-white dark:bg-emerald-400 dark:text-slate-950",
+    text: "text-emerald-700 dark:text-emerald-300",
   },
 };
+
+function formatDashboardDate(value) {
+  if (!value) return "Not recorded yet";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not recorded yet";
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
 
 function getDashboardContent(user) {
   const firstName = user?.name?.trim()?.split(" ")[0] || "there";
@@ -133,77 +144,40 @@ function getDashboardContent(user) {
         { label: "Browse categories", to: "/products" },
         { label: "My enquiries", to: "/enquiries", secondary: true },
       ],
-      summary: [
+      accountInfo: [
         { label: "Account type", value: "Government customer" },
-        { label: "Verification", value: isVerified ? "Verified" : "Pending review" },
-        { label: "Primary flow", value: "Enquiries and quotations" },
+        {
+          label: "Verification",
+          value: isVerified ? "Verified" : "Pending review",
+        },
+        { label: "Last login", value: formatDashboardDate(user.lastLogin) },
+      ],
+      heroHighlights: [
+        {
+          title: "Procurement ready",
+          text: isVerified ? "Verified account access" : "Verification pending",
+          to: "/enquiries",
+          icon: BadgeCheck,
+          tone: "emerald",
+        },
+        {
+          title: "Catalogue to quote",
+          text: "Enquiries, quotes, and follow-up",
+          to: "/quotes",
+          icon: ReceiptText,
+          tone: "cyan",
+        },
+        {
+          title: "Service desk",
+          text: "AMC, repairs, and installation",
+          to: "/services",
+          icon: LifeBuoy,
+          tone: "orange",
+        },
       ],
       notice: isVerified
         ? null
         : "Verification is still pending. You can browse the catalogue now, and procurement actions will unlock after approval.",
-      workspaceCards: [
-        {
-          title: "Browse categories",
-          description:
-            "Review products filtered for institutional procurement and continue from relevant product details.",
-          to: "/products",
-          icon: PackageSearch,
-          eyebrow: "Catalogue",
-          tone: "cyan",
-        },
-        {
-          title: "My enquiries",
-          description:
-            "Track submitted requirements, updates, and responses from the procurement team.",
-          to: "/enquiries",
-          icon: Inbox,
-          eyebrow: "Procurement",
-          tone: "emerald",
-        },
-        {
-          title: "My quotes",
-          description:
-            "Review issued quotations, compare responses, and continue the approval process.",
-          to: "/quotes",
-          icon: Quote,
-          eyebrow: "Quotations",
-          tone: "orange",
-        },
-      ],
-      serviceCards: [
-        {
-          title: "Request service",
-          description:
-            "Open installation, AMC, repair, or support requests from the service catalogue.",
-          to: "/services",
-          icon: Wrench,
-          eyebrow: "Service",
-          tone: "orange",
-        },
-        {
-          title: "Service enquiries",
-          description:
-            "See submitted service requirements and follow up on technician coordination.",
-          to: "/service-enquiries",
-          icon: Inbox,
-          eyebrow: "Service tracking",
-          tone: "emerald",
-        },
-        {
-          title: "Service quotes",
-          description:
-            "Review service pricing proposals, approvals, and ongoing support coordination.",
-          to: "/service-quotes",
-          icon: FileCheck,
-          eyebrow: "Service quotations",
-          tone: "cyan",
-        },
-      ],
-      workflow: [
-        "Browse catalogue items relevant to your department",
-        "Submit product enquiries from the product detail workflow",
-        "Review quotations and continue service coordination from one dashboard",
-      ],
     };
   }
 
@@ -219,119 +193,154 @@ function getDashboardContent(user) {
       { label: "Browse products", to: "/products" },
       { label: "View cart", to: "/cart", secondary: true },
     ],
-    summary: [
+    accountInfo: [
       { label: "Account type", value: "Private customer" },
-      { label: "Primary flow", value: "Ecommerce ordering" },
-      { label: "Support", value: "Service requests and quotes" },
+      { label: "Account status", value: "Active" },
+      { label: "Last login", value: formatDashboardDate(user.lastLogin) },
+    ],
+    heroHighlights: [
+      {
+        title: "Shop faster",
+        text: "Browse categories and products",
+        to: "/products",
+        icon: Boxes,
+        tone: "cyan",
+      },
+      {
+        title: "Order control",
+        text: "Cart, checkout, and invoices",
+        to: "/orders",
+        icon: Gauge,
+        tone: "orange",
+      },
+      {
+        title: "Support hub",
+        text: "Services, quotes, and follow-up",
+        to: "/services",
+        icon: LifeBuoy,
+        tone: "emerald",
+      },
     ],
     notice: null,
-    workspaceCards: [
-      {
-        title: "Browse products",
-        description:
-          "See the product categories and continue into the ecommerce catalogue built for private customers.",
-        to: "/products",
-        icon: PackageSearch,
-        eyebrow: "Catalogue",
-        tone: "cyan",
-      },
-      {
-        title: "Shopping cart",
-        description:
-          "Continue from saved items and move directly into checkout when you are ready.",
-        to: "/cart",
-        icon: ShoppingCart,
-        eyebrow: "Checkout",
-        tone: "orange",
-      },
-      {
-        title: "My orders",
-        description:
-          "Track placed orders, invoices, delivery status, and previous purchase history.",
-        to: "/orders",
-        icon: ClipboardList,
-        eyebrow: "Orders",
-        tone: "emerald",
-      },
-      {
-        title: "Wishlist",
-        description:
-          "Keep shortlisted items ready for later review and faster repeat browsing.",
-        to: "/wishlist",
-        icon: Heart,
-        eyebrow: "Saved items",
-        tone: "cyan",
-      },
-    ],
-    serviceCards: [
-      {
-        title: "Request service",
-        description:
-          "Open installation, AMC, repair, or support requests from the service catalogue.",
-        to: "/services",
-        icon: Wrench,
-        eyebrow: "Service",
-        tone: "orange",
-      },
-      {
-        title: "Service enquiries",
-        description:
-          "Track ongoing service requests, open calls, and coordination updates in one place.",
-        to: "/service-enquiries",
-        icon: Inbox,
-        eyebrow: "Service tracking",
-        tone: "emerald",
-      },
-      {
-        title: "Service quotes",
-        description:
-          "Review issued service quotations and continue approvals without leaving the dashboard.",
-        to: "/service-quotes",
-        icon: FileCheck,
-        eyebrow: "Service quotations",
-        tone: "cyan",
-      },
-    ],
-    workflow: [
-      "Browse private-customer product categories and product details",
-      "Continue through cart, checkout, and order tracking",
-      "Use the same workspace for installation, AMC, and support requests",
-    ],
   };
 }
 
-function DashboardCard({ item }) {
-  const Icon = item.icon;
-  const tone = CARD_TONES[item.tone] || CARD_TONES.cyan;
-
+function DashboardHeroPanel({ dashboard }) {
   return (
-    <Link
-      to={item.to}
-      className="group tech-panel rounded-lg p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${tone.iconBg}`}
-        >
-          <Icon className={`h-5 w-5 ${tone.iconText}`} />
+    <div className="hero-shell overflow-hidden rounded-lg shadow-sm">
+      <div className="grid min-h-full xl:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="p-6 sm:p-8 lg:p-9">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              {dashboard.badge}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-600 dark:border-cyan-900/50 dark:bg-slate-950/35 dark:text-slate-300">
+              <ShieldCheck className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-300" />
+              Secure workspace
+            </span>
+          </div>
+
+          <h1 className="mt-5 max-w-3xl text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
+            {dashboard.heading}
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
+            {dashboard.description}
+          </p>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {dashboard.accountInfo.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-lg border border-slate-200/80 bg-white/60 px-4 py-3 dark:border-cyan-950/50 dark:bg-slate-950/25"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {item.label}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
+                  {item.value}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            {dashboard.primaryActions.map((action) => (
+              <Link
+                key={action.label}
+                to={action.to}
+                className={
+                  action.secondary
+                    ? "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300"
+                    : "inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 dark:bg-cyan-500 px-5 py-3 text-sm font-semibold text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-cyan-400"
+                }
+              >
+                {action.label}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ))}
+          </div>
+
+          {dashboard.notice && (
+            <div className="mt-6 rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
+              {dashboard.notice}
+            </div>
+          )}
         </div>
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          {item.eyebrow}
-        </span>
-      </div>
 
-      <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
-        {item.title}
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-        {item.description}
-      </p>
+        <div className="border-t border-slate-200/80 bg-white/55 p-5 dark:border-cyan-950/50 dark:bg-slate-950/25 xl:border-l xl:border-t-0">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Today
+              </p>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                Ready to continue
+              </h2>
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-950 text-white dark:bg-cyan-400 dark:text-slate-950">
+              <Gauge className="h-5 w-5" />
+            </div>
+          </div>
 
-      <div className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold ${tone.arrowText}`}>
-        Open workspace
-        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <div className="scan-divider my-5"></div>
+
+          <div className="space-y-3">
+            {dashboard.heroHighlights.map((item) => {
+              const Icon = item.icon;
+              const tone = HERO_TONES[item.tone] || HERO_TONES.cyan;
+
+              return (
+                <Link
+                  key={item.title}
+                  to={item.to}
+                  className={`group block rounded-lg border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${tone.panel}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone.icon}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className={`text-sm font-semibold ${tone.text}`}>
+                        {item.title}
+                      </h3>
+                      <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                        {item.text}
+                      </p>
+                      <span className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold ${tone.text}`}>
+                        Open
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -369,136 +378,7 @@ export default function Home() {
               className="w-[92%] max-w-7xl mx-auto mt-10"
               variants={containerVariants}
             >
-              <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-6">
-                <div className="tech-panel rounded-lg p-6 sm:p-8">
-                  <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                    {dashboard.badge}
-                  </span>
-                  <h1 className="mt-4 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
-                    {dashboard.heading}
-                  </h1>
-                  <p className="mt-3 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300">
-                    {dashboard.description}
-                  </p>
-
-                  <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                    {dashboard.primaryActions.map((action) => (
-                      <Link
-                        key={action.label}
-                        to={action.to}
-                        className={
-                          action.secondary
-                            ? "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300"
-                            : "inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 dark:bg-cyan-500 px-5 py-3 text-sm font-semibold text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-cyan-400"
-                        }
-                      >
-                        {action.label}
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    ))}
-                  </div>
-
-                  {dashboard.notice && (
-                    <div className="mt-6 rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
-                      {dashboard.notice}
-                    </div>
-                  )}
-                </div>
-
-                <div className="tech-panel rounded-lg p-6 sm:p-8">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                      <ShieldCheck className="h-5 w-5 text-cyan-700 dark:text-cyan-300" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Account overview
-                      </p>
-                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                        Current workspace
-                      </h2>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-3">
-                    {dashboard.summary.map((item) => (
-                      <div
-                        key={item.label}
-                        className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3"
-                      >
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                          {item.label}
-                        </div>
-                        <div className="mt-1 text-sm font-medium text-slate-900 dark:text-white">
-                          {item.value}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="scan-divider my-6"></div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                      What to do next
-                    </h3>
-                    <div className="mt-4 space-y-3">
-                      {dashboard.workflow.map((step) => (
-                        <div key={step} className="flex items-start gap-3">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
-                          <p className="text-sm text-slate-600 dark:text-slate-300">
-                            {step}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.section>
-
-            <motion.section
-              className="w-[92%] max-w-7xl mx-auto"
-              variants={containerVariants}
-            >
-              <div className="flex items-end justify-between gap-4 mb-5">
-                <div>
-                  <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                    Core workspace
-                  </span>
-                  <h2 className="mt-3 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-                    Product and account actions
-                  </h2>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-                {dashboard.workspaceCards.map((item) => (
-                  <DashboardCard key={item.title} item={item} />
-                ))}
-              </div>
-            </motion.section>
-
-            <motion.section
-              className="w-[92%] max-w-7xl mx-auto pb-4"
-              variants={containerVariants}
-            >
-              <div className="flex items-end justify-between gap-4 mb-5">
-                <div>
-                  <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                    Shared service workspace
-                  </span>
-                  <h2 className="mt-3 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-                    Service requests and support follow-up
-                  </h2>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {dashboard.serviceCards.map((item) => (
-                  <DashboardCard key={item.title} item={item} />
-                ))}
-              </div>
+              <DashboardHeroPanel dashboard={dashboard} />
             </motion.section>
           </>
         ) : (
