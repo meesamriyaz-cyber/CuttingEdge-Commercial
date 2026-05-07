@@ -4,6 +4,7 @@ import ServiceCardSkeleton from "../../components/ServiceCardSkeleton";
 import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 import { Search, Filter, ClipboardCheck, FileText, Wrench, CheckCircle2 } from "lucide-react";
+import { API_URL } from "../../api/client";
 
 const SERVICE_STEPS = [
   {

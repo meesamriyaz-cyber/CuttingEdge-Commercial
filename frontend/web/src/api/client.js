@@ -81,7 +81,10 @@ export async function apiRequest(path, options = {}) {
       (payload && (payload.message || payload.error)) ||
       res.statusText ||
       "Request failed";
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = res.status;
+    error.payload = payload;
+    throw error;
   }
 
   return payload;

@@ -52,11 +52,23 @@ export default function Register() {
         payload.officialEmail = officialEmail;
       }
 
-      await registerApi(payload);
-      setSuccess("Account created successfully. Redirecting to sign in...");
-      setTimeout(() => navigate("/login"), 1800);
+      const data = await registerApi(payload);
+      const emailNeedsResend =
+        clientType === "PUBLIC" && data.emailDelivery?.sent === false;
+
+      setSuccess(
+        emailNeedsResend
+          ? "Account created, but the verification email could not be delivered. Sign in and use Resend code on the verification screen."
+          : "Account created successfully. Redirecting to sign in...",
+      );
+      setTimeout(() => navigate("/login"), emailNeedsResend ? 3200 : 1800);
     } catch (err) {
-      setError(err.message || "Registration failed");
+      const deliveryError = err.payload?.emailDelivery?.error;
+      setError(
+        deliveryError
+          ? `${err.message} Reason: ${deliveryError}`
+          : err.message || "Registration failed",
+      );
     } finally {
       setLoading(false);
     }

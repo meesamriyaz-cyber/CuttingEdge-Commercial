@@ -49,7 +49,10 @@ export default function Login() {
       });
 
       if (data.verificationRequired) {
-        navigate("/verify-account", { replace: true });
+        navigate("/verify-account", {
+          replace: true,
+          state: { emailDelivery: data.emailDelivery },
+        });
       } else if (data.user?.roles?.includes("admin")) {
         navigate("/admin/dashboard", { replace: true });
       } else {

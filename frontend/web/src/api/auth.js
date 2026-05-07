@@ -29,6 +29,12 @@ export function verifyGovtCodeApi({ code }) {
   });
 }
 
+export function resendGovtVerificationCodeApi() {
+  return apiRequest("/auth/verify/resend", {
+    method: "POST",
+  });
+}
+
 export function refreshTokenApi(refreshToken) {
   return apiRequest("/auth/refresh", {
     method: "POST",
