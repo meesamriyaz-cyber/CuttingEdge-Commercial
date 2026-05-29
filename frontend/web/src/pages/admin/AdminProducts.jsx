@@ -11,6 +11,17 @@ import { Button } from "../../components/ui";
 
 const PAGE_SIZES = [5, 10, 20];
 
+const CATEGORIES = [
+  "Networking equipment",
+  "Computers",
+  "Printers",
+  "IT Accessories",
+  "Software",
+  "Storage",
+  "Electronic Appliances",
+  "Mi Mobiles"
+];
+
 export default function AdminProducts() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -22,8 +33,6 @@ export default function AdminProducts() {
   const [pageSize, setPageSize] = useState(10);
   const [editingId, setEditingId] = useState(null);
   const [editedPrice, setEditedPrice] = useState("");
-  const [editingStockId, setEditingStockId] = useState(null);
-  const [editedStock, setEditedStock] = useState("");
 
   async function load() {
     const data = await fetchAllProducts();
@@ -33,16 +42,6 @@ export default function AdminProducts() {
   useEffect(() => {
     load();
   }, []);
-
-  const categories = useMemo(() => {
-    return Array.from(
-      new Set(
-        products
-          .map((product) => product.category?.trim())
-          .filter(Boolean),
-      ),
-    ).sort((a, b) => a.localeCompare(b));
-  }, [products]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -73,12 +72,6 @@ export default function AdminProducts() {
   async function savePrice(id) {
     await updateProduct(id, { price: Number(editedPrice) });
     setEditingId(null);
-    load();
-  }
-
-  async function saveStock(id) {
-    await updateProduct(id, { stock: Math.max(0, Number(editedStock) || 0) });
-    setEditingStockId(null);
     load();
   }
 
@@ -123,7 +116,7 @@ export default function AdminProducts() {
             className="input-base"
           >
             <option value="ALL">All Categories</option>
-            {categories.map((item) => (
+            {CATEGORIES.map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -168,7 +161,7 @@ export default function AdminProducts() {
         <table className="w-full text-sm">
           <thead className="bg-slate-50/80 dark:bg-slate-950/45">
             <tr>
-              {["Name", "Category", "Segment", "Price", "Stock", "Status", "Actions"].map((heading) => (
+              {["Name", "Category", "Segment", "Price", "Status", "Actions"].map((heading) => (
                 <th
                   key={heading}
                   className="p-3 text-left font-semibold text-slate-700 dark:text-slate-200"
@@ -239,65 +232,6 @@ export default function AdminProducts() {
                 </td>
 
                 <td className="p-3">
-                  {editingStockId === product._id ? (
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() =>
-                          setEditedStock((value) =>
-                            String(Math.max(0, Number(value || 0) - 1)),
-                          )
-                        }
-                        className="btn-muted h-8 w-8"
-                        aria-label="Decrease stock"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="0"
-                        value={editedStock}
-                        onChange={(event) => setEditedStock(event.target.value)}
-                        className="input-base h-8 w-20"
-                      />
-                      <button
-                        onClick={() =>
-                          setEditedStock((value) => String(Number(value || 0) + 1))
-                        }
-                        className="btn-muted h-8 w-8"
-                        aria-label="Increase stock"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => saveStock(product._id)}
-                        className="btn-success h-8 w-8"
-                        aria-label="Save stock"
-                      >
-                        <Check size={15} />
-                      </button>
-                      <button
-                        onClick={() => setEditingStockId(null)}
-                        className="btn-muted h-8 w-8"
-                        aria-label="Cancel stock edit"
-                      >
-                        <X size={15} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setEditingStockId(product._id);
-                        setEditedStock(String(product.stock ?? 0));
-                      }}
-                      className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:text-cyan-800 dark:text-white dark:hover:text-cyan-200"
-                    >
-                      {product.stock ?? 0}
-                      <Pencil size={13} />
-                    </button>
-                  )}
-                </td>
-
-                <td className="p-3">
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-semibold ${
                       product.isActive
@@ -329,7 +263,7 @@ export default function AdminProducts() {
 
             {!paginated.length && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-slate-500 dark:text-slate-400">
+                <td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">
                   No products found
                 </td>
               </tr>
@@ -363,10 +297,6 @@ export default function AdminProducts() {
 
             <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
               Price: INR {product.price}
-            </div>
-
-            <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-              Stock: {product.stock ?? 0}
             </div>
 
             <div className="flex flex-wrap justify-end gap-2">
