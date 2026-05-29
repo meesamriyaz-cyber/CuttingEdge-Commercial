@@ -21,6 +21,7 @@ import {
   Box,
 } from "lucide-react";
 import { Button } from "../../../components/ui";
+import { getImageUrl } from "../../../utils/productImages";
 
 const ORDER_STATUSES = [
   {
@@ -131,10 +132,7 @@ export default function AdminOrderDetails() {
   }, [id]);
 
   const getProductImage = (item) => {
-    if (item.product?.images && item.product.images.length > 0) {
-      return item.product.images[0].url;
-    }
-    return null;
+    return getImageUrl(item.product?.images?.[0]);
   };
 
   if (loading) {

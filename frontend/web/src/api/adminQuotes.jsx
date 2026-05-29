@@ -10,17 +10,22 @@ function authHeaders() {
   };
 }
 
+async function parseResponse(res, fallbackMessage) {
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.message || fallbackMessage);
+  }
+
+  return data;
+}
+
 export async function fetchAdminQuotes() {
   const res = await fetch(`${API_BASE}/admin/quotes`, {
     headers: authHeaders(),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Failed to fetch quotes");
-  }
-
-  return res.json();
+  return parseResponse(res, "Failed to fetch quotes");
 }
 
 export async function fetchAdminQuote(id) {
@@ -32,12 +37,7 @@ export async function fetchAdminQuote(id) {
     headers: authHeaders(),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Failed to fetch quote");
-  }
-
-  return res.json();
+  return parseResponse(res, "Failed to fetch quote");
 }
 
 export async function updateQuoteStatus(id, status, adminRemark) {
@@ -49,7 +49,8 @@ export async function updateQuoteStatus(id, status, adminRemark) {
       body: JSON.stringify({ status, adminRemark }),
     },
   );
-  return res.json();
+
+  return parseResponse(res, "Failed to update quote");
 }
 
 export async function createQuoteFromEnquiry(enquiryId, payload) {
@@ -61,7 +62,8 @@ export async function createQuoteFromEnquiry(enquiryId, payload) {
       body: JSON.stringify(payload),
     },
   );
-  return res.json();
+
+  return parseResponse(res, "Failed to create quote");
 }
 
 export async function fetchQuoteByEnquiry(enquiryId) {
@@ -69,10 +71,5 @@ export async function fetchQuoteByEnquiry(enquiryId) {
     headers: authHeaders(),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Failed to fetch quote by enquiry");
-  }
-
-  return res.json();
+  return parseResponse(res, "Failed to fetch quote by enquiry");
 }

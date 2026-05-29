@@ -6,12 +6,13 @@ export const Card = forwardRef(
       <div
         ref={ref}
         className={`
-          bg-white dark:bg-slate-800
-          border border-slate-200 dark:border-slate-700
+          bg-white/95 dark:bg-slate-950/70
+          border border-slate-200/90 dark:border-cyan-950/55
           rounded-lg
-          shadow-sm
+          shadow-[0_18px_42px_-34px_rgba(8,16,29,0.68)]
+          backdrop-blur-sm
           transition-all duration-200
-          ${hover ? "hover:shadow-md" : ""}
+          ${hover ? "hover:-translate-y-0.5 hover:border-cyan-300/80 hover:shadow-[0_24px_52px_-34px_rgba(8,16,29,0.72)]" : ""}
           ${className}
         `}
         {...props}

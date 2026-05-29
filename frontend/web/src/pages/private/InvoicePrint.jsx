@@ -59,17 +59,17 @@ export default function InvoicePrint() {
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 print:py-0 print:px-0 print:bg-white">
       {/* Action Buttons - Hidden when printing */}
-      <div className="max-w-4xl mx-auto mb-6 flex gap-3 print:hidden">
+      <div className="max-w-4xl mx-auto mb-6 flex flex-col gap-3 sm:flex-row print:hidden">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg shadow hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg shadow hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
         >
           <Printer className="w-4 h-4" />
           Print Invoice
@@ -79,13 +79,13 @@ export default function InvoicePrint() {
       {/* Invoice Container */}
       <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 print:bg-indigo-600 print:from-indigo-600 print:to-indigo-600">
-          <div className="flex justify-between items-start">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 sm:p-8 print:bg-indigo-600 print:from-indigo-600 print:to-indigo-600">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">TAX INVOICE</h1>
               <p className="text-indigo-100">Original for Recipient</p>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <div className="text-2xl font-bold">{seller.name}</div>
               <div className="text-indigo-100 text-sm mt-1">
                 {seller.address}
@@ -98,8 +98,8 @@ export default function InvoicePrint() {
         </div>
 
         {/* Invoice Details */}
-        <div className="p-8 border-b border-gray-200">
-          <div className="grid grid-cols-2 gap-8">
+        <div className="border-b border-gray-200 p-4 sm:p-8">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8">
             {/* Bill To */}
             <div>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -119,19 +119,19 @@ export default function InvoicePrint() {
                 Invoice Details
               </h3>
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                   <span className="text-gray-600">Invoice Number:</span>
                   <span className="font-semibold text-gray-900">
                     {invoiceNo}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                   <span className="text-gray-600">Invoice Date:</span>
                   <span className="font-semibold text-gray-900">
                     {invoiceDate}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                   <span className="text-gray-600">Due Date:</span>
                   <span className="font-semibold text-gray-900"> {(() => {
     const date = new Date(invoiceDate);
@@ -145,8 +145,9 @@ export default function InvoicePrint() {
         </div>
 
         {/* Items Table */}
-        <div className="p-8">
-          <table className="w-full">
+        <div className="p-4 sm:p-8">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px]">
             <thead>
               <tr className="bg-gray-100 border-b-2 border-gray-300">
                 <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -196,14 +197,15 @@ export default function InvoicePrint() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Totals Section */}
-        <div className="px-8 pb-8">
+        <div className="px-4 pb-6 sm:px-8 sm:pb-8">
           <div className="flex justify-end">
             <div className="w-full max-w-md">
               <div className="bg-gray-50 rounded-lg p-6 space-y-3">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex flex-col gap-1 text-gray-600 sm:flex-row sm:justify-between">
                   <span>Taxable Amount</span>
                   <span className="font-medium">
                     ₹
@@ -212,7 +214,7 @@ export default function InvoicePrint() {
                     })}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex flex-col gap-1 text-gray-600 sm:flex-row sm:justify-between">
                   <span>CGST (9%)</span>
                   <span className="font-medium">
                     ₹
@@ -221,7 +223,7 @@ export default function InvoicePrint() {
                     })}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex flex-col gap-1 text-gray-600 sm:flex-row sm:justify-between">
                   <span>SGST (9%)</span>
                   <span className="font-medium">
                     ₹
@@ -231,7 +233,7 @@ export default function InvoicePrint() {
                   </span>
                 </div>
                 {invoicePricing.discountAmount > 0 && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex flex-col gap-1 text-green-600 sm:flex-row sm:justify-between">
                     <span>Discount</span>
                     <span className="font-medium">
                       -₹
@@ -242,7 +244,7 @@ export default function InvoicePrint() {
                   </div>
                 )}
                 <div className="border-t-2 border-gray-300 pt-3 mt-3">
-                  <div className="flex justify-between text-lg font-bold text-gray-900">
+                  <div className="flex flex-col gap-1 text-lg font-bold text-gray-900 sm:flex-row sm:justify-between">
                     <span>Grand Total</span>
                     <span>
                       ₹
@@ -263,7 +265,7 @@ export default function InvoicePrint() {
         </div>
 
         {/* Bank Details & Authorization */}
-        <div className="px-8 pb-8 grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-6 px-4 pb-6 sm:grid-cols-2 sm:gap-8 sm:px-8 sm:pb-8">
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-bold text-gray-900 mb-3">Bank Details</h4>
             <div className="text-sm text-gray-600 space-y-1">
@@ -282,7 +284,7 @@ export default function InvoicePrint() {
             </div>
           </div>
           <div className="flex flex-col justify-between">
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <div className="text-sm text-gray-600 mb-8">
                 Authorized Signatory
               </div>
@@ -296,7 +298,7 @@ export default function InvoicePrint() {
         </div>
 
         {/* Terms & Footer */}
-        <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
+        <div className="bg-gray-50 px-4 py-6 sm:px-8 border-t border-gray-200">
           <div className="text-xs text-gray-500 space-y-2">
             <p>
               <span className="font-semibold">Terms & Conditions:</span>

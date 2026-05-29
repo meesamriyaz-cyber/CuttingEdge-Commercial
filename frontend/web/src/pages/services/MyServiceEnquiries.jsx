@@ -47,7 +47,7 @@ export default function MyServiceEnquiries() {
 
   if (loading) {
     return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+      <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-5xl px-4">
             <div className="theme-card rounded-[24px] p-10 text-center">
@@ -61,7 +61,7 @@ export default function MyServiceEnquiries() {
 
   if (error) {
     return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+      <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-5xl px-4">
             <div className="theme-card rounded-[24px] p-8 text-center">
@@ -74,7 +74,7 @@ export default function MyServiceEnquiries() {
   }
 
   return (
-    <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+    <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
       <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-5xl">
           <section className="hero-shell rounded-[28px] p-6 sm:p-8">

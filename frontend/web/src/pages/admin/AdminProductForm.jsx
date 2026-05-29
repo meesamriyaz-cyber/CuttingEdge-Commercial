@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   createProduct,
+  fetchProductCategories,
   updateProduct,
   fetchProduct,
 } from "../../api/adminProducts";
 
-const CATEGORIES = [
+const CUSTOM_CATEGORY_VALUE = "__custom_category__";
+
+const FALLBACK_CATEGORIES = [
   "Networking equipment",
   "Computers",
   "Laptops",
@@ -19,6 +22,29 @@ const CATEGORIES = [
   "Stationary",
 ];
 
+function normalizeCategory(value) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function mergeCategories(...categoryGroups) {
+  const seen = new Set();
+  const categories = [];
+
+  categoryGroups.flat().forEach((category) => {
+    const name =
+      typeof category === "string" ? category : category?.name || "";
+    const normalized = normalizeCategory(name);
+    const key = normalized.toLowerCase();
+
+    if (!normalized || seen.has(key)) return;
+
+    seen.add(key);
+    categories.push(normalized);
+  });
+
+  return categories.sort((a, b) => a.localeCompare(b));
+}
+
 export default function AdminProductForm({ mode }) {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -29,12 +55,14 @@ export default function AdminProductForm({ mode }) {
     name: "",
     description: "",
     price: "",
+    stock: 0,
     sku: "",
     segment: "CONSUMER",
     category: "",
   });
 
   const [newCategory, setNewCategory] = useState("");
+  const [categoryOptions, setCategoryOptions] = useState(FALLBACK_CATEGORIES);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +70,29 @@ export default function AdminProductForm({ mode }) {
   const [imageFiles, setImageFiles] = useState([]);
   const [isProcessingImages, setIsProcessingImages] = useState(false);
   const [existingImages, setExistingImages] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCategories() {
+      try {
+        const data = await fetchProductCategories();
+        if (!isMounted) return;
+
+        setCategoryOptions((current) =>
+          mergeCategories(FALLBACK_CATEGORIES, current, data),
+        );
+      } catch {
+        // Keep the fallback list available if the category lookup fails.
+      }
+    }
+
+    loadCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // load product when editing
   useEffect(() => {
@@ -56,10 +107,15 @@ export default function AdminProductForm({ mode }) {
           name: data.name || "",
           description: data.description || "",
           price: data.price || "",
+          stock: Number(data.stock || 0),
           sku: data.sku || "",
           segment: data.segment || "CONSUMER",
           category: data.category || "",
         });
+
+        if (data.category) {
+          setCategoryOptions((current) => mergeCategories(current, data.category));
+        }
 
         // Load existing images for editing
         if (data.images && data.images.length > 0) {
@@ -131,8 +187,44 @@ export default function AdminProductForm({ mode }) {
 
     setForm((prev) => ({
       ...prev,
-      [name]: name === "price" ? Number(value) : value,
+      [name]: ["price", "stock"].includes(name) ? Number(value) : value,
     }));
+  }
+
+  function adjustStock(delta) {
+    setForm((prev) => ({
+      ...prev,
+      stock: Math.max(0, Number(prev.stock || 0) + delta),
+    }));
+  }
+
+  function handleCategoryChange(e) {
+    const { value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      category: value,
+    }));
+
+    if (value !== CUSTOM_CATEGORY_VALUE) {
+      setNewCategory("");
+    }
+  }
+
+  function applyCustomCategory(value) {
+    const category = normalizeCategory(value);
+
+    if (!category) {
+      setForm((prev) => ({ ...prev, category: "" }));
+      setNewCategory("");
+      return "";
+    }
+
+    setCategoryOptions((current) => mergeCategories(current, category));
+    setForm((prev) => ({ ...prev, category }));
+    setNewCategory("");
+
+    return category;
   }
 
   async function handleSubmit(e) {
@@ -144,10 +236,21 @@ export default function AdminProductForm({ mode }) {
       return;
     }
 
+    const selectedCategory =
+      form.category === CUSTOM_CATEGORY_VALUE
+        ? normalizeCategory(newCategory)
+        : normalizeCategory(form.category);
+
+    if (!selectedCategory) {
+      setError("Please select or enter a category");
+      return;
+    }
+
     setSaving(true);
     setError("");
     const payload = {
       ...form,
+      category: selectedCategory,
       images: imageFiles, // base64 list for new images
       existingImages: existingImages, // existing images for edit mode
     };
@@ -166,10 +269,10 @@ export default function AdminProductForm({ mode }) {
     }
   }
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p className="px-4 py-6">Loading...</p>;
 
   return (
-    <div className="max-w-xl space-y-4">
+    <div className="mx-auto w-full max-w-xl space-y-4 px-4 py-6 sm:px-6">
       <h2 className="text-lg font-semibold text-slate-900">
         {isEdit ? "Edit Product" : "Create Product"}
       </h2>
@@ -202,7 +305,7 @@ export default function AdminProductForm({ mode }) {
           rows={3}
         />
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <input
             name="price"
             type="number"
@@ -221,40 +324,67 @@ export default function AdminProductForm({ mode }) {
             className="w-full border rounded px-3 py-2"
           />
         </div>
+
+        <div className="space-y-2 rounded border border-slate-200 p-3">
+          <label className="text-xs font-medium text-slate-600">
+            Stock quantity
+          </label>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => adjustStock(-1)}
+              className="h-10 w-10 rounded border text-lg font-semibold"
+              aria-label="Decrease stock"
+            >
+              -
+            </button>
+            <input
+              name="stock"
+              type="number"
+              min="0"
+              step="1"
+              value={form.stock}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2 text-center"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => adjustStock(1)}
+              className="h-10 w-10 rounded border text-lg font-semibold"
+              aria-label="Increase stock"
+            >
+              +
+            </button>
+          </div>
+          <p className="text-xs text-slate-500">
+            Customers can only add quantities that are available in stock.
+          </p>
+        </div>
         <div className="space-y-2">
           <select
             name="category"
             value={form.category}
-            onChange={handleChange}
+            onChange={handleCategoryChange}
             className="w-full border rounded px-3 py-2"
             required
           >
             <option value="">Select Category</option>
-            {CATEGORIES.map((c) => (
+            {categoryOptions.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
             ))}
-            <option value="custom">+ Add New Category</option>
+            <option value={CUSTOM_CATEGORY_VALUE}>+ Add New Category</option>
           </select>
-          {form.category === "custom" && (
+          {form.category === CUSTOM_CATEGORY_VALUE && (
             <input
               type="text"
               placeholder="Enter new category name"
               className="w-full border rounded px-3 py-2"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              onBlur={(e) => {
-                if (e.target.value.trim()) {
-                  setForm((prev) => ({
-                    ...prev,
-                    category: e.target.value.trim(),
-                  }));
-                  setNewCategory("");
-                } else {
-                  setForm((prev) => ({ ...prev, category: "" }));
-                }
-              }}
+              onBlur={(e) => applyCustomCategory(e.target.value)}
               autoFocus
             />
           )}
@@ -279,7 +409,7 @@ export default function AdminProductForm({ mode }) {
           </p>
         )}
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col justify-end gap-2 sm:flex-row">
           <button
             type="submit"
             disabled={saving || isProcessingImages}
@@ -323,7 +453,7 @@ export default function AdminProductForm({ mode }) {
                 <h4 className="text-sm font-medium text-slate-700 mb-2">
                   Existing Images
                 </h4>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {existingImages.map((image, index) => (
                     <div key={image.publicId} className="relative group">
                       <img
@@ -362,7 +492,7 @@ export default function AdminProductForm({ mode }) {
                 <h4 className="text-sm font-medium text-slate-700 mb-2">
                   New Images
                 </h4>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {preview.map((img, i) => (
                     <div key={`new-${i}`} className="relative group">
                       <img

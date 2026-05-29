@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import RoleGate from "../../components/RoleGate";
 import { API_URL } from "../../api/client";
+import toast from "react-hot-toast";
 
 export default function ServiceQuoteDetails() {
   const { id, enquiryId } = useParams();
@@ -70,10 +71,11 @@ export default function ServiceQuoteDetails() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
+      toast.success(`Quote ${decision.toLowerCase()} successfully`);
       // Refresh quote data
       loadQuote();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "Could not process quote");
     } finally {
       setActionLoading(false);
     }
@@ -102,13 +104,13 @@ export default function ServiceQuoteDetails() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "Failed to download PDF");
     }
   }
 
   if (loading) {
     return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+      <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
         <div className="min-h-screen bg py-8 px-4">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse space-y-4">
@@ -124,7 +126,7 @@ export default function ServiceQuoteDetails() {
 
   if (error) {
     return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+      <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
         <div className="min-h-screen bg py-8 px-4">
           <div className="max-w-4xl mx-auto">
             <button
@@ -157,7 +159,7 @@ export default function ServiceQuoteDetails() {
 
   if (!quote) {
     return (
-      <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+      <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
         <div className="min-h-screen bg py-8 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <p>Quote not available</p>
@@ -191,7 +193,7 @@ export default function ServiceQuoteDetails() {
   const statusBadge = getStatusBadge();
 
   return (
-    <RoleGate allow={["PRIVATE", "PUBLIC"]}>
+    <RoleGate allow={["PRIVATE", "PUBLIC"]} showFallback>
       <div className="min-h-screen bg py-8">
         <div className="max-w-4xl mx-auto px-4 space-y-6">
           {/* Back Button */}

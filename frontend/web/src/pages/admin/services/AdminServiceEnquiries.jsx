@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import { API_URL } from "../../../api/client";
 import { useAuthStore } from "../../../store/authStore";
+import { Button } from "../../../components/ui";
 
 export default function AdminServiceEnquiries() {
   const { accessToken } = useAuthStore();
@@ -71,7 +72,7 @@ export default function AdminServiceEnquiries() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[700px] text-sm">
                 <thead className="bg-slate-100">
                   <tr>
                     <th className="p-4 text-left">ID</th>
@@ -127,12 +128,14 @@ export default function AdminServiceEnquiries() {
                       </td>
 
                       <td className="p-4 text-right">
-                        <Link
+                        <Button
+                          size="sm"
                           to={`/admin/service-enquiries/${enq._id}`}
-                          className="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700"
+                          className="min-h-8 px-3 py-1.5 text-xs"
                         >
                           View
-                        </Link>
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </Button>
                       </td>
                     </tr>
                   ))}

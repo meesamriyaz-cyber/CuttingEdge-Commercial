@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Building2,
 } from "lucide-react";
+import { Button } from "../../../components/ui";
 
 const statusConfig = {
   PLACED: {
@@ -187,8 +188,8 @@ export default function AdminOrders() {
         </div>
 
         {/* Filters */}
-        <div className="rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-4 theme-card bg-surface border border-white/40 shadow-lg">
-          <div className="flex items-center gap-2 flex-1 min-w-[250px]">
+        <div className="rounded-2xl p-4 mb-6 flex flex-col gap-4 theme-card bg-surface border border-white/40 shadow-lg sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex w-full min-w-0 items-center gap-2 sm:flex-1 sm:min-w-[250px]">
             <Search className="w-5 h-5 text-slate-400" />
             <input
               type="text"
@@ -198,12 +199,12 @@ export default function AdminOrders() {
               className="flex-1 bg-transparent outline-none text-slate-900 placeholder-slate-400"
             />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Filter className="w-5 h-5 text-slate-400" />
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 rounded-lg outline-none bg-slate-100 text-slate-900 border border-slate-200"
+              className="w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-slate-900 outline-none sm:w-auto"
             >
               <option value="ALL">All Status</option>
               {Object.keys(statusConfig).map((status) => (
@@ -218,7 +219,7 @@ export default function AdminOrders() {
         {/* Orders Table */}
         <div className="rounded-2xl overflow-hidden theme-card bg-surface border border-white/40 shadow-lg">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[760px]">
               <thead className="bg-slate-100">
                 <tr>
                   <th className="p-4 text-left text-sm font-semibold text-slate-900">
@@ -333,13 +334,14 @@ export default function AdminOrders() {
                           </div>
                         </td>
                         <td className="p-4 text-right">
-                          <Link
+                          <Button
+                            size="sm"
                             to={`/admin/orders/${order._id}`}
-                            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition-colors hover:opacity-80 bg-slate-100 text-slate-900 border border-slate-200 hover:bg-slate-200"
+                            className="min-h-8 px-3 py-1.5 text-xs"
                           >
                             View
                             <ChevronRight className="w-4 h-4" />
-                          </Link>
+                          </Button>
                         </td>
                       </tr>
                     );

@@ -27,6 +27,7 @@ import { getWishlist, addToWishlist, removeFromWishlist } from "../../api/wishli
 import LayoutContainer from "../../components/LayoutContainer";
 import { fadeInVariants } from "../../utils/animations";
 import { Button } from "../../components/ui";
+import { getProductPrimaryImage } from "../../utils/productImages";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -149,6 +150,12 @@ export default function ProductListByCategory() {
   async function handleAddToCart(productId, productName) {
     if (isGovt) return;
 
+    const product = products.find((item) => item._id === productId);
+    if (Number(product?.stock || 0) < 1) {
+      toast.error(`${productName} is out of stock`);
+      return;
+    }
+
     setAddingToCart(productId);
     try {
       await updateQuantity(productId, 1);
@@ -235,7 +242,7 @@ export default function ProductListByCategory() {
           </Button>
         </div>
 
-        <section className="tech-panel rounded-lg p-6 sm:p-8">
+        <section className="hero-shell rounded-lg p-6 sm:p-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
               <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
@@ -251,7 +258,7 @@ export default function ProductListByCategory() {
               </p>
             </div>
 
-            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3">
+            <div className="rounded-lg border border-slate-200 bg-white/80 px-4 py-3 shadow-[0_18px_40px_-32px_rgba(8,16,29,0.55)] backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/45">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Visible products
               </div>
@@ -262,7 +269,7 @@ export default function ProductListByCategory() {
           </div>
         </section>
 
-        <div className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 p-4 shadow-sm">
+        <div className="glass-premium flex items-start gap-3 rounded-lg p-4">
           {isGovt ? (
             <LogIn className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
           ) : (
@@ -282,7 +289,7 @@ export default function ProductListByCategory() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
+        <div className="glass-premium rounded-lg p-4 sm:p-5">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 justify-between">
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
               <div className="relative flex-1 max-w-md">
@@ -292,7 +299,7 @@ export default function ProductListByCategory() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search products..."
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 pl-11 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
+                  className="theme-input w-full pl-11 pr-4"
                 />
               </div>
 
@@ -301,7 +308,7 @@ export default function ProductListByCategory() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full appearance-none rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 pl-11 pr-10 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
+                  className="theme-input w-full appearance-none pl-11 pr-10"
                 >
                   <option value="newest">Newest first</option>
                   <option value="name">Name A-Z</option>
@@ -374,7 +381,7 @@ export default function ProductListByCategory() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.03, 0.24), duration: 0.28 }}
               >
-                <div className="group tech-panel relative flex h-full flex-col rounded-lg p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                <div className="group theme-card relative flex h-full flex-col rounded-lg p-4 transition-all duration-200 hover:-translate-y-1">
                   <button
                     type="button"
                     className={`absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 transition-all ${
@@ -396,16 +403,12 @@ export default function ProductListByCategory() {
                     className="block"
                   >
                     <div className="flex h-44 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-950 p-5">
-                      {product.images?.[0]?.url ? (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <Package className="h-14 w-14 text-slate-300 dark:text-slate-600" />
-                      )}
+                      <img
+                        src={getProductPrimaryImage(product)}
+                        alt={product.name}
+                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
                     </div>
                   </Link>
 
@@ -440,6 +443,19 @@ export default function ProductListByCategory() {
                         ? "Pricing via quotation"
                         : PRICE_FORMATTER.format(product.price || 0)}
                     </div>
+                    {!isGovt && (
+                      <p
+                        className={`mt-1 text-xs font-medium ${
+                          Number(product.stock || 0) > 0
+                            ? "text-emerald-600 dark:text-emerald-300"
+                            : "text-red-600 dark:text-red-300"
+                        }`}
+                      >
+                        {Number(product.stock || 0) > 0
+                          ? `${product.stock} in stock`
+                          : "Out of stock"}
+                      </p>
+                    )}
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       {isGovt
                         ? "Use the product details page to continue with enquiry."
@@ -458,7 +474,7 @@ export default function ProductListByCategory() {
                         size="sm"
                         className="gap-2"
                         onClick={() => handleAddToCart(product._id, product.name)}
-                        disabled={addingToCart === product._id}
+                        disabled={addingToCart === product._id || Number(product.stock || 0) < 1}
                       >
                         {addingToCart === product._id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -486,16 +502,12 @@ export default function ProductListByCategory() {
                 <div className="tech-panel flex flex-col md:flex-row gap-5 rounded-lg p-4 sm:p-5">
                   <Link to={`/products/${product._id}`} className="md:w-44 lg:w-52 shrink-0">
                     <div className="flex h-40 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-950 p-5">
-                      {product.images?.[0]?.url ? (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className="max-h-full max-w-full object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <Package className="h-14 w-14 text-slate-300 dark:text-slate-600" />
-                      )}
+                      <img
+                        src={getProductPrimaryImage(product)}
+                        alt={product.name}
+                        className="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                      />
                     </div>
                   </Link>
 
@@ -551,6 +563,19 @@ export default function ProductListByCategory() {
                             ? "Pricing via quotation"
                             : PRICE_FORMATTER.format(product.price || 0)}
                         </div>
+                        {!isGovt && (
+                          <p
+                            className={`mt-1 text-xs font-medium ${
+                              Number(product.stock || 0) > 0
+                                ? "text-emerald-600 dark:text-emerald-300"
+                                : "text-red-600 dark:text-red-300"
+                            }`}
+                          >
+                            {Number(product.stock || 0) > 0
+                              ? `${product.stock} in stock`
+                              : "Out of stock"}
+                          </p>
+                        )}
                         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                           {isGovt
                             ? "Continue from product details into the enquiry workflow."
@@ -569,7 +594,7 @@ export default function ProductListByCategory() {
                             size="sm"
                             className="gap-2"
                             onClick={() => handleAddToCart(product._id, product.name)}
-                            disabled={addingToCart === product._id}
+                            disabled={addingToCart === product._id || Number(product.stock || 0) < 1}
                           >
                             {addingToCart === product._id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />

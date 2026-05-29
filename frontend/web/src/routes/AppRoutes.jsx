@@ -44,11 +44,13 @@ import AdminQuotes from "../pages/admin/quotes/AdminQuotes";
 import AdminServiceEnquiries from "../pages/admin/services/AdminServiceEnquiries";
 import AdminServiceEnquiryDetails from "../pages/admin/services/AdminServiceEnquiryDetails";
 import AdminServiceQuoteCreate from "../pages/admin/services/AdminServiceQuoteCreate";
+import AdminServiceQuoteDetails from "../pages/admin/services/AdminServiceQuoteDetails";
 import InvoicePrint from "../pages/private/InvoicePrint";
 import ProductListGuest from "../pages/products/ProductListGuest";
 import ServiceList from "../pages/services/ServicesList";
 import ProductDetailsGuest from "../pages/products/ProductDetailsGuest";
 import ServiceEnquiry from "../pages/services/ServiceEnquiry";
+import ServiceDetail from "../pages/services/ServiceDetail";
 
 export default function AppRoutes() {
   const user = useAuthStore((state) => state.user);
@@ -61,6 +63,7 @@ export default function AppRoutes() {
       <Route path="/products-guest" element={<ProductListGuest />} />
       <Route path="/products-guest/:id" element={<ProductDetailsGuest />} />
       <Route path="/services" element={<ServiceList />} />
+      <Route path="/services/:slug" element={<ServiceDetail />} />
 
       <Route
         path="/services/enquiry/:slug"
@@ -409,6 +412,16 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/service-quotes/:id"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <AdminServiceQuoteDetails />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all for authenticated users */}
       <Route
@@ -416,7 +429,9 @@ export default function AppRoutes() {
         element={
           user ? (
             user.roles?.includes("admin") ? (
-              <AdminDashboard />
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
             ) : (
               <Home />
             )

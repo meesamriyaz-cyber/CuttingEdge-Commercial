@@ -61,7 +61,7 @@ export async function apiRequest(path, options = {}) {
     if (res.status === 401) {
       // Clear auth store
       try {
-        useAuthStore.getState().logout();
+        useAuthStore.getState().expireSession();
       } catch (e) {
         // Fallback - clear localStorage directly
         localStorage.removeItem("session");

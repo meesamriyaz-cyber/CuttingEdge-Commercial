@@ -1,4 +1,5 @@
-import { Plus, Minus, Trash, AlertTriangle, Package } from "lucide-react";
+import { Plus, Minus, Trash, AlertTriangle } from "lucide-react";
+import { getProductPrimaryImage } from "../../utils/productImages";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -14,21 +15,19 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
     product.stock <= 5;
 
   const outOfStock = typeof product?.stock === "number" && product.stock === 0;
+  const maxStockReached =
+    typeof product?.stock === "number" && quantity >= product.stock;
 
   return (
     <div className="theme-card rounded-[24px] p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100/90 dark:bg-slate-900/60">
-            {product?.images?.[0]?.url ? (
-              <img
-                src={product.images[0].url}
-                alt={product.name}
-                className="h-full w-full object-contain p-3"
-              />
-            ) : (
-              <Package className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-            )}
+            <img
+              src={getProductPrimaryImage(product)}
+              alt={product.name}
+              className="h-full w-full object-contain p-3"
+            />
           </div>
 
           <div className="min-w-0">
@@ -71,7 +70,7 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove }) {
 
             <button
               onClick={onIncrease}
-              disabled={outOfStock}
+              disabled={outOfStock || maxStockReached}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/85 text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:text-cyan-300"
             >
               <Plus size={14} />

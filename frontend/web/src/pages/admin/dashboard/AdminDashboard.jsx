@@ -1,156 +1,228 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchAdminQuotes } from "../../../api/adminQuotes";
-
 import {
-  Users,
-  ShoppingCart,
-  MessageSquare,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  PlusCircle,
-  Settings,
-  Activity,
+  ArrowRight,
+  BadgeCheck,
+  BarChart3,
   Calendar,
+  ClipboardList,
+  FileText,
+  LifeBuoy,
+  Package,
+  ReceiptText,
+  ShoppingCart,
+  Users,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  HoverPulse,
-  FloatingElement,
-  BounceIn,
-  CardFlip,
-} from "../../../components/MicroInteractions";
+import { motion as Motion } from "framer-motion";
+
 import { fetchAdminEnquiries } from "../../../api/adminEnquiries";
-import { useAuthStore } from "../../../store/authStore";
+import { fetchAdminQuotes } from "../../../api/adminQuotes";
 import { API_URL } from "../../../api/client";
+import { useAuthStore } from "../../../store/authStore";
+import { Button } from "../../../components/ui";
+import { containerVariants, fadeInVariants } from "../../../utils/animations";
 
-// Mock data for non-enquiry stats - replace with actual API calls
-/* const mockStats = {
-  totalOrders: 156,
-  totalRevenue: 89450,
-  activeQuotes: 1,
-  newCustomers: 12,
-}; */
+function formatDate(value) {
+  if (!value) return "Not recorded";
 
-const mockRecentActivity = [
-  {
-    id: 1,
-    type: "order",
-    title: "New Order #ORD-2024-001",
-    time: "2 minutes ago",
-    status: "pending",
-  },
-  {
-    id: 3,
-    type: "quote",
-    title: "Quote generated for ABC Corp",
-    time: "1 hour ago",
-    status: "sent",
-  },
-  {
-    id: 4,
-    type: "customer",
-    title: "New customer registered",
-    time: "2 hours ago",
-    status: "completed",
-  },
-  {
-    id: 5,
-    type: "order",
-    title: "Order #ORD-2024-002 shipped",
-    time: "4 hours ago",
-    status: "completed",
-  },
-];
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not recorded";
 
-const mockQuickActions = [
-  {
-    id: 1,
-    title: "Create New Product",
-    icon: PlusCircle,
-    color: "from-orange-500 to-amber-500",
-    href: "/admin/products",
-  },
-  {
-    id: 2,
-    title: "Manage Orders",
-    icon: ShoppingCart,
-    color: "from-green-500 to-orange-500",
-    href: "/admin/orders",
-  },
-  {
-    id: 3,
-    title: "Product Enquiries",
-    icon: MessageSquare,
-    color: "from-orange-500 to-amber-500",
-    href: "/admin/enquiries",
-  },
-  {
-    id: 4,
-    title: "Service Enquiries",
-    icon: MessageSquare,
-    color: "from-orange-500 to-red-500",
-    href: "/admin/service-enquiries",
-  },
-];
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatMoney(value) {
+  return `INR ${Number(value || 0).toLocaleString("en-IN")}`;
+}
+
+function buildSalesSeries(orders = []) {
+  const now = new Date();
+  const months = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    const key = `${date.getFullYear()}-${date.getMonth()}`;
+
+    return {
+      key,
+      label: new Intl.DateTimeFormat("en-IN", { month: "short" }).format(date),
+      orders: 0,
+      revenue: 0,
+    };
+  });
+  const byKey = new Map(months.map((month) => [month.key, month]));
+
+  orders.forEach((order) => {
+    const date = new Date(order.createdAt);
+    if (Number.isNaN(date.getTime())) return;
+
+    const key = `${date.getFullYear()}-${date.getMonth()}`;
+    const bucket = byKey.get(key);
+    if (!bucket) return;
+
+    bucket.orders += 1;
+    bucket.revenue += order.pricing?.grandTotal || order.totalAmount || order.total || 0;
+  });
+
+  return months;
+}
+
+function StatCard({ title, value, description, icon: Icon, tone = "cyan" }) {
+  const toneClass = {
+    cyan: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/25 dark:text-cyan-200",
+    amber: "bg-orange-50 text-orange-700 dark:bg-orange-950/25 dark:text-orange-200",
+    emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-200",
+    slate: "bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200",
+  }[tone];
+
+  return (
+    <Motion.div variants={fadeInVariants} className="theme-card rounded-lg p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            {title}
+          </p>
+          <p className="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
+            {value}
+          </p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {description}
+          </p>
+        </div>
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${toneClass}`}>
+          <Icon size={21} />
+        </div>
+      </div>
+    </Motion.div>
+  );
+}
+
+function ActivityRow({ activity }) {
+  return (
+    <Link
+      to={activity.to}
+      className="flex items-center gap-3 rounded-lg px-3 py-3 transition hover:bg-cyan-50/65 dark:hover:bg-slate-900/70"
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700 dark:bg-cyan-950/25 dark:text-cyan-200">
+        <activity.icon size={18} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+          {activity.title}
+        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {activity.meta}
+        </p>
+      </div>
+      <span className="rounded-full border border-slate-200 bg-white/70 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300">
+        {activity.status}
+      </span>
+    </Link>
+  );
+}
+
+function SalesChart({ data, loading }) {
+  const maxRevenue = Math.max(1, ...data.map((item) => item.revenue));
+  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+  const totalOrders = data.reduce((sum, item) => sum + item.orders, 0);
+
+  return (
+    <section className="theme-card rounded-lg p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+            Sales overview
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Revenue trend from recent orders.
+          </p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700 dark:bg-cyan-950/25 dark:text-cyan-200">
+          <BarChart3 size={20} />
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-lg border border-slate-200/80 bg-white/72 p-3 dark:border-cyan-950/50 dark:bg-slate-950/35">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Six-month sales
+          </p>
+          <p className="mt-1 text-lg font-bold text-slate-950 dark:text-white">
+            {loading ? "..." : formatMoney(totalRevenue)}
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-200/80 bg-white/72 p-3 dark:border-cyan-950/50 dark:bg-slate-950/35">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Orders
+          </p>
+          <p className="mt-1 text-lg font-bold text-slate-950 dark:text-white">
+            {loading ? "..." : totalOrders}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 flex h-44 items-end gap-2 rounded-lg border border-slate-200/80 bg-white/60 p-3 dark:border-cyan-950/50 dark:bg-slate-950/30">
+        {data.map((item) => {
+          const height = loading ? 32 : Math.max(14, Math.round((item.revenue / maxRevenue) * 128));
+
+          return (
+            <div key={item.key} className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2">
+              <div className="flex h-32 w-full items-end justify-center">
+                <div
+                  className="w-full max-w-8 rounded-t-lg bg-[linear-gradient(180deg,#0f766e_0%,#d97706_100%)] shadow-[0_14px_28px_-22px_rgba(8,16,29,0.75)] transition-all"
+                  style={{ height }}
+                  title={`${item.label}: ${formatMoney(item.revenue)}`}
+                />
+              </div>
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                {item.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 export default function AdminDashboard() {
-  const { accessToken } = useAuthStore();
+  const { accessToken, user } = useAuthStore();
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
     activeQuotes: 0,
+    totalQuotes: 0,
     newCustomers: 0,
     pendingEnquiries: 0,
     pendingServiceEnquiries: 0,
   });
-  const [time, setTime] = useState(new Date());
   const [enquiries, setEnquiries] = useState([]);
+  const [salesSeries, setSalesSeries] = useState(() => buildSalesSeries([]));
   const [loading, setLoading] = useState(true);
-  const [quoteStats, setQuoteStats] = useState({
-    total: 0,
-    active: 0,
-    accepted: 0,
-    rejected: 0,
-  });
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Fetch all dashboard data
-  useEffect(() => {
-    const loadDashboardData = async () => {
+    async function loadDashboardData() {
       try {
         setLoading(true);
 
-        // Load orders
         const ordersRes = await fetch(`${API_URL}/admin/orders`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const ordersData = await ordersRes.json();
-        const ordersList = Array.isArray(ordersData) ? ordersData : [];
-
-        // Calculate order stats
+        const ordersList = Array.isArray(ordersData) ? ordersData : ordersData.orders || [];
         const totalRevenue = ordersList.reduce(
-          (sum, order) =>
-            sum + (order.pricing?.grandTotal || order.totalAmount || 0),
+          (sum, order) => sum + (order.pricing?.grandTotal || order.totalAmount || order.total || 0),
           0,
         );
+        setSalesSeries(buildSalesSeries(ordersList));
 
-        // Load enquiries
-        const data = await fetchAdminEnquiries();
-        const enquiryList = data.enquiries || data || [];
+        const enquiryData = await fetchAdminEnquiries();
+        const enquiryList = enquiryData.enquiries || enquiryData || [];
         setEnquiries(enquiryList);
 
-        // Count pending enquiries
-        const pendingCount = enquiryList.filter(
-          (enq) => enq.status === "NEW" || enq.status === "IN_REVIEW",
-        ).length;
-
-        // Load service enquiries
         let pendingServiceCount = 0;
         try {
           const serviceRes = await fetch(`${API_URL}/admin/service-enquiries`, {
@@ -158,14 +230,13 @@ export default function AdminDashboard() {
           });
           const serviceData = await serviceRes.json();
           const serviceEnquiries = serviceData.enquiries || [];
-          pendingServiceCount = serviceEnquiries.filter(
-            (enq) => enq.status === "NEW" || enq.status === "IN_PROGRESS",
+          pendingServiceCount = serviceEnquiries.filter((enq) =>
+            ["NEW", "IN_PROGRESS", "IN_REVIEW"].includes(enq.status),
           ).length;
-        } catch (serviceErr) {
-          console.error("Failed to load service enquiries:", serviceErr);
+        } catch (error) {
+          console.error("Failed to load service enquiries:", error);
         }
 
-        // Load users for new customers count
         let newCustomers = 0;
         try {
           const usersRes = await fetch(`${API_URL}/admin/users`, {
@@ -176,571 +247,232 @@ export default function AdminDashboard() {
             const users = usersData.users || [];
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            newCustomers = users.filter((user) => {
-              const userDate = new Date(user.createdAt);
-              return userDate >= thirtyDaysAgo;
+            newCustomers = users.filter((currentUser) => {
+              const createdAt = new Date(currentUser.createdAt);
+              return createdAt >= thirtyDaysAgo;
             }).length;
           }
-        } catch (userErr) {
-          console.error("Failed to load users:", userErr);
+        } catch (error) {
+          console.error("Failed to load users:", error);
+        }
+
+        let quoteList = [];
+        try {
+          const quoteData = await fetchAdminQuotes();
+          quoteList = Array.isArray(quoteData) ? quoteData : quoteData.quotes || [];
+        } catch (error) {
+          console.error("Failed to load quote stats:", error);
         }
 
         setStats({
           totalOrders: ordersList.length,
-          totalRevenue: totalRevenue,
-          pendingEnquiries: pendingCount,
+          totalRevenue,
+          pendingEnquiries: enquiryList.filter((enq) =>
+            ["NEW", "IN_REVIEW"].includes(enq.status),
+          ).length,
           pendingServiceEnquiries: pendingServiceCount,
-          newCustomers: newCustomers,
-          activeQuotes: 0, // Will be updated by loadQuoteStats
+          newCustomers,
+          activeQuotes: quoteList.filter((quote) => quote.status === "SENT").length,
+          totalQuotes: quoteList.length,
         });
+        setLastUpdated(new Date());
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     if (accessToken) {
       loadDashboardData();
+      const interval = setInterval(loadDashboardData, 30000);
+      return () => clearInterval(interval);
     }
 
-    // Refresh data every 30 seconds
-    const interval = setInterval(() => {
-      if (accessToken) {
-        loadDashboardData();
-      }
-    }, 30000);
-    return () => clearInterval(interval);
+    return undefined;
   }, [accessToken]);
 
-  useEffect(() => {
-    const loadQuoteStats = async () => {
-      try {
-        const quotes = await fetchAdminQuotes();
-
-        const list = Array.isArray(quotes) ? quotes : quotes.quotes || [];
-        const activeCount = list.filter((q) => q.status === "SENT").length;
-
-        setQuoteStats({
-          total: list.length,
-          active: activeCount,
-          accepted: list.filter((q) => q.status === "ACCEPTED").length,
-          rejected: list.filter((q) => q.status === "REJECTED").length,
-        });
-
-        setStats((prev) => ({
-          ...prev,
-          activeQuotes: activeCount,
-        }));
-      } catch (err) {
-        console.error("Failed to load quote stats", err);
-      }
-    };
-
-    loadQuoteStats();
-  }, []);
-
-  // Generate real-time enquiry activities
-  const getEnquiryActivities = () => {
-    if (!enquiries.length) return [];
-
-    return enquiries
-      .slice(0, 5) // Show last 5 enquiries
-      .map((enq) => ({
-        id: `enq-${enq._id}`,
-        type: "enquiry",
-        title: `Enquiry from ${enq.user?.organizationName || enq.user?.name || "Customer"}`,
-        time: new Date(enq.createdAt).toLocaleDateString(),
-        status: enq.status.toLowerCase(),
-        enquiryId: enq._id.slice(-6),
-      }));
-  };
-
-  const allRecentActivity = getEnquiryActivities();
-
-  const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
-    <HoverPulse>
-      <motion.div
-        className="bg-surface border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
-        whileHover={{ y: -4, scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className={`p-3 rounded-lg bg-gradient-to-br ${color} text-white shadow-lg`}
-            >
-              <Icon className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">{title}</p>
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
-            </div>
-          </div>
-          {trend && (
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${
-                trend === "up" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {trend === "up" ? (
-                <TrendingUp className="w-4 h-4" />
-              ) : (
-                <TrendingDown className="w-4 h-4" />
-              )}
-              {trendValue}
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </HoverPulse>
+  const recentActivities = useMemo(
+    () =>
+      enquiries.slice(0, 5).map((enquiry) => ({
+        title: enquiry.user?.organizationName || enquiry.user?.name || "Customer enquiry",
+        meta: `${formatDate(enquiry.createdAt)} - ${enquiry._id?.slice(-6) || "request"}`,
+        status: enquiry.status || "NEW",
+        to: `/admin/enquiries/${enquiry._id}`,
+        icon: ClipboardList,
+      })),
+    [enquiries],
   );
 
-  const ActivityItem = ({ activity }) => {
-    const getTypeIcon = (type) => {
-      switch (type) {
-        case "order":
-          return ShoppingCart;
-        case "enquiry":
-          return MessageSquare;
-        case "quote":
-          return DollarSign;
-        case "customer":
-          return Users;
-        default:
-          return Activity;
-      }
-    };
-
-    const getTypeColor = (type) => {
-      switch (type) {
-        case "order":
-          return "text-orange-600 bg-orange-100";
-        case "enquiry":
-          return "text-orange-600 bg-orange-100";
-        case "quote":
-          return "text-green-600 bg-green-100";
-        case "customer":
-          return "text-orange-600 bg-orange-100";
-        default:
-          return "text-gray-600 bg-gray-100";
-      }
-    };
-
-    const getStatusColor = (status) => {
-      switch (status) {
-        case "completed":
-        case "delivered":
-          return "bg-green-100 text-green-700 border border-green-200";
-        case "pending":
-        case "processing":
-          return "bg-yellow-100 text-yellow-700 border border-yellow-200";
-        case "new":
-        case "placed":
-          return "bg-orange-100 text-orange-700 border border-orange-200";
-        default:
-          return "bg-gray-100 text-gray-700 border border-gray-200";
-      }
-    };
-
-    const Icon = getTypeIcon(activity.type);
-
-    return (
-      <motion.div
-        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-        whileHover={{ x: 4 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
-        <div className={`p-2 rounded-lg ${getTypeColor(activity.type)}`}>
-          <Icon className="w-4 h-4" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-          <p className="text-xs text-gray-500">{activity.time}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activity.status)}`}
-          >
-            {activity.status}
-          </span>
-        </div>
-      </motion.div>
-    );
-  };
-
-  const QuickActionCard = ({ action }) => {
-    const Icon = action.icon;
-
-    return (
-      <HoverPulse>
-        <motion.div
-          className="group relative overflow-hidden rounded-xl border border-gray-200 bg-surface p-6 shadow-lg hover:shadow-xl transition-all duration-300"
-          whileHover={{ y: -2, scale: 1.01 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        >
-          <Link to={action.href}>
-            <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
-
-            <div className="relative flex items-center gap-4">
-              <div
-                className={`p-3 rounded-lg bg-gradient-to-br ${action.color} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}
-              >
-                <Icon className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {action.title}
-                </h3>
-                <p className="text-sm text-gray-600">Quick action</p>
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-xs text-gray-500">Click to proceed</span>
-              <motion.div
-                className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-orange-500 transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-              >
-                <svg
-                  className="w-3 h-3 text-gray-600 group-hover:text-white transition-colors duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </motion.div>
-            </div>
-          </Link>
-        </motion.div>
-      </HoverPulse>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
-      <div className="space-y-6 animate-fade-in max-w-7xl mx-auto px-4 relative z-10">
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row gap-6 w-full">
-          <div className="flex-1">
-            <BounceIn delay={0.1}>
-              <div className="bg-gradient-to-br from-orange-600 via-orange-700 to-amber-600 rounded-2xl p-8 text-white relative overflow-hidden">
-                <FloatingElement delay={0}>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl" />
-                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-xl" />
-                </FloatingElement>
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1 className="text-3xl font-bold mb-2">
-                        Admin Dashboard
-                      </h1>
-                      <p className="text-orange-100">
-                        Welcome back, Administrator
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-orange-100">
-                        Last updated
-                      </div>
-                      <div className="text-lg font-semibold">
-                        {time.toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                      <div className="text-2xl font-bold">
-                        {stats.totalOrders}
-                      </div>
-                      <div className="text-sm text-orange-100">
-                        Total Orders
-                      </div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                      <div className="text-2xl font-bold">
-                        ₹{stats.totalRevenue.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-orange-100">
-                        Total Revenue
-                      </div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                      <div className="text-2xl font-bold">
-                        {stats.pendingEnquiries}
-                      </div>
-                      <div className="text-sm text-orange-100">
-                        Product Enquiries
-                      </div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                      <div className="text-2xl font-bold">
-                        {stats.pendingServiceEnquiries}
-                      </div>
-                      <div className="text-sm text-orange-100">
-                        Service Enquiries
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </BounceIn>
+    <Motion.div
+      className="space-y-5"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <Motion.section variants={fadeInVariants} className="hero-shell rounded-lg p-5 sm:p-6 lg:p-7">
+        <div className="relative z-10 grid gap-6 xl:grid-cols-[1fr_280px] xl:items-end">
+          <div>
+            <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              Admin Control
+            </span>
+            <h1 className="mt-4 text-2xl font-bold text-slate-950 dark:text-white sm:text-3xl">
+              Operations dashboard
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+              Monitor orders, enquiries, quotations, and service requests from one consistent workspace.
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Button to="/admin/products/new">
+                <Package size={18} />
+                New Product
+              </Button>
+              <Button variant="secondary" to="/admin/enquiries">
+                <ClipboardList size={18} />
+                Review Enquiries
+              </Button>
+            </div>
           </div>
 
-          <div className="lg:w-80 space-y-4">
-            <BounceIn delay={0.2}>
-              <div className="bg-surface rounded-xl border border-gray-200 p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Quick Stats</h3>
-                  <Calendar className="w-5 h-5 text-gray-500" />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Active Quotes</span>
-                    <span className="text-lg font-semibold text-gray-900">
-                      {stats.activeQuotes}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">New Customers</span>
-                    <span className="text-lg font-semibold text-gray-900">
-                      {stats.newCustomers}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
-                      Avg. Response Time
-                    </span>
-                    <span className="text-lg font-semibold text-gray-900">
-                      2.5h
-                    </span>
-                  </div>
-                </div>
+          <div className="rounded-lg border border-slate-200/80 bg-white/72 p-4 shadow-sm backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/35">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-200">
+                <BadgeCheck size={20} />
               </div>
-            </BounceIn>
-
-            <BounceIn delay={0.3}>
-              <div className="bg-gradient-to-br from-orange-600 to-amber-600 rounded-xl p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">System Status</h3>
-                    <p className="text-orange-100 text-sm">
-                      All systems operational
-                    </p>
-                  </div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-                </div>
-              </div>
-            </BounceIn>
-          </div>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Orders"
-            value={stats.totalOrders}
-            icon={ShoppingCart}
-            trend="up"
-            trendValue="+12%"
-            color="from-orange-500 to-amber-500"
-          />
-          <StatCard
-            title="Total Revenue"
-            value={`₹${stats.totalRevenue.toLocaleString()}`}
-            icon={DollarSign}
-            trend="up"
-            trendValue="+8.5%"
-            color="from-green-500 to-orange-500"
-          />
-          <StatCard
-            title="Pending Enquiries"
-            value={stats.pendingEnquiries}
-            icon={MessageSquare}
-            trend="down"
-            trendValue="-3"
-            color="from-orange-500 to-amber-500"
-          />
-          <StatCard
-            title="Active Quotes"
-            value={quoteStats.active}
-            icon={DollarSign}
-            trend="up"
-            trendValue=""
-            color="from-orange-500 to-red-500"
-          />
-          <StatCard
-            title="Total Quotes"
-            value={quoteStats.total}
-            icon={DollarSign}
-            color="from-green-500 to-orange-500"
-          />
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
-          {/* Recent Activity */}
-          <div className="lg:col-span-2">
-            <BounceIn delay={0.4}>
-              <div className="bg-surface rounded-xl border border-gray-200 shadow-lg">
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Recent Activity
-                  </h3>
-                </div>
-                <div className="divide-y divide-gray-200">
-                  <AnimatePresence>
-                    {allRecentActivity.map((activity, index) => (
-                      <motion.div
-                        key={activity.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <ActivityItem activity={activity} />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-                <div className="p-4 border-t border-gray-200">
-                  <Link
-                    to="/admin/enquiries"
-                    className="w-full block text-center text-sm text-orange-600 hover:text-orange-700 font-medium"
-                  >
-                    View All Enquiries
-                  </Link>
-                </div>
-              </div>
-            </BounceIn>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="space-y-6">
-            <BounceIn delay={0.5}>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Quick Actions
-                </h3>
-                <div className="space-y-4">
-                  {mockQuickActions.map((action) => (
-                    <QuickActionCard key={action.id} action={action} />
-                  ))}
-                </div>
+                <p className="text-sm font-bold text-slate-950 dark:text-white">
+                  System operational
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Signed in as {user?.name || "Administrator"}
+                </p>
               </div>
-            </BounceIn>
-
-            {/* Service Enquiries Summary */}
-            <BounceIn delay={0.6}>
-              <div className="bg-surface rounded-xl p-6 border border-gray-200 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">
-                    Service Enquiries
-                  </h3>
-                  <MessageSquare className="w-5 h-5 text-orange-500" />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
-                      Pending Review
-                    </span>
-                    <span className="text-lg font-bold text-orange-600">
-                      {stats.pendingServiceEnquiries}
-                    </span>
-                  </div>
-                  <Link
-                    to="/admin/service-enquiries"
-                    className="block w-full text-center mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
-                  >
-                    View All
-                  </Link>
-                </div>
-              </div>
-            </BounceIn>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <Calendar size={14} />
+              {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString("en-IN")}` : "Waiting for data"}
+            </div>
           </div>
         </div>
+      </Motion.section>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <BounceIn delay={0.7}>
-            <Link to="/admin/enquiries">
-              <div className="bg-surface rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-shadow shadow-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-orange-100">
-                    <MessageSquare className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      Product Enquiries
-                    </h4>
-                    <p className="text-sm text-gray-600">Pending review</p>
-                  </div>
-                </div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {stats.pendingEnquiries}
-                </div>
-              </div>
-            </Link>
-          </BounceIn>
+      <Motion.section variants={containerVariants} className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          title="Orders"
+          value={loading ? "..." : stats.totalOrders}
+          description="Total customer orders"
+          icon={ShoppingCart}
+        />
+        <StatCard
+          title="Revenue"
+          value={loading ? "..." : formatMoney(stats.totalRevenue)}
+          description="Recorded order value"
+          icon={ReceiptText}
+          tone="amber"
+        />
+        <StatCard
+          title="Enquiries"
+          value={loading ? "..." : stats.pendingEnquiries}
+          description="Product requests pending"
+          icon={ClipboardList}
+          tone="emerald"
+        />
+        <StatCard
+          title="Service"
+          value={loading ? "..." : stats.pendingServiceEnquiries}
+          description="Service requests pending"
+          icon={LifeBuoy}
+          tone="slate"
+        />
+      </Motion.section>
 
-          <BounceIn delay={0.8}>
-            <Link to="/admin/service-enquiries">
-              <div className="bg-surface rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-shadow shadow-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-orange-100">
-                    <MessageSquare className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      Service Enquiries
-                    </h4>
-                    <p className="text-sm text-gray-600">Pending review</p>
-                  </div>
-                </div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {stats.pendingServiceEnquiries}
-                </div>
-              </div>
-            </Link>
-          </BounceIn>
+      <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
+        <Motion.section variants={fadeInVariants} className="theme-card rounded-lg p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+                Recent product enquiries
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Latest government/customer requests that need admin attention.
+              </p>
+            </div>
+            <Button variant="secondary" size="sm" to="/admin/enquiries">
+              View all
+              <ArrowRight size={15} />
+            </Button>
+          </div>
 
-          <BounceIn delay={0.9}>
-            <Link to="/admin/quotes">
-              <div className="bg-surface rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-shadow shadow-lg">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-green-100">
-                    <DollarSign className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      Active Quotes
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Sent & awaiting response
-                    </p>
-                  </div>
-                </div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {quoteStats.active}
-                </div>
+          <div className="divide-y divide-slate-200/75 dark:divide-cyan-950/45">
+            {loading && (
+              <div className="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                Loading enquiries...
               </div>
-            </Link>
-          </BounceIn>
-        </div>
+            )}
+            {!loading && recentActivities.length === 0 && (
+              <div className="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                No recent enquiries yet.
+              </div>
+            )}
+            {!loading &&
+              recentActivities.map((activity) => (
+                <ActivityRow key={activity.to} activity={activity} />
+              ))}
+          </div>
+        </Motion.section>
+
+        <Motion.aside variants={fadeInVariants} className="space-y-5">
+          <SalesChart data={salesSeries} loading={loading} />
+
+          <section className="theme-card rounded-lg p-4">
+            <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+              Quote overview
+            </h2>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-slate-200/80 bg-white/72 p-3 dark:border-cyan-950/50 dark:bg-slate-950/35">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Active
+                </p>
+                <p className="mt-1 text-xl font-bold text-slate-950 dark:text-white">
+                  {loading ? "..." : stats.activeQuotes}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200/80 bg-white/72 p-3 dark:border-cyan-950/50 dark:bg-slate-950/35">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Total
+                </p>
+                <p className="mt-1 text-xl font-bold text-slate-950 dark:text-white">
+                  {loading ? "..." : stats.totalQuotes}
+                </p>
+              </div>
+            </div>
+            <Button variant="secondary" size="sm" to="/admin/quotes" className="mt-4 w-full">
+              <FileText size={16} />
+              Manage Quotes
+            </Button>
+          </section>
+
+          <section className="theme-card rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700 dark:bg-orange-950/25 dark:text-orange-200">
+                <Users size={19} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-950 dark:text-white">
+                  New customers
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Last 30 days
+                </p>
+              </div>
+              <p className="ml-auto text-2xl font-bold text-slate-950 dark:text-white">
+                {loading ? "..." : stats.newCustomers}
+              </p>
+            </div>
+          </section>
+        </Motion.aside>
       </div>
-    </div>
+    </Motion.div>
   );
 }

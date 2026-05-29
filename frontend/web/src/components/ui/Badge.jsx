@@ -5,12 +5,12 @@ export function Badge({
   className = "",
 }) {
   const variants = {
-    primary: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-    secondary: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
-    success: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    danger: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-    warning: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-    info: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    primary: "border border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/25 dark:text-orange-300",
+    secondary: "border border-slate-200 bg-white/80 text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300",
+    success: "border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/25 dark:text-emerald-300",
+    danger: "border border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/25 dark:text-red-300",
+    warning: "border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/25 dark:text-amber-300",
+    info: "border border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-300",
   };
 
   const sizes = {
@@ -22,7 +22,7 @@ export function Badge({
   return (
     <span
       className={`
-        inline-flex items-center font-medium rounded-full
+        inline-flex items-center font-semibold rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]
         ${variants[variant]}
         ${sizes[size]}
         ${className}

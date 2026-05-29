@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchAdminQuote, updateQuoteStatus } from "../../../api/adminQuotes";
+import { fetchAdminQuote } from "../../../api/adminQuotes";
 import { Skeleton } from "../../../components/Skeleton";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../../../store/authStore";
@@ -14,20 +14,15 @@ export default function AdminQuoteDetails() {
   const { accessToken } = useAuthStore();
 
   const [quote, setQuote] = useState(null);
-  const [status, setStatus] = useState("");
-  const [adminRemark, setAdminRemark] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   async function load() {
     try {
       setLoading(true);
-      setError("");
 
       const data = await fetchAdminQuote(id);
       setQuote(data);
     } catch (err) {
-      setError("Failed to load quote");
-      toast.error("Failed to load quote");
+      toast.error(err.message || "Failed to load quote");
     } finally {
       setLoading(false);
     }
@@ -42,11 +37,6 @@ export default function AdminQuoteDetails() {
 
     load();
   }, [id]);
-
-  async function handleUpdate() {
-    //await updateQuoteStatus(id, status, adminRemark);
-    load();
-  }
 
   async function downloadPDF() {
     try {
@@ -84,7 +74,15 @@ export default function AdminQuoteDetails() {
       </div>
     );
   }
-  if (!quote) return <p>Quote not found</p>;
+  if (!quote) {
+    return (
+      <div className="theme-card max-w-3xl rounded-[24px] p-8 text-center">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+          Quote not found
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 max-w-3xl">
@@ -95,16 +93,13 @@ export default function AdminQuoteDetails() {
         ← Back
       </button>
 
-      <h2 className="text-lg font-semibold">
-        Quote #{quote.quoteNumber || quote._id.slice(-6)}
-      </h2>
       <h2 className="text-lg font-semibold flex items-center gap-3">
-        Quote #{quote._id.slice(-6).toUpperCase()}
+        Quote #{quote.quoteNumber || quote._id.slice(-6).toUpperCase()}
         <span
           className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs
-        bg-green-100 text-green-700 border border-green-300"
+        bg-cyan-50 text-cyan-700 border border-cyan-200"
         >
-          ✔ Email sent
+          {quote.status}
         </span>
       </h2>
       <div className="grid md:grid-cols-2 gap-4">

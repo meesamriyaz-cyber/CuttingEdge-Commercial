@@ -37,8 +37,11 @@ export default function Navbar() {
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
   const isHomePage = location.pathname === "/";
+  const isAdmin = user?.roles?.includes("admin");
   const productPath = user ? "/products" : "/products-guest";
-  const baseNavItems = user
+  const baseNavItems = isAdmin
+    ? []
+    : user
     ? [
         { label: "Products", to: productPath, show: !isHomePage },
         { label: "Services", to: "/services", show: !isHomePage },
@@ -52,17 +55,21 @@ export default function Navbar() {
         { label: "Services", to: "/services", show: !isHomePage },
       ].filter((item) => item.show);
   const navItems = isAuthPage ? [] : baseNavItems;
+  const hasMobileMenuActions =
+    navItems.length > 0 ||
+    Boolean(user) ||
+    (!user && !isAuthPage);
 
   const navLinkClass = (to) =>
-    `text-sm font-semibold transition-colors ${
+    `inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold transition-all ${
       location.pathname === to || location.pathname.startsWith(`${to}/`)
-        ? "text-cyan-700 dark:text-cyan-300"
-        : "text-slate-700 hover:text-cyan-700 dark:text-slate-200 dark:hover:text-cyan-300"
+        ? "bg-cyan-50 text-cyan-800 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.22)] dark:bg-cyan-950/25 dark:text-cyan-200"
+        : "text-slate-700 hover:bg-white/70 hover:text-cyan-800 dark:text-slate-200 dark:hover:bg-slate-900/70 dark:hover:text-cyan-200"
     }`;
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-white/78 dark:bg-[#07111f]/92 backdrop-blur-xl border-b border-slate-200/75 dark:border-cyan-950/45"
+      className="sticky top-0 z-50 bg-transparent"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -71,19 +78,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Logo */}
           {!user ? (
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#07111f_0%,#0f766e_58%,#d97706_100%)] text-white shadow-[0_16px_34px_-24px_rgba(8,16,29,0.82)]">
+                <Package size={19} />
+              </span>
               <span
                 className="
-                inline-flex items-center gap-2
-                px-5 py-2.5
-                rounded-lg
-                text-sm md:text-base
-                font-bold
-                bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)]
-                text-white
-                shadow-[0_18px_40px_-26px_rgba(8,16,29,0.78)]
-                hover:-translate-y-0.5
-                transition-all duration-300
+                  hidden text-sm font-bold leading-tight text-slate-900 dark:text-white sm:inline-flex md:text-base
               "
               >
                 Cutting Edge Enterprises
@@ -91,7 +92,7 @@ export default function Navbar() {
             </Link>
           ) : (
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] flex items-center justify-center text-white font-bold rounded-lg shadow-[0_16px_34px_-24px_rgba(8,16,29,0.82)]">
+              <div className="w-10 h-10 bg-[linear-gradient(135deg,#07111f_0%,#0f766e_58%,#d97706_100%)] flex items-center justify-center text-white font-bold rounded-lg shadow-[0_16px_34px_-24px_rgba(8,16,29,0.82)]">
                 <Package size={20} />
               </div>
               <div className="hidden sm:block">
@@ -116,10 +117,10 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             {/* Cart */}
-            {user && user.clientType === "PRIVATE" && (
+            {user && !isAdmin && user.clientType === "PRIVATE" && (
               <button
                 onClick={() => navigate("/cart")}
-                className="relative p-2.5 rounded-lg bg-white/80 dark:bg-slate-900/65 border border-slate-200/80 dark:border-cyan-950/50 hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
+                className="relative p-2.5 rounded-lg bg-white/88 dark:bg-slate-900/65 border border-slate-200/85 dark:border-cyan-950/50 shadow-[0_12px_28px_-24px_rgba(8,16,29,0.6)] hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
@@ -133,11 +134,12 @@ export default function Navbar() {
 
             {/* Wishlist */}
             {user &&
+              !isAdmin &&
               (user.clientType === "PRIVATE" ||
                 user.clientType === "PUBLIC") && (
                 <button
                   onClick={() => navigate("/wishlist")}
-                  className="p-2.5 rounded-lg bg-white/80 dark:bg-slate-900/65 border border-slate-200/80 dark:border-cyan-950/50 hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
+                  className="p-2.5 rounded-lg bg-white/88 dark:bg-slate-900/65 border border-slate-200/85 dark:border-cyan-950/50 shadow-[0_12px_28px_-24px_rgba(8,16,29,0.6)] hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/70 dark:hover:bg-slate-900 transition-colors"
                   aria-label="Wishlist"
                 >
                   <Heart className="w-5 h-5 text-slate-700 dark:text-slate-300" />
@@ -170,21 +172,25 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-cyan-50 dark:hover:bg-slate-900 transition-colors"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {hasMobileMenuActions && (
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-cyan-50 dark:hover:bg-slate-900 transition-colors"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
+      {hasMobileMenuActions && mobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className="md:hidden border-t border-slate-200/75 dark:border-cyan-950/45 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl"
+          className="md:hidden bg-transparent"
         >
           <div className="px-4 py-4 space-y-3">
             {navItems.map((item) => (
@@ -201,7 +207,7 @@ export default function Navbar() {
               </button>
             ))}
 
-            {user && user.clientType === "PRIVATE" && (
+            {user && !isAdmin && user.clientType === "PRIVATE" && (
               <>
                 <button
                   onClick={() => {
@@ -231,7 +237,7 @@ export default function Navbar() {
               </>
             )}
 
-            {user && user.clientType === "PUBLIC" && (
+            {user && !isAdmin && user.clientType === "PUBLIC" && (
               <button
                 onClick={() => {
                   navigate("/wishlist");

@@ -15,6 +15,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Button } from "../../components/ui";
+import { getImageUrl } from "../../utils/productImages";
 
 const statusConfig = {
   PLACED: {
@@ -87,15 +88,12 @@ export default function MyOrders() {
   }, [accessToken, navigate]);
 
   const getProductImage = (item) => {
-    if (item.product?.images && item.product.images.length > 0) {
-      return item.product.images[0].url;
-    }
-    return null;
+    return getImageUrl(item.product?.images?.[0]);
   };
 
   if (loading) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto flex max-w-5xl items-center justify-center px-4">
             <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
@@ -107,7 +105,7 @@ export default function MyOrders() {
 
   if (error) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-5xl px-4">
             <div className="theme-card rounded-[24px] p-8 text-center">
@@ -127,7 +125,7 @@ export default function MyOrders() {
   }
 
   return (
-    <RoleGate allow={["PRIVATE"]}>
+    <RoleGate allow={["PRIVATE"]} showFallback>
       <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-6xl">
           <section className="hero-shell rounded-[28px] p-6 sm:p-8">

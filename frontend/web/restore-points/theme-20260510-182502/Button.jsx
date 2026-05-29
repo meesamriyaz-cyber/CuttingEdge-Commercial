@@ -3,21 +3,21 @@ import { useNavigate } from "react-router-dom";
 
 const variants = {
   primary:
-    "bg-[linear-gradient(135deg,#07111f_0%,#0f766e_54%,#d97706_100%)] text-white shadow-[0_18px_44px_-24px_rgba(8,16,29,0.82)] hover:-translate-y-0.5 hover:shadow-[0_26px_52px_-26px_rgba(15,118,110,0.5)]",
+    "bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] text-white shadow-[0_18px_40px_-26px_rgba(8,16,29,0.78)] hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-24px_rgba(14,116,144,0.42)]",
   secondary:
-    "bg-white/88 dark:bg-slate-950/60 border border-slate-200/90 dark:border-teal-950/65 hover:bg-teal-50/80 dark:hover:bg-slate-900 hover:border-teal-300 dark:hover:border-teal-800 text-slate-800 dark:text-slate-100 shadow-[0_14px_34px_-26px_rgba(8,16,29,0.58)] backdrop-blur-sm",
+    "bg-white/80 dark:bg-slate-950/45 border border-slate-200/85 dark:border-cyan-950/60 hover:bg-cyan-50/65 dark:hover:bg-slate-900 hover:border-cyan-300 dark:hover:border-cyan-800 text-slate-700 dark:text-slate-100 shadow-[0_12px_28px_-24px_rgba(8,16,29,0.58)] backdrop-blur-sm",
   ghost:
-    "hover:bg-teal-50 dark:hover:bg-teal-950/25 text-slate-700 dark:text-teal-200",
+    "hover:bg-cyan-50 dark:hover:bg-cyan-950/25 text-slate-700 dark:text-cyan-200",
   danger:
     "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-[0_18px_34px_-24px_rgba(239,68,68,0.55)]",
   link:
-    "text-teal-700 dark:text-teal-300 hover:text-amber-700 dark:hover:text-amber-300 underline-offset-4 hover:underline",
+    "text-cyan-700 dark:text-cyan-300 hover:text-orange-600 dark:hover:text-orange-300 underline-offset-4 hover:underline",
 };
 
 const sizes = {
-  sm: "min-h-9 px-3 py-1.5 text-sm",
-  md: "min-h-11 px-4 py-2 text-sm",
-  lg: "min-h-12 px-6 py-3 text-base",
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2 text-base",
+  lg: "px-6 py-3 text-lg",
 };
 
 export const Button = forwardRef(
@@ -55,9 +55,8 @@ export const Button = forwardRef(
           inline-flex items-center justify-center gap-2
           font-semibold rounded-lg
           transition-all duration-200
-          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
-          active:translate-y-0
           ${variants[variant]}
           ${sizes[size]}
           ${className}

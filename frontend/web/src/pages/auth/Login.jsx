@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Package, ShieldCheck, ArrowRight } from "lucide-react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  Building2,
+  Eye,
+  EyeOff,
+  LifeBuoy,
+  Package,
+  PackageSearch,
+  ShieldCheck,
+} from "lucide-react";
 import { loginApi } from "../../api/auth";
 import { useAuthStore } from "../../store/authStore";
 import HeroLeftContent from "../../components/HeroLeftContent";
@@ -11,6 +20,24 @@ import {
   heroSideVariants,
   formSideVariants,
 } from "../../utils/animations";
+
+const ACCESS_POINTS = [
+  {
+    icon: PackageSearch,
+    label: "Products",
+    text: "Browse and order",
+  },
+  {
+    icon: Building2,
+    label: "Procurement",
+    text: "Enquiries and quotes",
+  },
+  {
+    icon: LifeBuoy,
+    label: "Services",
+    text: "Requests and support",
+  },
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -66,24 +93,24 @@ export default function Login() {
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-page px-4 sm:px-6 py-10 sm:py-14"
+    <Motion.div
+      className="flex min-h-[calc(100vh-4rem)] items-center bg-page px-4 py-8 sm:px-6 sm:py-10"
       variants={authPageVariants}
       initial="hidden"
       animate="visible"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="hero-shell rounded-[28px] p-3 sm:p-4 shadow-[0_28px_64px_-44px_rgba(8,16,29,0.48)]">
+        <div className="hero-shell overflow-hidden rounded-lg p-2 shadow-[0_28px_64px_-44px_rgba(8,16,29,0.48)] sm:p-3">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <motion.div
+            <Motion.div
               variants={heroSideVariants}
-              className="hidden rounded-[24px] tech-panel px-8 py-10 lg:block"
+              className="hidden rounded-lg tech-panel px-8 py-10 lg:block"
             >
               <HeroLeftContent hideCTA clientType="PRIVATE" />
-            </motion.div>
+            </Motion.div>
 
-            <motion.div variants={formSideVariants}>
-              <div className="theme-card rounded-[24px] p-6 sm:p-8 lg:p-10">
+            <Motion.div variants={formSideVariants}>
+              <div className="theme-card rounded-lg p-6 sm:p-8 lg:p-10">
                 <div className="mb-7">
                   <div className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
                     <ShieldCheck size={13} />
@@ -107,27 +134,27 @@ export default function Login() {
 
                 <AnimatePresence>
                   {sessionExpired && (
-                    <motion.div
+                    <Motion.div
                       className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-amber-200"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                     >
                       Your session expired. Please sign in again.
-                    </motion.div>
+                    </Motion.div>
                   )}
                 </AnimatePresence>
 
                 <AnimatePresence>
                   {error && (
-                    <motion.div
+                    <Motion.div
                       className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                     >
                       {error}
-                    </motion.div>
+                    </Motion.div>
                   )}
                 </AnimatePresence>
 
@@ -172,6 +199,23 @@ export default function Login() {
                   </Button>
                 </form>
 
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {ACCESS_POINTS.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={item.label} className="auth-access-tile">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                          <Icon size={16} className="text-cyan-700 dark:text-cyan-300" />
+                          {item.label}
+                        </div>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {item.text}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <div className="mt-7 border-t border-slate-200/80 pt-5 dark:border-slate-800">
                   <p className="text-center text-sm text-slate-500 dark:text-slate-400">
                     New here?{" "}
@@ -189,10 +233,10 @@ export default function Login() {
                   One sign-in supports private commerce, public procurement, and service workflows.
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

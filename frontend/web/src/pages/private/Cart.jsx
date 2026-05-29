@@ -4,6 +4,7 @@ import { ArrowRight, Package } from "lucide-react";
 import RoleGate from "../../components/RoleGate";
 import CartItem from "./CartItem";
 import OrderSummary from "../../components/OrderSummary";
+import ProductRecommendations from "../../components/ProductRecommendations";
 import { useCartStore } from "../../store/cartStore";
 import { Button } from "../../components/ui";
 
@@ -26,7 +27,7 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-page px-4 py-12">
           <div className="mx-auto max-w-5xl">
             <div className="theme-card rounded-[24px] p-10 text-center">
@@ -40,7 +41,7 @@ export default function Cart() {
 
   if (error) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-page px-4 py-12">
           <div className="mx-auto max-w-5xl">
             <div className="theme-card rounded-[24px] p-8 text-center">
@@ -53,9 +54,11 @@ export default function Cart() {
   }
 
   const itemCount = cart?.items?.reduce((count, item) => count + item.quantity, 0) || 0;
+  const lineItemCount = cart?.items?.length || 0;
+  const singleCartItem = lineItemCount === 1 ? cart.items[0] : null;
 
   return (
-    <RoleGate allow={["PRIVATE"]}>
+    <RoleGate allow={["PRIVATE"]} showFallback>
       <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-7xl">
           <section className="hero-shell rounded-[28px] p-6 sm:p-8">
@@ -109,34 +112,46 @@ export default function Cart() {
               </Button>
             </div>
           ) : (
-            <div className="mt-8 grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
-              <div className="space-y-4">
-                {cart.items.map((item) => (
-                  <CartItem
-                    key={item.product._id}
-                    item={item}
-                    onIncrease={() => updateQuantity(item.product._id, 1)}
-                    onDecrease={() => updateQuantity(item.product._id, -1)}
-                    onRemove={() => removeItem(item.product._id)}
-                  />
-                ))}
-              </div>
+            <>
+              <div className="mt-8 grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
+                <div className="space-y-4">
+                  {cart.items.map((item) => (
+                    <CartItem
+                      key={item.product._id}
+                      item={item}
+                      onIncrease={() => updateQuantity(item.product._id, 1)}
+                      onDecrease={() => updateQuantity(item.product._id, -1)}
+                      onRemove={() => removeItem(item.product._id)}
+                    />
+                  ))}
+                </div>
 
-              <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-                <OrderSummary />
+                <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+                  <OrderSummary />
 
-                <div className="theme-card rounded-[24px] p-5 space-y-3">
-                  <Button onClick={() => navigate("/checkout")} className="w-full gap-2">
-                    Proceed to Checkout
-                    <ArrowRight size={16} />
-                  </Button>
+                  <div className="theme-card rounded-[24px] p-5 space-y-3">
+                    <Button onClick={() => navigate("/checkout")} className="w-full gap-2">
+                      Proceed to Checkout
+                      <ArrowRight size={16} />
+                    </Button>
 
-                  <Button variant="secondary" onClick={clearCart} className="w-full">
-                    Clear Cart
-                  </Button>
+                    <Button variant="secondary" onClick={clearCart} className="w-full">
+                      Clear Cart
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {singleCartItem && (
+                <ProductRecommendations
+                  className="mt-8"
+                  title="Related picks for your cart"
+                  description="Useful items from the same category and popular alternatives to complete the order."
+                  relatedCategory={singleCartItem.product?.category}
+                  excludeProductIds={[singleCartItem.product?._id]}
+                />
+              )}
+            </>
           )}
         </div>
       </div>

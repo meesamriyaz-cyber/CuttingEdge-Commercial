@@ -1,6 +1,7 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { createQuoteFromEnquiry } from "../../../api/adminQuotes";
+import { toast } from "react-hot-toast";
 
 export default function AdminQuoteCreate() {
   const { id: enquiryId } = useParams();
@@ -14,6 +15,7 @@ export default function AdminQuoteCreate() {
     validityDate: "",
     notes: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,12 +23,20 @@ export default function AdminQuoteCreate() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setSubmitting(true);
+
     try {
-      const res = await createQuoteFromEnquiry(enquiryId, form);
-      // Redirect to enquiries page after successful quote creation
+      const data = await createQuoteFromEnquiry(enquiryId, form);
+      if (data?.emailSent === false) {
+        toast.error(data.message || "Quote created, but email delivery failed");
+      } else {
+        toast.success(data?.message || "Quote created successfully");
+      }
       navigate("/admin/enquiries", { replace: true });
     } catch (err) {
-      alert(err.message || "Failed to create quote");
+      toast.error(err.message || "Failed to create quote");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -93,9 +103,10 @@ export default function AdminQuoteCreate() {
 
         <button
           type="submit"
-          className="px-3 py-2 rounded bg-blue-600 text-white text-sm"
+          disabled={submitting}
+          className="px-3 py-2 rounded bg-blue-600 text-white text-sm disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Create Quote
+          {submitting ? "Creating..." : "Create Quote"}
         </button>
       </form>
     </div>

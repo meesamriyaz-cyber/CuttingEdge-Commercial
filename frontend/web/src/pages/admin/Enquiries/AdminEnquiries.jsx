@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { fetchAdminEnquiries } from "../../../api/adminEnquiries";
-import { Building2, ShoppingBag } from "lucide-react";
+import { Building2, ChevronRight, ShoppingBag } from "lucide-react";
+import { Button } from "../../../components/ui";
 
 export default function AdminEnquiries() {
   const [enquiries, setEnquiries] = useState([]);
@@ -63,7 +63,7 @@ export default function AdminEnquiries() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[760px] text-sm">
                 <thead className="bg-slate-100">
                   <tr>
                     <th className="p-4 text-left">ID</th>
@@ -138,12 +138,14 @@ export default function AdminEnquiries() {
                       </td>
 
                       <td className="p-4 text-right">
-                        <Link
+                        <Button
+                          size="sm"
                           to={`/admin/enquiries/${enq._id}`}
-                          className="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700"
+                          className="min-h-8 px-3 py-1.5 text-xs"
                         >
                           View
-                        </Link>
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </Button>
                       </td>
                     </tr>
                   ))}

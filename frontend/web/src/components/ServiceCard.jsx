@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock, Network, ShieldCheck, Wrench, Building2, Code2 } from "lucide-react";
+import { ArrowRight, Lock, Network, ShieldCheck, Wrench, Building2, Code2 } from "lucide-react";
 
 /**
  * Local icon mapping (UI concern, NOT DB)
@@ -36,24 +36,22 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
        // onClick={handleCardClick}
        className="
          group relative overflow-hidden
-         tech-panel
+         theme-card
          rounded-lg
          p-5 sm:p-6
-         cursor-pointer
-         shadow-sm hover:shadow-md
-         hover:border-orange-500/50 dark:hover:border-orange-400/50
          transition-all duration-300
-         hover:-translate-y-0.5
+         hover:-translate-y-1
+         hover:border-cyan-300 dark:hover:border-cyan-800
        "
     >
       {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 pointer-events-none bg-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-500 via-slate-900 to-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       {/* LEFT ICON */}
       <div className="shrink-0 mb-4 sm:mb-0 sm:absolute sm:top-6 sm:left-6">
         <div
-          className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-lg bg-slate-950 dark:bg-cyan-500 shadow-sm"
+          className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-lg bg-[linear-gradient(135deg,#07111f_0%,#0f766e_58%,#d97706_100%)] text-white shadow-[0_18px_38px_-26px_rgba(8,16,29,0.76)]"
         >
-          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white dark:text-slate-950" />
+          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         </div>
       </div>
 
@@ -71,7 +69,7 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
           {serviceTags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300"
+              className="rounded-full border border-slate-200/90 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300"
             >
               {tag}
             </span>
@@ -81,11 +79,11 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
         {/* RATE */}
         <div className="mt-4 flex items-center gap-3">
           {canShowRate ? (
-            <span className="inline-flex rounded-full bg-orange-100 dark:bg-orange-900/40 px-4 py-1.5 text-sm font-semibold text-orange-700 dark:text-orange-300">
+            <span className="inline-flex rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-sm font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/25 dark:text-orange-300">
               {service.rateLabel}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400">
               <Lock className="w-3.5 h-3.5" />
               Pricing available after sign-in
             </span>
@@ -94,17 +92,25 @@ export default function ServiceCard({ service, index, isAuthenticated }) {
 
         {/* ACTIONS */}
         <div className="mt-5 flex items-center gap-2 flex-wrap">
+          <Link
+            to={`/services/${service.slug}`}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white/88 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-[0_14px_30px_-26px_rgba(8,16,29,0.62)] transition-all duration-200 hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-cyan-800 dark:hover:text-cyan-300"
+          >
+            View details
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+
           {isAuthenticated ? (
             <Link
               to={`/services/enquiry/${service.slug}`}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-orange-600 text-white font-semibold text-sm shadow-sm hover:bg-orange-700 hover:shadow-md transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[linear-gradient(135deg,#07111f_0%,#0f766e_58%,#d97706_100%)] text-white font-semibold text-sm shadow-[0_18px_38px_-26px_rgba(8,16,29,0.76)] hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-26px_rgba(15,118,110,0.42)] transition-all duration-200"
             >
               Request Service
             </Link>
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-orange-700 hover:shadow-md transition-all duration-200"
+              className="inline-flex items-center justify-center rounded-lg bg-[linear-gradient(135deg,#07111f_0%,#0f766e_58%,#d97706_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_38px_-26px_rgba(8,16,29,0.76)] hover:-translate-y-0.5 transition-all duration-200"
             >
               Sign in to continue
             </Link>

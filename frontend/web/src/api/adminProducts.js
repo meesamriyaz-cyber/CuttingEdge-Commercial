@@ -10,11 +10,26 @@ function authHeaders() {
   };
 }
 
+async function parseResponse(res, fallbackMessage) {
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(data?.message || fallbackMessage);
+  }
+  return data;
+}
+
 export async function fetchAllProducts() {
   const res = await fetch(`${API_BASE}/products`, {
     headers: authHeaders(),
   });
-  return res.json();
+  return parseResponse(res, "Failed to fetch products");
+}
+
+export async function fetchProductCategories() {
+  const res = await fetch(`${API_BASE}/products/categories`, {
+    headers: authHeaders(),
+  });
+  return parseResponse(res, "Failed to fetch categories");
 }
 
 export async function createProduct(data) {
@@ -23,7 +38,7 @@ export async function createProduct(data) {
     headers: authHeaders(),
     body: JSON.stringify(data),
   });
-  return res.json();
+  return parseResponse(res, "Failed to create product");
 }
 
 export async function updateProduct(id, data) {
@@ -32,7 +47,7 @@ export async function updateProduct(id, data) {
     headers: authHeaders(),
     body: JSON.stringify(data),
   });
-  return res.json();
+  return parseResponse(res, "Failed to update product");
 }
 
 export async function deactivateProduct(id) {
@@ -40,12 +55,12 @@ export async function deactivateProduct(id) {
     method: "DELETE",
     headers: authHeaders(),
   });
-  return res.json();
+  return parseResponse(res, "Failed to deactivate product");
 }
 
 export async function fetchProduct(id) {
   const res = await fetch(`${API_BASE}/products/${id}`, {
     headers: authHeaders(),
   });
-  return res.json();
+  return parseResponse(res, "Failed to fetch product");
 }

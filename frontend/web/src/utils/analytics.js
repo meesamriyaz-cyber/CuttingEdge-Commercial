@@ -3,6 +3,7 @@ export const trackEvent = (event, payload = {}) => {
     window.gtag("event", event, payload);
   }
 
-  // fallback (optional)
-  console.log("[Analytics]", event, payload);
+  if (import.meta.env.DEV) {
+    console.log("[Analytics]", event, payload);
+  }
 };

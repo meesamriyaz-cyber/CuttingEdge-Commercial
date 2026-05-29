@@ -14,9 +14,9 @@ export default function VerificationRoute({ children }) {
     return <Navigate to="/" replace />;
   }
 
-  // If government client is already verified, redirect to enquiries
+  // If government client is already verified, redirect to dashboard
   if (user.govtValidationStatus === "VERIFIED") {
-    return <Navigate to="/enquiries" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // If government client is not verified, show the verification page

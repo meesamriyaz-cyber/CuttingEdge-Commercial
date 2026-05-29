@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Building2, UserRound, ShieldCheck, ArrowRight } from "lucide-react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  Building2,
+  ClipboardCheck,
+  LifeBuoy,
+  PackageSearch,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { registerApi } from "../../api/auth";
 import HeroLeftContent from "../../components/HeroLeftContent";
 import { Button, Input } from "../../components/ui";
@@ -23,6 +31,24 @@ const ACCOUNT_TYPES = [
     title: "Government customer",
     description: "Procurement enquiries, quotations, and institutional workflow tracking.",
     icon: Building2,
+  },
+];
+
+const SETUP_POINTS = [
+  {
+    icon: PackageSearch,
+    label: "Catalogue",
+    text: "Products and categories",
+  },
+  {
+    icon: ClipboardCheck,
+    label: "Workflow",
+    text: "Orders or quotations",
+  },
+  {
+    icon: LifeBuoy,
+    label: "Support",
+    text: "Services and follow-up",
   },
 ];
 
@@ -75,24 +101,24 @@ export default function Register() {
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-page px-4 sm:px-6 py-10 sm:py-14"
+    <Motion.div
+      className="flex min-h-[calc(100vh-4rem)] items-center bg-page px-4 py-8 sm:px-6 sm:py-10"
       variants={authPageVariants}
       initial="hidden"
       animate="visible"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="hero-shell rounded-[28px] p-3 sm:p-4 shadow-[0_28px_64px_-44px_rgba(8,16,29,0.48)]">
+        <div className="hero-shell overflow-hidden rounded-lg p-2 shadow-[0_28px_64px_-44px_rgba(8,16,29,0.48)] sm:p-3">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.02fr_0.98fr]">
-            <motion.div
+            <Motion.div
               variants={heroSideVariants}
-              className="hidden rounded-[24px] tech-panel px-8 py-10 lg:block"
+              className="hidden rounded-lg tech-panel px-8 py-10 lg:block"
             >
               <HeroLeftContent hideCTA />
-            </motion.div>
+            </Motion.div>
 
-            <motion.div variants={formSideVariants}>
-              <div className="theme-card rounded-[24px] p-6 sm:p-8 lg:p-10">
+            <Motion.div variants={formSideVariants}>
+              <div className="theme-card rounded-lg p-6 sm:p-8 lg:p-10">
                 <div className="mb-7">
                   <div className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
                     <ShieldCheck size={13} />
@@ -111,25 +137,25 @@ export default function Register() {
 
                 <AnimatePresence>
                   {error && (
-                    <motion.div
+                    <Motion.div
                       className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                     >
                       {error}
-                    </motion.div>
+                    </Motion.div>
                   )}
 
                   {success && (
-                    <motion.div
+                    <Motion.div
                       className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:text-emerald-200"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                     >
                       {success}
-                    </motion.div>
+                    </Motion.div>
                   )}
                 </AnimatePresence>
 
@@ -144,14 +170,17 @@ export default function Register() {
                           key={type.id}
                           type="button"
                           onClick={() => setClientType(type.id)}
-                          className={`rounded-2xl border p-4 text-left transition-all ${
-                            active
-                              ? "border-cyan-400 bg-cyan-50/70 shadow-[0_18px_40px_-30px_rgba(8,145,178,0.35)] dark:border-cyan-700 dark:bg-cyan-950/20"
-                              : "border-slate-200/90 bg-white/70 hover:border-cyan-200 hover:bg-cyan-50/45 dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-cyan-900"
-                          }`}
+                          className={`auth-mode-tile ${active ? "auth-mode-tile-active" : ""}`}
                         >
-                          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white dark:bg-cyan-500 dark:text-slate-950">
-                            <Icon size={18} />
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-950 text-white dark:bg-cyan-500 dark:text-slate-950">
+                              <Icon size={18} />
+                            </div>
+                            <span
+                              className={`mt-1 h-2.5 w-2.5 rounded-full ${
+                                active ? "bg-cyan-600 dark:bg-cyan-300" : "bg-slate-300 dark:bg-slate-700"
+                              }`}
+                            />
                           </div>
                           <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                             {type.title}
@@ -215,9 +244,10 @@ export default function Register() {
                         <Input
                           label="Official email"
                           type="email"
-                          placeholder="official@example.gov.in"
+                          placeholder="name@department.gov.in"
                           value={officialEmail}
                           onChange={(e) => setOfficialEmail(e.target.value)}
+                          helperText="Use a department-issued government email. Public mailboxes such as Gmail, Yahoo, and Outlook are not accepted."
                           required
                         />
                       </div>
@@ -236,9 +266,26 @@ export default function Register() {
 
                   {clientType === "PUBLIC" && (
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Government accounts go through a verification step before procurement features are enabled.
+                      Government accounts require an approved official domain and email code verification before procurement features are enabled.
                     </p>
                   )}
+
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {SETUP_POINTS.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div key={item.label} className="auth-access-tile">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                            <Icon size={16} className="text-cyan-700 dark:text-cyan-300" />
+                            {item.label}
+                          </div>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            {item.text}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </form>
 
                 <div className="mt-7 border-t border-slate-200/80 pt-5 dark:border-slate-800">
@@ -253,10 +300,10 @@ export default function Register() {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

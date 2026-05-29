@@ -21,6 +21,7 @@ import {
   Receipt,
 } from "lucide-react";
 import { Button } from "../../components/ui";
+import { getImageUrl } from "../../utils/productImages";
 
 const statusConfig = {
   PLACED: {
@@ -68,7 +69,9 @@ const getAccessToken = () => {
     const storeToken = useAuthStore.getState().accessToken;
     if (storeToken) return storeToken;
   } catch (e) {
-    console.warn("[OrderDetails] Could not read from auth store:", e);
+    if (import.meta.env.DEV) {
+      console.warn("[OrderDetails] Could not read from auth store:", e);
+    }
   }
 
   // Fallback to localStorage
@@ -95,9 +98,6 @@ export default function OrderDetails() {
       const token = getAccessToken();
 
       if (!token) {
-        console.log(
-          "[OrderDetails] No access token available (checked store + localStorage)",
-        );
         setError("Authentication required. Please log in.");
         setLoading(false);
         return;
@@ -112,12 +112,13 @@ export default function OrderDetails() {
 
         // Handle 401 - session expired
         if (res.status === 401) {
-          console.warn("[OrderDetails] 401 Unauthorized - clearing session");
           localStorage.removeItem("session");
           try {
             useAuthStore.getState().logout();
           } catch (e) {
-            console.error("[OrderDetails] Failed to logout:", e);
+            if (import.meta.env.DEV) {
+              console.error("[OrderDetails] Failed to logout:", e);
+            }
           }
           window.location.href = "/login?expired=true";
           return;
@@ -126,7 +127,6 @@ export default function OrderDetails() {
         if (!res.ok) throw new Error(data.message || "Failed to fetch order");
         setOrder(data);
       } catch (err) {
-        console.error("[OrderDetails] Failed to load order:", err);
         setError(err.message || "Failed to load order details");
       } finally {
         setLoading(false);
@@ -153,15 +153,14 @@ export default function OrderDetails() {
         }
       })
       .catch((err) => {
-        console.error("Failed to fetch fallback address:", err);
+        if (import.meta.env.DEV) {
+          console.error("Failed to fetch fallback address:", err);
+        }
       });
   }, [order]);
 
   const getProductImage = (item) => {
-    if (item.product?.images && item.product.images.length > 0) {
-      return item.product.images[0].url;
-    }
-    return null;
+    return getImageUrl(item.product?.images?.[0]);
   };
 
   function buildInvoice(order) {
@@ -194,7 +193,7 @@ export default function OrderDetails() {
 
   if (loading) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-4xl mx-auto px-4 flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-3">
@@ -209,7 +208,7 @@ export default function OrderDetails() {
 
   if (error) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-4xl mx-auto px-4">
             <div className="rounded-xl p-8 text-center theme-card bg-surface border border-white/40 shadow-lg">
@@ -240,7 +239,7 @@ export default function OrderDetails() {
 
   if (!order) {
     return (
-      <RoleGate allow={["PRIVATE"]}>
+      <RoleGate allow={["PRIVATE"]} showFallback>
         <div className="min-h-screen bg-surface py-8">
           <div className="max-w-4xl mx-auto px-4">
             <div className="rounded-xl p-8 text-center theme-card bg-surface border border-white/40 shadow-lg">
@@ -272,7 +271,7 @@ export default function OrderDetails() {
     paymentStatusConfig[order.paymentStatus] || paymentStatusConfig.PENDING;
 
   return (
-    <RoleGate allow={["PRIVATE"]}>
+    <RoleGate allow={["PRIVATE"]} showFallback>
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* Back Button */}

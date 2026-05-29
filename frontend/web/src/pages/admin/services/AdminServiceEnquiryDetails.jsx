@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../../api/client";
 import { useAuthStore } from "../../../store/authStore";
+import { toast } from "react-hot-toast";
 
 const STATUSES = ["NEW", "IN_PROGRESS", "QUOTED", "COMPLETED", "CLOSED"];
 
@@ -16,6 +17,7 @@ export default function AdminServiceEnquiryDetails() {
   const [adminRemark, setAdminRemark] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   async function load() {
     try {
@@ -45,32 +47,36 @@ export default function AdminServiceEnquiryDetails() {
       // Load quote if status is QUOTED
       if (enquiryData.status === "QUOTED") {
         try {
-          const quoteRes = await fetch(`${API_URL}/admin/service-quotes`, {
+          const quoteRes = await fetch(`${API_URL}/admin/service-quotes/by-enquiry/${id}`, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           });
-          const quotesData = await quoteRes.json();
-          const quotes = quotesData.quotes || [];
-          const foundQuote = quotes.find(q => q.enquiry?._id === id);
+
+          if (!quoteRes.ok) {
+            throw new Error("Quote not found");
+          }
+
+          const foundQuote = await quoteRes.json();
           setQuote(foundQuote);
-        } catch (quoteErr) {
-          console.error("Failed to load quote:", quoteErr);
+        } catch {
           setQuote(null);
         }
       } else {
         setQuote(null);
       }
     } catch (err) {
-      console.error("Failed to load enquiry:", err);
       setError(err.message || "Failed to load enquiry");
       setEnquiry(null);
+      toast.error(err.message || "Failed to load enquiry");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleUpdate() {
+    setSaving(true);
+
     try {
       const res = await fetch(`${API_URL}/admin/service-enquiries/${id}/status`, {
         method: "PATCH",
@@ -85,9 +91,12 @@ export default function AdminServiceEnquiryDetails() {
         throw new Error("Failed to update status");
       }
 
+      toast.success("Service enquiry updated");
       load();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -199,9 +208,10 @@ export default function AdminServiceEnquiryDetails() {
 
         <button
           onClick={handleUpdate}
-          className="px-4 py-2 rounded bg-blue-600 text-white text-sm"
+          disabled={saving}
+          className="px-4 py-2 rounded bg-blue-600 text-white text-sm disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Save Update
+          {saving ? "Saving..." : "Save Update"}
         </button>
       </div>
 

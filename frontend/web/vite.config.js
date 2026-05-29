@@ -57,10 +57,6 @@ export default defineConfig({
          changeOrigin: true,
          rewrite: (path) => path.replace(/^\/api\/services/, "/services"),
        },
-       "/services": {
-          target: "http://localhost:5000",
-          changeOrigin: true,
-        },
       "/public": {
         target: "http://localhost:5000",
         changeOrigin: true,

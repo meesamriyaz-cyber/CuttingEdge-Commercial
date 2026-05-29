@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import { Button } from "../../components/ui";
+import toast from "react-hot-toast";
 
 export default function ServiceEnquiry() {
   const { slug } = useParams();
@@ -14,6 +15,7 @@ export default function ServiceEnquiry() {
   const [requirement, setRequirement] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     async function loadService() {
@@ -32,7 +34,7 @@ export default function ServiceEnquiry() {
         } else {
           setError(data.message || "Service not found");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load service. Please try again.");
       } finally {
         setLoading(false);
@@ -45,29 +47,37 @@ export default function ServiceEnquiry() {
     e.preventDefault();
 
     if (!requirement) {
-      alert("Please describe your requirement");
+      toast.error("Please describe your requirement");
       return;
     }
 
-    const res = await fetch(`${API_URL}/services/enquiry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        serviceId: service._id,
-        requirementDetails: requirement,
-      }),
-    });
+    setSubmitting(true);
 
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message || "Failed to submit enquiry");
-      return;
+    try {
+      const res = await fetch(`${API_URL}/services/enquiry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          serviceId: service._id,
+          requirementDetails: requirement,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to submit enquiry");
+      }
+
+      toast.success("Service enquiry submitted");
+      navigate("/service-enquiries");
+    } catch (err) {
+      toast.error(err.message || "Failed to submit enquiry");
+    } finally {
+      setSubmitting(false);
     }
-
-    navigate("/service-enquiries");
   }
 
   // Handle unauthenticated users - show login prompt
@@ -155,8 +165,10 @@ export default function ServiceEnquiry() {
           <Button
             type="submit"
             className="w-full"
+            disabled={submitting}
+            isLoading={submitting}
           >
-            Submit Enquiry
+            {submitting ? "Submitting..." : "Submit Enquiry"}
           </Button>
         </form>
       </div>

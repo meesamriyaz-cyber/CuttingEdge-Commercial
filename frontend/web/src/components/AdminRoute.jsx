@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import AdminLayout from "../pages/admin/AdminLayout";
 
 export default function AdminRoute({ children }) {
   const { user, isInit } = useAuthStore();
@@ -10,5 +11,5 @@ export default function AdminRoute({ children }) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <AdminLayout>{children}</AdminLayout>;
 }

@@ -18,7 +18,7 @@ export default function OrderSuccess() {
   }, [orderId, navigate]);
 
   return (
-    <RoleGate allow={["PRIVATE"]}>
+    <RoleGate allow={["PRIVATE"]} showFallback>
       <div className="min-h-screen bg-page px-4 py-12">
         <div className="mx-auto max-w-3xl">
           <div className="hero-shell rounded-[28px] overflow-hidden">

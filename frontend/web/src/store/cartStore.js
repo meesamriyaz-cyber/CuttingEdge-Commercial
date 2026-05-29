@@ -123,7 +123,7 @@ export const useCartStore = create((set, get) => ({
       if (res.status === 401) {
         // Clear auth store and localStorage properly
         try {
-          useAuthStore.getState().logout();
+          useAuthStore.getState().expireSession();
         } catch (e) {
           // Fallback if logout fails
           localStorage.removeItem("session");

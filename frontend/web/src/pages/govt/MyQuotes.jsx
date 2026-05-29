@@ -43,7 +43,7 @@ export default function MyQuotes() {
 
   if (loading) {
     return (
-      <RoleGate allow={["PUBLIC"]}>
+      <RoleGate allow={["PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-5xl px-4">
             <div className="theme-card rounded-[24px] p-10 text-center">
@@ -57,7 +57,7 @@ export default function MyQuotes() {
 
   if (error) {
     return (
-      <RoleGate allow={["PUBLIC"]}>
+      <RoleGate allow={["PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-5xl px-4">
             <div className="theme-card rounded-[24px] p-8 text-center">
@@ -70,7 +70,7 @@ export default function MyQuotes() {
   }
 
   return (
-    <RoleGate allow={["PUBLIC"]}>
+    <RoleGate allow={["PUBLIC"]} showFallback>
       <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-5xl">
           <section className="hero-shell rounded-[28px] p-6 sm:p-8">

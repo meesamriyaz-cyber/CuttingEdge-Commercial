@@ -2,6 +2,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { API_URL } from "../../../api/client";
 import { useAuthStore } from "../../../store/authStore";
+import { toast } from "react-hot-toast";
 
 export default function AdminServiceQuoteCreate() {
   const { id: enquiryId } = useParams();
@@ -45,10 +46,14 @@ export default function AdminServiceQuoteCreate() {
         throw new Error(data.message || "Failed to create quote");
       }
 
-      // Redirect to enquiries page after successful quote creation
+      if (data?.emailSent === false) {
+        toast.error(data.message || "Quote created, but email delivery failed");
+      } else {
+        toast.success(data.message || "Service quote created successfully");
+      }
       navigate("/admin/service-enquiries", { replace: true });
     } catch (err) {
-      alert(err.message || "Failed to create quote");
+      toast.error(err.message || "Failed to create quote");
     } finally {
       setLoading(false);
     }

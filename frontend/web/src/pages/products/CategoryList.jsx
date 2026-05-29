@@ -24,6 +24,7 @@ import { getCategories } from "../../api/products";
 import LayoutContainer from "../../components/LayoutContainer";
 import { containerVariants, fadeInVariants } from "../../utils/animations";
 import { Button } from "../../components/ui";
+import { getCategoryFallbackImage } from "../../utils/productImages";
 
 function getCategoryIcon(name) {
   const value = name.toLowerCase();
@@ -51,6 +52,37 @@ function getCategoryIcon(name) {
   }
 
   return Box;
+}
+
+function CategoryCardImage({ category, heightClass, iconSizeClass }) {
+  const [imageSrc, setImageSrc] = useState(
+    category.image || getCategoryFallbackImage(category.name),
+  );
+  const Icon = getCategoryIcon(category.name);
+
+  useEffect(() => {
+    setImageSrc(category.image || getCategoryFallbackImage(category.name));
+  }, [category.image, category.name]);
+
+  if (!imageSrc) {
+    return (
+      <div className={`flex ${heightClass} items-center justify-center`}>
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+          <Icon className={`${iconSizeClass} text-cyan-700 dark:text-cyan-300`} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={category.name}
+      className={`${heightClass} w-full object-cover transition-transform duration-300 group-hover:scale-105`}
+      loading="lazy"
+      onError={() => setImageSrc(getCategoryFallbackImage(category.name))}
+    />
+  );
 }
 
 export default function CategoryList() {
@@ -142,7 +174,7 @@ export default function CategoryList() {
           </Button>
         </div>
 
-        <motion.section className="tech-panel rounded-lg p-6 sm:p-8" variants={containerVariants}>
+        <motion.section className="hero-shell rounded-lg p-6 sm:p-8" variants={containerVariants}>
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
               <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
@@ -159,7 +191,7 @@ export default function CategoryList() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:min-w-[280px]">
-              <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4">
+              <div className="rounded-lg border border-slate-200 bg-white/80 p-4 shadow-[0_18px_40px_-32px_rgba(8,16,29,0.55)] backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/45">
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Categories
                 </div>
@@ -167,7 +199,7 @@ export default function CategoryList() {
                   {categories.length}
                 </div>
               </div>
-              <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4">
+              <div className="rounded-lg border border-slate-200 bg-white/80 p-4 shadow-[0_18px_40px_-32px_rgba(8,16,29,0.55)] backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/45">
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Visible products
                 </div>
@@ -179,7 +211,7 @@ export default function CategoryList() {
           </div>
         </motion.section>
 
-        <div className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 p-4 shadow-sm">
+        <div className="glass-premium flex items-start gap-3 rounded-lg p-4">
           <FolderOpen className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
           <div>
             <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -193,7 +225,7 @@ export default function CategoryList() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
+        <div className="glass-premium rounded-lg p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
             <div className="relative flex-1 max-w-md">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -202,7 +234,7 @@ export default function CategoryList() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search categories..."
-                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 pl-11 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
+                className="theme-input w-full pl-11 pr-4"
               />
             </div>
 
@@ -266,8 +298,6 @@ export default function CategoryList() {
             variants={containerVariants}
           >
             {filteredCategories.map((category, index) => {
-              const Icon = getCategoryIcon(category.name);
-
               return (
                 <motion.div
                   key={category.name}
@@ -277,7 +307,7 @@ export default function CategoryList() {
                 >
                   <Link
                     to={`/products/category/${encodeURIComponent(category.name)}`}
-                    className="group tech-panel flex h-full flex-col rounded-lg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="group theme-card flex h-full flex-col rounded-lg p-5 transition-all duration-200 hover:-translate-y-1"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
@@ -286,20 +316,11 @@ export default function CategoryList() {
                     </div>
 
                     <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
-                      {category.image ? (
-                        <img
-                          src={category.image}
-                          alt={category.name}
-                          className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-40 items-center justify-center">
-                          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                            <Icon className="h-7 w-7 text-cyan-700 dark:text-cyan-300" />
-                          </div>
-                        </div>
-                      )}
+                      <CategoryCardImage
+                        category={category}
+                        heightClass="h-40"
+                        iconSizeClass="h-7 w-7"
+                      />
                     </div>
 
                     <div className="mt-5 flex-1">
@@ -328,8 +349,6 @@ export default function CategoryList() {
             variants={containerVariants}
           >
             {filteredCategories.map((category, index) => {
-              const Icon = getCategoryIcon(category.name);
-
               return (
                 <motion.div
                   key={category.name}
@@ -339,23 +358,14 @@ export default function CategoryList() {
                 >
                   <Link
                     to={`/products/category/${encodeURIComponent(category.name)}`}
-                    className="group flex h-full flex-col rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="group theme-card flex h-full flex-col rounded-lg p-4 transition-all duration-200 hover:-translate-y-1"
                   >
                     <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
-                      {category.image ? (
-                        <img
-                          src={category.image}
-                          alt={category.name}
-                          className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-24 items-center justify-center">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                            <Icon className="h-5 w-5 text-cyan-700 dark:text-cyan-300" />
-                          </div>
-                        </div>
-                      )}
+                      <CategoryCardImage
+                        category={category}
+                        heightClass="h-24"
+                        iconSizeClass="h-5 w-5"
+                      />
                     </div>
                     <h3 className="mt-4 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2">
                       {category.name}

@@ -62,11 +62,11 @@ export default function ReviewsList({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {summary && summary.totalReviews > 0 && (
-        <div className="panel-muted p-6">
-          <div className="flex flex-col gap-8 md:flex-row">
-            <div className="text-center md:text-left">
+        <div className="panel-muted min-w-0 p-5 sm:p-6">
+          <div className="flex min-w-0 flex-col gap-8 md:flex-row">
+            <div className="min-w-0 text-center md:text-left">
               <div className="mb-2 text-5xl font-bold text-slate-900 dark:text-white">
                 {summary.averageRating.toFixed(1)}
               </div>
@@ -78,7 +78,7 @@ export default function ReviewsList({
               </p>
             </div>
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               {[5, 4, 3, 2, 1].map((star) => (
                 <div key={star} className="mb-2 flex items-center gap-3">
                   <span className="w-8 text-sm text-slate-600 dark:text-slate-300">
@@ -102,7 +102,7 @@ export default function ReviewsList({
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4">
         <AnimatePresence mode="popLayout">
           {reviews.map((review, index) => {
             const isOwner = currentUserId && review.user?._id === currentUserId;
@@ -114,18 +114,18 @@ export default function ReviewsList({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className="panel-muted p-5 sm:p-6"
+                className="panel-muted min-w-0 p-5 sm:p-6"
               >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="mb-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 font-semibold text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300">
                       {review.user?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
-                    <div>
-                      <p className="font-semibold text-slate-900 dark:text-white">
+                    <div className="min-w-0">
+                      <p className="break-words font-semibold text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                         {review.user?.name || "Anonymous"}
                       </p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center gap-0.5">
                           {renderStars(review.rating)}
                         </div>
@@ -145,7 +145,7 @@ export default function ReviewsList({
                   )}
 
                   {isOwner && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 self-start">
                       <button
                         onClick={() => onEditReview?.(review)}
                         className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-900"
@@ -165,12 +165,12 @@ export default function ReviewsList({
                 </div>
 
                 {review.title && (
-                  <h4 className="mb-2 font-semibold text-slate-900 dark:text-white">
+                  <h4 className="mb-2 break-words font-semibold text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                     {review.title}
                   </h4>
                 )}
 
-                <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-300">
+                <p className="mb-4 break-words leading-relaxed text-slate-600 [overflow-wrap:anywhere] dark:text-slate-300">
                   {review.comment}
                 </p>
 
@@ -188,7 +188,7 @@ export default function ReviewsList({
                   </div>
                 )}
 
-                <div className="flex items-center justify-between border-t border-slate-200/80 pt-4 dark:border-slate-800">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-4 dark:border-slate-800">
                   <button
                     onClick={() => handleHelpful(review._id, true)}
                     disabled={helpfulLoading === review._id}

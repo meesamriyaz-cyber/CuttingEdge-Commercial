@@ -386,11 +386,15 @@ export const useAnimationDebug = (name, variants) => {
   const debugProps = {
     onAnimationStart: () => {
       setIsAnimating(true);
-      console.log(`Animation started: ${name}`);
+      if (import.meta.env.DEV) {
+        console.log(`Animation started: ${name}`);
+      }
     },
     onAnimationComplete: () => {
       setIsAnimating(false);
-      console.log(`Animation completed: ${name}`);
+      if (import.meta.env.DEV) {
+        console.log(`Animation completed: ${name}`);
+      }
     },
   };
 

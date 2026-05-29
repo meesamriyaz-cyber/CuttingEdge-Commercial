@@ -169,7 +169,7 @@ export default function MyEnquiries() {
 
   if (loading && currentPage === 1) {
     return (
-      <RoleGate allow={["PUBLIC"]}>
+      <RoleGate allow={["PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-7xl px-4">
             <div className="theme-card rounded-[24px] p-10 text-center">
@@ -183,7 +183,7 @@ export default function MyEnquiries() {
 
   if (error) {
     return (
-      <RoleGate allow={["PUBLIC"]}>
+      <RoleGate allow={["PUBLIC"]} showFallback>
         <div className="min-h-screen bg-page py-12">
           <div className="mx-auto max-w-7xl px-4">
             <div className="theme-card rounded-[24px] p-8 text-center">
@@ -196,7 +196,7 @@ export default function MyEnquiries() {
   }
 
   return (
-    <RoleGate allow={["PUBLIC"]}>
+    <RoleGate allow={["PUBLIC"]} showFallback>
       <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-7xl">
           <motion.section

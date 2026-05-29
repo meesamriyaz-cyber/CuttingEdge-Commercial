@@ -21,7 +21,7 @@ export default function GovtVerificationRoute({ children }) {
     user.clientType === "PUBLIC" &&
     user.govtValidationStatus !== "VERIFIED"
   ) {
-    return <Navigate to="/verify" replace />;
+    return <Navigate to="/verify-account" replace />;
   }
 
   return children;

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import {
   heroTextVariants,
   containerVariants,
@@ -9,29 +9,35 @@ import {
   PackageSearch,
   Wrench,
   ArrowRight,
-  Star,
   Building2,
-  Headphones,
-  UserRound,
+  BadgeCheck,
+  LifeBuoy,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "./ui";
 
 const AUTH_TRUST_POINTS = [
   {
-    icon: UserRound,
-    title: "Private customers",
-    text: "Cart, checkout, orders, and post-purchase support.",
+    icon: PackageSearch,
+    title: "Catalogue desk",
+    text: "Products, categories, and order-ready details stay easy to scan.",
   },
   {
     icon: Building2,
-    title: "Government customers",
-    text: "Product enquiries, quotations, and procurement tracking.",
+    title: "Procurement desk",
+    text: "Enquiries, quotations, and department follow-up stay in one flow.",
   },
   {
-    icon: Headphones,
-    title: "Shared services",
-    text: "Installation, AMC, repairs, and support after login.",
+    icon: LifeBuoy,
+    title: "Service desk",
+    text: "AMC, installation, repairs, and service quotes sit alongside supply.",
   },
+];
+
+const AUTH_METRICS = [
+  { value: "2", label: "customer paths" },
+  { value: "3", label: "workflows" },
+  { value: "OEM", label: "supply focus" },
 ];
 
 export default function HeroLeftContent({
@@ -41,45 +47,70 @@ export default function HeroLeftContent({
   const navigate = useNavigate();
 
   return (
-    <motion.section
+    <Motion.section
       className="relative flex flex-col items-center lg:items-start justify-center text-center lg:text-left w-full h-full pr-4"
       variants={containerVariants}
     >
-      {/* Tagline */}
-      <motion.div
-        variants={heroTextVariants}
-        custom={0}
-        className="signal-chip inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6"
-      >
-        <Star size={14} className="text-cyan-500" fill="currentColor" />
-        Trusted Partner for Businesses
-      </motion.div>
+      <Motion.div variants={heroTextVariants} custom={0} className="auth-visual-panel w-full max-w-xl">
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-slate-950 shadow-[0_18px_34px_-26px_rgba(0,0,0,0.72)]">
+                <ShieldCheck size={21} />
+              </div>
+              <div>
+                <p className="hidden text-lg font-extrabold uppercase tracking-wide text-cyan-50">
+                  Cutting Edge Enterprises
+                </p>
+                <p className="text-sm font-semibold text-white">
+                  Commercial access portal
+                </p>
+              </div>
+            </div>
+            <BadgeCheck className="h-5 w-5 text-orange-200" />
+          </div>
 
-      {/* Headline */}
-      <motion.h1
+          <h1 className="mt-8 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.65rem]">
+            One workspace for products, quotations, and service.
+          </h1>
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-cyan-50/85 sm:text-base">
+            Sign in once and continue into the right commercial path, whether it is a private order, public procurement enquiry, or service request.
+          </p>
+
+          <div className="mt-7 grid grid-cols-3 gap-3">
+            {AUTH_METRICS.map((metric) => (
+              <div key={metric.label} className="auth-metric-tile">
+                <div className="text-xl font-bold text-white">{metric.value}</div>
+                <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-100/80">
+                  {metric.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Motion.div>
+
+      <Motion.h2
         variants={heroTextVariants}
         custom={0.1}
-        className="mt-0 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 dark:text-white leading-[1.1]"
+        className="mt-7 text-2xl font-bold tracking-tight text-slate-800 dark:text-white sm:text-3xl"
       >
-        Products & Services{" "}
+        Built for business buying,{" "}
         <span className="text-cyan-700 dark:text-cyan-300">
-          Made Simple
+          not just browsing
         </span>
-      </motion.h1>
+      </Motion.h2>
 
-      {/* Subheading */}
-      <motion.p
+      <Motion.p
         variants={heroTextVariants}
         custom={0.2}
-        className="mt-5 max-w-lg text-base text-slate-600 dark:text-slate-300 leading-relaxed"
+        className="mt-3 max-w-lg text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
       >
-        Discover quality products and professional services tailored for your business needs. 
-        Trusted by enterprises across sectors.
-      </motion.p>
+        A cleaner front door for customers who need products, procurement paperwork, and support handled with the same level of care.
+      </Motion.p>
 
-      {/* CTA */}
       {!user && !hideCTA && (
-        <motion.div
+        <Motion.div
           variants={heroTextVariants}
           custom={0.3}
           className="mt-8 flex gap-4 flex-wrap justify-center lg:justify-start"
@@ -101,21 +132,20 @@ export default function HeroLeftContent({
             <Wrench size={18} />
             Explore Services
           </Button>
-        </motion.div>
+        </Motion.div>
       )}
 
-      {/* Compact trust points for auth screens */}
-      <motion.div
+      <Motion.div
         variants={heroTextVariants}
         custom={0.4}
-        className="mt-8 grid gap-3 w-full max-w-lg"
+        className="mt-6 grid gap-3 w-full max-w-lg"
       >
         {AUTH_TRUST_POINTS.map((point) => {
           const Icon = point.icon;
           return (
             <div
               key={point.title}
-              className="tech-panel flex items-start gap-3 rounded-lg p-4 shadow-sm"
+              className="auth-trust-row"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
                 <Icon size={19} className="text-cyan-700 dark:text-cyan-300" />
@@ -131,8 +161,8 @@ export default function HeroLeftContent({
             </div>
           );
         })}
-      </motion.div>
+      </Motion.div>
 
-    </motion.section>
+    </Motion.section>
   );
 }

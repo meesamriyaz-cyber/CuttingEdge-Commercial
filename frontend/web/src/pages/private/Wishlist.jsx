@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Heart, Package, ShoppingCart, Trash2, ArrowLeft, Loader2 } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, ArrowLeft, Loader2 } from "lucide-react";
 import { getWishlist, removeFromWishlist } from "../../api/wishlist";
 import { useCartStore } from "../../store/cartStore";
 import LayoutContainer from "../../components/LayoutContainer";
 import { Button } from "../../components/ui";
+import { getProductPrimaryImage } from "../../utils/productImages";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -135,17 +136,11 @@ export default function Wishlist() {
                 >
                   <Link to={`/products/${product._id}`}>
                     <div className="aspect-square bg-slate-100/90 dark:bg-slate-900/60">
-                      {product.images?.[0]?.url ? (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className="h-full w-full object-contain p-4"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <Package className="h-16 w-16 text-slate-300 dark:text-slate-600" />
-                        </div>
-                      )}
+                      <img
+                        src={getProductPrimaryImage(product)}
+                        alt={product.name}
+                        className="h-full w-full object-contain p-4"
+                      />
                     </div>
                   </Link>
 

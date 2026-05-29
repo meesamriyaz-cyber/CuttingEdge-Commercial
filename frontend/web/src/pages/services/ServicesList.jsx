@@ -42,7 +42,7 @@ export default function ServicesList() {
     async function loadServices() {
       try {
         const res = await fetch(`${API_URL}/services`);
-       const data = await res.json();
+        const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to load services");
         setServices(data);
       } catch (err) {
@@ -63,24 +63,36 @@ export default function ServicesList() {
   });
 
   return (
-    <section className="bg-slate-50 dark:bg-[#07111f] min-h-screen relative overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 relative z-10">
-        {/* Header */}
+    <section className="min-h-screen bg-page relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="tech-panel rounded-lg p-6 sm:p-8 text-center"
+          className="hero-shell grid gap-6 rounded-lg p-6 sm:p-8 lg:grid-cols-[1fr_320px] lg:items-end"
         >
-          <span className="signal-chip inline-block px-4 py-1.5 mb-4 text-xs font-semibold uppercase tracking-widest rounded-full">
-            Professional Services
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-            Our Professional Services
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-            Reliable IT installation, maintenance, repair, and AMC support for homes, offices, and institutions.
-          </p>
+          <div className="relative z-10">
+            <span className="signal-chip inline-flex px-3 py-1 text-xs font-semibold uppercase tracking-wide rounded-full">
+              Professional Services
+            </span>
+            <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 dark:text-white">
+              Service support without guesswork.
+            </h1>
+            <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+              Compare installation, AMC, repair, and development services before
+              signing in. Each service has a detail page so customers know the
+              scope before raising a request.
+            </p>
+          </div>
+
+          <div className="relative z-10 rounded-lg border border-slate-200 bg-white/80 p-4 shadow-[0_18px_40px_-32px_rgba(8,16,29,0.55)] backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/45">
+            <div className="text-3xl font-bold text-slate-950 dark:text-white">
+              {services.length || 5}
+            </div>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Active service workflows for offices, homes, and institutions.
+            </p>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -111,7 +123,7 @@ export default function ServicesList() {
         </div>
 
         {!isAuthenticated && (
-          <div className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 p-4 shadow-sm">
+          <div className="glass-premium flex items-start gap-3 rounded-lg p-4">
             <Search className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
             <div>
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -124,23 +136,21 @@ export default function ServicesList() {
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-center"
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center"
           >
             <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
           </motion.div>
         )}
 
-        {/* Search and Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 p-4 sm:p-6"
+          className="glass-premium rounded-lg p-4 sm:p-5"
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search Input */}
@@ -153,7 +163,7 @@ export default function ServicesList() {
                 placeholder="Search services..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all duration-200"
+                className="theme-input w-full pl-12 pr-4"
               />
             </div>
 
@@ -165,7 +175,7 @@ export default function ServicesList() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all duration-200 appearance-none cursor-pointer"
+                className="theme-input w-full cursor-pointer appearance-none pl-12 pr-10"
               >
                 <option value="ALL">All categories</option>
                 <option value="Networking">Networking</option>

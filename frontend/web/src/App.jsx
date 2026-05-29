@@ -1,17 +1,19 @@
 import { useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import AppRoutes from "./routes/AppRoutes";
+import BackendWakeNotice from "./components/BackendWakeNotice";
 import Navbar from "./components/Navbar";
 import ThemeProvider from "./components/ThemeProvider";
 import { pageVariants, pageTransition } from "./utils/animations";
 import { useAuthStore } from "./store/authStore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { warmBackend } from "./api/backendWakeMonitor";
 
 const AnimatedAppRoutes = () => {
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <Motion.div
         key="app-routes"
         variants={pageVariants}
         initial="initial"
@@ -20,18 +22,25 @@ const AnimatedAppRoutes = () => {
         transition={pageTransition}
       >
         <AppRoutes />
-      </motion.div>
+      </Motion.div>
     </AnimatePresence>
   );
 };
 
 export default function App() {
   const user = useAuthStore((state) => state.user);
+  const sessionExpired = useAuthStore((state) => state.sessionExpired);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Check if current route is invoice page (hide navbar/footer)
   const isInvoicePage = location.pathname.includes("/invoice");
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      warmBackend();
+    }
+  }, [location.pathname]);
 
   // Redirect unauthenticated users away from protected application areas.
   useEffect(() => {
@@ -48,10 +57,15 @@ export default function App() {
       route === "/" ? currentPath === "/" : currentPath.startsWith(route),
     );
 
+    if (sessionExpired && !["/login", "/register"].includes(currentPath)) {
+      navigate("/login?expired=true", { replace: true });
+      return;
+    }
+
     if (!user && !isPublicRoute) {
       navigate("/login", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, sessionExpired, navigate]);
 
   return (
     <ThemeProvider>
@@ -64,6 +78,7 @@ export default function App() {
           },
         }}
       />
+      <BackendWakeNotice />
 
       {/* Hide navbar on invoice page */}
       {!isInvoicePage && <Navbar />}

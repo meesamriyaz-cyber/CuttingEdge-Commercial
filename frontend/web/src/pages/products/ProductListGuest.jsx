@@ -11,6 +11,7 @@ import {
 
 import { API_URL } from "../../api/client";
 import { Button } from "../../components/ui";
+import { getProductPrimaryImage } from "../../utils/productImages";
 
 function RatingStars({ rating }) {
   return [...Array(5)].map((_, index) => (
@@ -82,7 +83,11 @@ export default function ProductListGuest() {
 
         setProducts(data);
       } catch (err) {
-        setError(err.message);
+        setError(
+          err.message === "Failed to fetch"
+            ? "We could not reach the product catalogue right now."
+            : err.message,
+        );
       } finally {
         setLoading(false);
       }
@@ -112,7 +117,7 @@ export default function ProductListGuest() {
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const pageTitle = selectedCategory
     ? `${selectedCategory} Products`
-    : "Browse genuine IT products";
+    : "Product Catalogue";
   const pageDescription = selectedCategory
     ? `Explore ${selectedCategory.toLowerCase()} options, compare specifications, and continue with the right workflow after sign-in.`
     : "Compare categories, review specifications, and continue with the right workflow after sign-in.";
@@ -134,56 +139,73 @@ export default function ProductListGuest() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#07111f] px-4">
-        <div className="rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200">
-          {error}
+        <div className="max-w-lg rounded-lg border border-red-200 bg-white px-6 py-7 text-center shadow-sm dark:border-red-900/40 dark:bg-slate-900">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/20">
+            <PackageCheck className="h-6 w-6 text-red-600 dark:text-red-300" />
+          </div>
+          <h1 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white">
+            Product catalogue unavailable
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {error} Please try again, or explore services while the catalogue
+            connection recovers.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button onClick={() => window.location.reload()}>Try again</Button>
+            <Button variant="secondary" onClick={() => navigate("/services")}>
+              Explore services
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#07111f] px-4 sm:px-6 py-10 sm:py-16">
+    <div className="min-h-screen bg-page px-4 py-8 sm:px-6 sm:py-12">
       <div className="max-w-7xl mx-auto space-y-10">
-        <div className="tech-panel rounded-lg p-5 sm:p-7 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
-          <div>
-            <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-              {selectedCategory || "Product Catalogue"}
-            </span>
-            <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-              {pageTitle}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-300">
-              {pageDescription}
-            </p>
-            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-              <PackageCheck className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-300" />
-              {resultLabel}
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-[1fr_180px] gap-3 w-full lg:w-auto">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search products..."
-                className="w-full lg:w-80 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-11 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
-              />
+        <div className="hero-shell rounded-lg p-5 sm:p-7">
+          <div className="relative z-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
+            <div className="min-w-0">
+              <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                {selectedCategory || "Product Catalogue"}
+              </span>
+              <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-slate-950 dark:text-white">
+                {pageTitle}
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-300">
+                {pageDescription}
+              </p>
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <PackageCheck className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-300" />
+                {resultLabel}
+              </p>
             </div>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500"
-            >
-              <option value="name">Sort by name</option>
-              <option value="category">Sort by category</option>
-              <option value="rating">Top rated</option>
-            </select>
+            <div className="grid w-full gap-3 sm:grid-cols-[1fr_180px] lg:w-auto">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search products..."
+                  className="theme-input w-full pl-11 pr-4 lg:w-80"
+                />
+              </div>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="theme-input px-4"
+              >
+                <option value="name">Sort by name</option>
+                <option value="category">Sort by category</option>
+                <option value="rating">Top rated</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -194,7 +216,7 @@ export default function ProductListGuest() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 pr-10 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 appearance-none"
+                  className="theme-input w-full appearance-none px-4 pr-10 font-medium"
                 >
                   <option value="">
                     All Categories ({categories.reduce((sum, item) => sum + item.count, 0)})
@@ -247,7 +269,7 @@ export default function ProductListGuest() {
           </div>
         )}
 
-        <div className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-cyan-900/50 bg-white dark:bg-slate-900 p-4 shadow-sm">
+        <div className="glass-premium flex items-start gap-3 rounded-lg p-4">
           <LogIn className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-300" />
           <div>
             <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -264,30 +286,24 @@ export default function ProductListGuest() {
             {paginatedProducts.map((product) => (
               <div
                 key={product._id}
-                className="group tech-panel relative flex cursor-pointer flex-col overflow-hidden rounded-lg p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                className="theme-card group relative flex cursor-pointer flex-col overflow-hidden rounded-lg p-4 transition-all duration-200 hover:-translate-y-1 hover:border-cyan-300 dark:hover:border-cyan-800"
                 onClick={() => setSelectedProduct(product)}
               >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent"></div>
-
                 {product.category && (
-                  <span className="absolute left-4 top-4 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <span className="absolute left-4 top-4 z-10 rounded-full border border-slate-200 bg-white/90 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300">
                     {product.category}
                   </span>
                 )}
 
-                <div className="mt-6 flex h-40 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 p-4">
-                  {product.images?.[0]?.url ? (
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-xs text-slate-400">No image</span>
-                  )}
+                <div className="flex h-44 items-center justify-center rounded-lg bg-gradient-to-br from-slate-50 to-cyan-50/60 p-4 dark:from-slate-900 dark:to-cyan-950/20">
+                  <img
+                    src={getProductPrimaryImage(product)}
+                    alt={product.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
                 </div>
 
-                <h3 className="mt-4 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2">
+                <h3 className="mt-4 min-h-10 text-sm font-bold text-slate-950 dark:text-white line-clamp-2">
                   {product.name}
                 </h3>
 
@@ -304,7 +320,7 @@ export default function ProductListGuest() {
                   </div>
                 )}
 
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <div className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300">
                   <BadgeCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                   Verified listing
                 </div>
@@ -371,15 +387,11 @@ export default function ProductListGuest() {
 
               <div className="space-y-4 p-4">
                 <div className="flex h-40 w-full items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900">
-                  {selectedProduct.images?.[0]?.url ? (
-                    <img
-                      src={selectedProduct.images[0].url}
-                      alt={selectedProduct.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-xs text-slate-400">No image</span>
-                  )}
+                  <img
+                    src={getProductPrimaryImage(selectedProduct)}
+                    alt={selectedProduct.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
                 </div>
 
                 <div>

@@ -6,12 +6,12 @@ import {
 } from "../../../api/adminEnquiries";
 import { fetchQuoteByEnquiry } from "../../../api/adminQuotes";
 import { Building2, ShoppingBag } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const STATUSES = ["NEW", "IN_REVIEW", "QUOTED", "CLOSED"];
 
 export default function AdminEnquiryDetails() {
   const { id } = useParams();
-  console.log("AdminEnquiryDetails - ID from URL params:", id);
   const navigate = useNavigate();
 
   const [enquiry, setEnquiry] = useState(null);
@@ -20,19 +20,18 @@ export default function AdminEnquiryDetails() {
   const [adminRemark, setAdminRemark] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   async function load() {
     try {
       setLoading(true);
       setError(null);
-      console.log("Loading enquiry with ID:", id);
 
       if (!id) {
         throw new Error("No enquiry ID provided in URL");
       }
 
       const enquiryData = await fetchAdminEnquiry(id);
-      console.log("Enquiry data received:", enquiryData);
 
       if (!enquiryData || !enquiryData._id) {
         throw new Error("Invalid enquiry data received from server");
@@ -46,25 +45,32 @@ export default function AdminEnquiryDetails() {
         try {
           const q = await fetchQuoteByEnquiry(id);
           setQuote(q);
-        } catch (quoteErr) {
-          console.error("Failed to load quote:", quoteErr);
+        } catch {
           setQuote(null);
         }
       } else {
         setQuote(null);
       }
     } catch (err) {
-      console.error("Failed to load enquiry:", err);
       setError(err.message || "Failed to load enquiry");
       setEnquiry(null);
+      toast.error(err.message || "Failed to load enquiry");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleUpdate() {
-    await updateEnquiryStatus(id, status, adminRemark);
-    load();
+    try {
+      setSaving(true);
+      await updateEnquiryStatus(id, status, adminRemark);
+      toast.success("Enquiry updated");
+      load();
+    } catch (err) {
+      toast.error(err.message || "Failed to update enquiry");
+    } finally {
+      setSaving(false);
+    }
   }
 
   useEffect(() => {
@@ -180,9 +186,10 @@ export default function AdminEnquiryDetails() {
 
         <button
           onClick={handleUpdate}
-          className="px-4 py-2 rounded bg-blue-600 text-white text-sm"
+          disabled={saving}
+          className="px-4 py-2 rounded bg-blue-600 text-white text-sm disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Save Update
+          {saving ? "Saving..." : "Save Update"}
         </button>
       </div>
 

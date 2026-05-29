@@ -82,7 +82,7 @@ function AddressForm({ address, onSubmit, onCancel, loading }) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             City
@@ -114,7 +114,7 @@ function AddressForm({ address, onSubmit, onCancel, loading }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Pincode
@@ -160,7 +160,7 @@ function AddressForm({ address, onSubmit, onCancel, loading }) {
         </label>
       </div>
 
-      <div className="flex gap-3 pt-2">
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row">
         <button
           type="submit"
           disabled={loading}
@@ -191,16 +191,16 @@ function AddressCard({ address, onEdit, onDelete, onSetDefault, loading }) {
           : "border-gray-200 hover:border-gray-300"
       }`}
     >
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900">{address.label}</span>
+      <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="break-words font-semibold text-gray-900">{address.label}</span>
           {address.isDefault && (
             <span className="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
               Default
             </span>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <button
             onClick={() => onEdit(address)}
             disabled={loading}

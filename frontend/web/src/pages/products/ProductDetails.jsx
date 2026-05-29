@@ -24,6 +24,8 @@ import { getProductReviews, canReviewProduct } from "../../api/reviews";
 import ReviewsList from "../../components/ReviewsList";
 import ReviewForm from "../../components/ReviewForm";
 import { Button } from "../../components/ui";
+import { getCategoryFallbackImage, getProductImages } from "../../utils/productImages";
+import toast from "react-hot-toast";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -50,8 +52,16 @@ export default function ProductDetails() {
   const [editingReview, setEditingReview] = useState(null);
 
   const isGovtClient = user?.clientType === "PUBLIC";
-  const hasImages = product?.images?.length > 0;
-  const currentImage = hasImages ? product.images[currentImageIndex] : null;
+  const productImageUrls = product ? getProductImages(product) : [];
+  const displayImages = product
+    ? productImageUrls.length > 0
+      ? productImageUrls
+      : [getCategoryFallbackImage(product.category || product.name)]
+    : [];
+  const hasImages = displayImages.length > 0;
+  const currentImage = displayImages[currentImageIndex] || displayImages[0];
+  const availableStock = Number(product?.stock || 0);
+  const outOfStock = availableStock < 1;
 
   useEffect(() => {
     async function loadProduct() {
@@ -104,15 +114,25 @@ export default function ProductDetails() {
 
   const nextImage = () =>
     setCurrentImageIndex((index) =>
-      index === product.images.length - 1 ? 0 : index + 1,
+      index === displayImages.length - 1 ? 0 : index + 1,
     );
 
   const prevImage = () =>
     setCurrentImageIndex((index) =>
-      index === 0 ? product.images.length - 1 : index - 1,
+      index === 0 ? displayImages.length - 1 : index - 1,
     );
 
   async function handleAddToCart() {
+    if (outOfStock) {
+      toast.error("This product is out of stock");
+      return;
+    }
+
+    if (quantity > availableStock) {
+      toast.error(`Only ${availableStock} left in stock`);
+      return;
+    }
+
     try {
       const res = await fetch(`${API_URL}/cart/add`, {
         method: "POST",
@@ -127,9 +147,10 @@ export default function ProductDetails() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
+      toast.success("Added to cart");
       navigate("/cart");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "Could not add item to cart");
     }
   }
 
@@ -212,10 +233,10 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-page px-4 sm:px-6 py-8 sm:py-12">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen overflow-x-hidden bg-page px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mx-auto max-w-7xl min-w-0">
         <motion.section
-          className="hero-shell relative mb-8 overflow-hidden rounded-[28px] p-6 sm:p-8"
+          className="hero-shell relative mb-8 min-w-0 overflow-hidden rounded-[28px] p-5 sm:p-8"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -229,51 +250,69 @@ export default function ProductDetails() {
             Back to products
           </button>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-            <div>
+          <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
                 {product.category && (
-                  <span className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  <span className="signal-chip inline-flex max-w-full items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
                     <Package size={12} />
-                    {product.category}
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                      {product.category}
+                    </span>
                   </span>
                 )}
                 {product.sku && (
-                  <span className="rounded-full border border-slate-200/85 bg-white/65 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-300">
+                  <span className="max-w-full break-words rounded-full border border-slate-200/85 bg-white/65 px-3 py-1 text-xs font-medium text-slate-600 [overflow-wrap:anywhere] dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-300">
                     SKU {product.sku}
                   </span>
                 )}
+                {!isGovtClient && (
+                  <div className="panel-muted min-w-0 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      Stock
+                    </p>
+                    <p
+                      className={`mt-2 break-words text-sm font-medium [overflow-wrap:anywhere] ${
+                        outOfStock
+                          ? "text-red-600 dark:text-red-300"
+                          : "text-emerald-700 dark:text-emerald-300"
+                      }`}
+                    >
+                      {outOfStock ? "Out of stock" : `${availableStock} available`}
+                    </p>
+                  </div>
+                )}
               </div>
 
-              <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              <h1 className="mt-4 break-words text-3xl font-bold tracking-tight text-slate-900 [overflow-wrap:anywhere] dark:text-white sm:text-4xl">
                 {product.name}
               </h1>
 
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+              <p className="mt-3 max-w-3xl break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] dark:text-slate-300 sm:text-base">
                 {product.description || "No description available."}
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="panel-muted p-4">
+            <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+              <div className="panel-muted min-w-0 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Product workflow
                 </p>
                 <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
                   {isGovtClient ? "Quotation-driven procurement" : "Direct retail purchase"}
                 </p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p className="mt-1 break-words text-sm text-slate-500 [overflow-wrap:anywhere] dark:text-slate-400">
                   {isGovtClient
                     ? "Submit an enquiry to receive pricing and supply confirmation."
                     : "Select quantity, add to cart, and complete checkout online."}
                 </p>
               </div>
 
-              <div className="panel-muted p-4">
+              <div className="panel-muted min-w-0 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Trust signal
                 </p>
-                <div className="mt-2 flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <div className="mt-2 flex min-w-0 items-start gap-2 break-words text-sm text-slate-600 [overflow-wrap:anywhere] dark:text-slate-300">
                   <ShieldCheck size={16} className="mt-0.5 text-cyan-600 dark:text-cyan-300" />
                   Listing managed through verified customer and service workflows.
                 </div>
@@ -282,9 +321,9 @@ export default function ProductDetails() {
           </div>
         </motion.section>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
           <motion.div
-            className="theme-card rounded-[24px] p-4 sm:p-6"
+            className="theme-card min-w-0 rounded-[24px] p-4 sm:p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -293,7 +332,7 @@ export default function ProductDetails() {
               {hasImages ? (
                 <motion.img
                   key={currentImageIndex}
-                  src={currentImage.url}
+                  src={currentImage}
                   alt={product.name}
                   className="h-full w-full object-contain p-6"
                   initial={{ opacity: 0 }}
@@ -305,7 +344,7 @@ export default function ProductDetails() {
                 </div>
               )}
 
-              {hasImages && product.images.length > 1 && (
+              {hasImages && displayImages.length > 1 && (
                 <>
                   <button
                     onClick={prevImage}
@@ -323,11 +362,11 @@ export default function ProductDetails() {
               )}
             </div>
 
-            {hasImages && product.images.length > 1 && (
+            {hasImages && displayImages.length > 1 && (
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
-                {product.images.map((img, index) => (
+                {displayImages.map((img, index) => (
                   <button
-                    key={img.url || index}
+                    key={img || index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border transition-all ${
                       index === currentImageIndex
@@ -335,7 +374,7 @@ export default function ProductDetails() {
                         : "border-slate-200/80 bg-white/70 hover:border-cyan-200 dark:border-slate-800 dark:bg-slate-950/35"
                     }`}
                   >
-                    <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    <img src={img} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -343,13 +382,13 @@ export default function ProductDetails() {
           </motion.div>
 
           <motion.div
-            className="theme-card rounded-[24px] p-6 sm:p-8"
+            className="theme-card min-w-0 rounded-[24px] p-5 sm:p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <div className="flex flex-col gap-6">
-              <div className="panel-muted p-5">
+            <div className="flex min-w-0 flex-col gap-6">
+              <div className="panel-muted min-w-0 p-5">
                 <div className="flex flex-wrap items-center gap-3">
                   {product.rating?.count > 0 ? (
                     <>
@@ -359,12 +398,12 @@ export default function ProductDetails() {
                       <span className="text-lg font-semibold text-slate-900 dark:text-white">
                         {product.rating.average.toFixed(1)}
                       </span>
-                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                      <span className="break-words text-sm text-slate-500 [overflow-wrap:anywhere] dark:text-slate-400">
                         {product.rating.count} review{product.rating.count !== 1 ? "s" : ""}
                       </span>
                     </>
                   ) : (
-                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                    <span className="break-words text-sm text-slate-500 [overflow-wrap:anywhere] dark:text-slate-400">
                       Customer review data will appear here after verified purchases.
                     </span>
                   )}
@@ -379,23 +418,23 @@ export default function ProductDetails() {
                 </button>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2">
                 {product.sku && (
-                  <div className="panel-muted p-4">
+                  <div className="panel-muted min-w-0 p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       SKU
                     </p>
-                    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                    <p className="mt-2 break-words text-sm font-medium text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                       {product.sku}
                     </p>
                   </div>
                 )}
                 {product.category && (
-                  <div className="panel-muted p-4">
+                  <div className="panel-muted min-w-0 p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Category
                     </p>
-                    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                    <p className="mt-2 break-words text-sm font-medium text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                       {product.category}
                     </p>
                   </div>
@@ -405,7 +444,7 @@ export default function ProductDetails() {
               <RoleGate allow={["PRIVATE"]}>
                 {product.segment === "CONSUMER" && (
                   <div className="space-y-4">
-                    <div className="panel-muted p-5">
+                    <div className="panel-muted min-w-0 p-5">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Price
                       </p>
@@ -417,8 +456,8 @@ export default function ProductDetails() {
                       </p>
                     </div>
 
-                    <div className="panel-muted p-5">
-                      <div className="flex items-center justify-between gap-3">
+                    <div className="panel-muted min-w-0 p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <span className="text-sm font-semibold text-slate-900 dark:text-white">
                           Quantity
                         </span>
@@ -433,7 +472,10 @@ export default function ProductDetails() {
                             {quantity}
                           </span>
                           <button
-                            onClick={() => setQuantity(quantity + 1)}
+                            onClick={() =>
+                              setQuantity(Math.min(availableStock, quantity + 1))
+                            }
+                            disabled={quantity >= availableStock}
                             className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/85 text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-800 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:border-cyan-900 dark:hover:text-cyan-300"
                           >
                             <Plus size={16} />
@@ -442,9 +484,14 @@ export default function ProductDetails() {
                       </div>
                     </div>
 
-                    <Button onClick={handleAddToCart} className="w-full gap-2" size="lg">
+                    <Button
+                      onClick={handleAddToCart}
+                      disabled={outOfStock}
+                      className="w-full gap-2"
+                      size="lg"
+                    >
                       <ShoppingCart size={18} />
-                      Add to Cart
+                      {outOfStock ? "Out of Stock" : "Add to Cart"}
                     </Button>
                   </div>
                 )}
@@ -453,16 +500,16 @@ export default function ProductDetails() {
               <RoleGate allow={["PUBLIC"]}>
                 {product.segment === "COMMERCIAL" && (
                   <div className="space-y-4">
-                    <div className="panel-muted p-5">
+                    <div className="panel-muted min-w-0 p-5">
                       <div className="flex items-start gap-3">
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-100 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300">
                           <Building2 size={20} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                             Government procurement workflow
                           </h2>
-                          <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                          <p className="mt-1 break-words text-sm leading-relaxed text-slate-500 [overflow-wrap:anywhere] dark:text-slate-400">
                             Submit your requirement and quantity details to receive a managed quote from the team.
                           </p>
                         </div>
@@ -480,17 +527,17 @@ export default function ProductDetails() {
         </div>
 
         <motion.section
-          className="theme-card mt-10 rounded-[24px] p-6 sm:p-8"
+          className="theme-card mt-10 min-w-0 rounded-[24px] p-5 sm:p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+            <div className="min-w-0">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                 Customer reviews
               </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              <p className="mt-1 break-words text-sm text-slate-500 [overflow-wrap:anywhere] dark:text-slate-400">
                 Verified purchase feedback and product impressions.
               </p>
             </div>
@@ -509,9 +556,11 @@ export default function ProductDetails() {
             )}
 
             {canReview.reason === "already_reviewed" && (
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300">
+              <span className="inline-flex max-w-full items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300">
                 <CheckCircle2 size={18} />
-                You have already reviewed this product
+                <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                  You have already reviewed this product
+                </span>
               </span>
             )}
           </div>
@@ -561,27 +610,27 @@ export default function ProductDetails() {
               </div>
 
               <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-6 py-6">
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                <p className="break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] dark:text-slate-300">
                   {product.description || "No detailed description available."}
                 </p>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="mt-6 grid min-w-0 gap-4 sm:grid-cols-2">
                   {product.sku && (
-                    <div className="panel-muted p-4">
+                    <div className="panel-muted min-w-0 p-4">
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         SKU
                       </span>
-                      <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                      <p className="mt-2 break-words text-sm font-medium text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                         {product.sku}
                       </p>
                     </div>
                   )}
                   {product.category && (
-                    <div className="panel-muted p-4">
+                    <div className="panel-muted min-w-0 p-4">
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Category
                       </span>
-                      <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                      <p className="mt-2 break-words text-sm font-medium text-slate-900 [overflow-wrap:anywhere] dark:text-white">
                         {product.category}
                       </p>
                     </div>

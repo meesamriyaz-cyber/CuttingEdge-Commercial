@@ -1,39 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Check, Pencil, Plus, Search, X } from "lucide-react";
+
 import {
-  fetchAllProducts,
   deactivateProduct,
+  fetchAllProducts,
   updateProduct,
 } from "../../api/adminProducts";
 import { Button } from "../../components/ui";
 
 const PAGE_SIZES = [5, 10, 20];
 
-const CATEGORIES = [
-  "Networking equipment",
-  "Computers",
-  "Printers",
-  "IT Accessories",
-  "Software",
-  "Storage",
-  "Electronic Appliances",
-];
-
 export default function AdminProducts() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-
   const [search, setSearch] = useState("");
   const [segment, setSegment] = useState("ALL");
   const [status, setStatus] = useState("ALL");
-  const [category, setCategory] = useState("ALL"); // ✅ NEW
-
+  const [category, setCategory] = useState("ALL");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
   const [editingId, setEditingId] = useState(null);
   const [editedPrice, setEditedPrice] = useState("");
+  const [editingStockId, setEditingStockId] = useState(null);
+  const [editedStock, setEditedStock] = useState("");
 
-  /* ---------------- Load ---------------- */
   async function load() {
     const data = await fetchAllProducts();
     setProducts(Array.isArray(data) ? data : []);
@@ -43,104 +34,105 @@ export default function AdminProducts() {
     load();
   }, []);
 
-  /* ---------------- Search + Filters ---------------- */
+  const categories = useMemo(() => {
+    return Array.from(
+      new Set(
+        products
+          .map((product) => product.category?.trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
 
-    return products.filter((p) => {
+    return products.filter((product) => {
       const matchSearch =
-        p.name?.toLowerCase().includes(q) ||
-        p.sku?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q);
-
-      const matchSegment =
-        segment === "ALL" || p.segment === segment;
-
+        product.name?.toLowerCase().includes(q) ||
+        product.sku?.toLowerCase().includes(q) ||
+        product.category?.toLowerCase().includes(q);
+      const matchSegment = segment === "ALL" || product.segment === segment;
       const matchStatus =
         status === "ALL" ||
-        (status === "ACTIVE" && p.isActive) ||
-        (status === "INACTIVE" && !p.isActive);
+        (status === "ACTIVE" && product.isActive) ||
+        (status === "INACTIVE" && !product.isActive);
+      const matchCategory = category === "ALL" || product.category === category;
 
-      const matchCategory =
-        category === "ALL" || p.category === category;
-
-      return (
-        matchSearch &&
-        matchSegment &&
-        matchStatus &&
-        matchCategory
-      );
+      return matchSearch && matchSegment && matchStatus && matchCategory;
     });
   }, [products, search, segment, status, category]);
 
-  /* ---------------- Pagination ---------------- */
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filtered.length / pageSize)
-  );
-
-  const paginated = filtered.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   useEffect(() => {
     setPage(1);
   }, [search, segment, status, category, pageSize]);
 
-  /* ---------------- Inline Price Edit ---------------- */
   async function savePrice(id) {
     await updateProduct(id, { price: Number(editedPrice) });
     setEditingId(null);
     load();
   }
 
-  return (
-    <div className="min-h-screen bg-page py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  async function saveStock(id) {
+    await updateProduct(id, { stock: Math.max(0, Number(editedStock) || 0) });
+    setEditingStockId(null);
+    load();
+  }
 
-        {/* ================= Header ================= */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
-              Product Management
+  return (
+    <div className="space-y-5">
+      <section className="hero-shell rounded-lg p-5 sm:p-6">
+        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              Catalogue Control
+            </span>
+            <h1 className="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+              Product management
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Search, filter and manage products
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Search, filter, price, and manage catalogue availability.
             </p>
           </div>
 
-          <Button
-            onClick={() => navigate("/admin/products/new")}
-            size="sm"
-          >
-            + New Product
+          <Button onClick={() => navigate("/admin/products/new")} size="sm">
+            <Plus size={16} />
+            New Product
           </Button>
         </div>
+      </section>
 
-        {/* ================= Filters ================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, SKU, category"
-            className="input-base"
-          />
+      <section className="theme-card rounded-lg p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name, SKU, category"
+              className="input-base pl-9"
+            />
+          </div>
 
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(event) => setCategory(event.target.value)}
             className="input-base"
           >
             <option value="ALL">All Categories</option>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
           </select>
 
           <select
             value={segment}
-            onChange={(e) => setSegment(e.target.value)}
+            onChange={(event) => setSegment(event.target.value)}
             className="input-base"
           >
             <option value="ALL">All Segments</option>
@@ -150,7 +142,7 @@ export default function AdminProducts() {
 
           <select
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(event) => setStatus(event.target.value)}
             className="input-base"
           >
             <option value="ALL">All Status</option>
@@ -160,203 +152,261 @@ export default function AdminProducts() {
 
           <select
             value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
+            onChange={(event) => setPageSize(Number(event.target.value))}
             className="input-base"
           >
-            {PAGE_SIZES.map((s) => (
-              <option key={s} value={s}>
-                {s} / page
+            {PAGE_SIZES.map((size) => (
+              <option key={size} value={size}>
+                {size} / page
               </option>
             ))}
           </select>
         </div>
+      </section>
 
-        {/* ================= Desktop Table ================= */}
-        <div className="hidden lg:block rounded-xl border bg-white shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                {["Name", "Category", "Segment", "Price", "Status", "Actions"].map(
-                  (h) => (
-                    <th key={h} className="p-3 text-left font-medium text-slate-700">
-                      {h}
-                    </th>
-                  )
-                )}
-              </tr>
-            </thead>
+      <div className="theme-card hidden overflow-hidden rounded-lg lg:block">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50/80 dark:bg-slate-950/45">
+            <tr>
+              {["Name", "Category", "Segment", "Price", "Stock", "Status", "Actions"].map((heading) => (
+                <th
+                  key={heading}
+                  className="p-3 text-left font-semibold text-slate-700 dark:text-slate-200"
+                >
+                  {heading}
+                </th>
+              ))}
+            </tr>
+          </thead>
 
-            <tbody>
-              {paginated.map((p) => (
-                <tr key={p._id} className="border-t hover:bg-slate-50">
-                  <td className="p-3">
-                    <div className="font-medium">{p.name}</div>
-                    <div className="text-xs text-slate-500">
-                      SKU: {p.sku || "N/A"}
-                    </div>
-                  </td>
+          <tbody>
+            {paginated.map((product) => (
+              <tr
+                key={product._id}
+                className="border-t border-slate-200/75 transition hover:bg-cyan-50/45 dark:border-cyan-950/45 dark:hover:bg-slate-900/55"
+              >
+                <td className="p-3">
+                  <div className="font-semibold text-slate-950 dark:text-white">
+                    {product.name}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    SKU: {product.sku || "N/A"}
+                  </div>
+                </td>
 
-                  <td className="p-3 text-slate-600">
-                    {p.category || "—"}
-                  </td>
-
-                  <td className="p-3">
-                    {p.segment}
-                  </td>
-
-                  <td className="p-3">
-                    {editingId === p._id ? (
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          value={editedPrice}
-                          onChange={(e) => setEditedPrice(e.target.value)}
-                          className="h-8 w-24 input-base"
-                        />
-                        <button
-                          onClick={() => savePrice(p._id)}
-                          className="btn-success h-8 w-8"
-                        >
-                          ✓
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="btn-muted h-8 w-8"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
+                <td className="p-3 text-slate-600 dark:text-slate-300">
+                  {product.category || "--"}
+                </td>
+                <td className="p-3 text-slate-600 dark:text-slate-300">
+                  {product.segment}
+                </td>
+                <td className="p-3">
+                  {editingId === product._id ? (
+                    <div className="flex gap-1">
+                      <input
+                        type="number"
+                        value={editedPrice}
+                        onChange={(event) => setEditedPrice(event.target.value)}
+                        className="input-base h-8 w-24"
+                      />
                       <button
-                        onClick={() => {
-                          setEditingId(p._id);
-                          setEditedPrice(p.price);
-                        }}
-                        className="hover:underline font-medium"
+                        onClick={() => savePrice(product._id)}
+                        className="btn-success h-8 w-8"
+                        aria-label="Save price"
                       >
-                        ₹ {p.price}
+                        <Check size={15} />
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="btn-muted h-8 w-8"
+                        aria-label="Cancel price edit"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setEditingId(product._id);
+                        setEditedPrice(product.price);
+                      }}
+                      className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:text-cyan-800 dark:text-white dark:hover:text-cyan-200"
+                    >
+                      INR {product.price}
+                      <Pencil size={13} />
+                    </button>
+                  )}
+                </td>
+
+                <td className="p-3">
+                  {editingStockId === product._id ? (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() =>
+                          setEditedStock((value) =>
+                            String(Math.max(0, Number(value || 0) - 1)),
+                          )
+                        }
+                        className="btn-muted h-8 w-8"
+                        aria-label="Decrease stock"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editedStock}
+                        onChange={(event) => setEditedStock(event.target.value)}
+                        className="input-base h-8 w-20"
+                      />
+                      <button
+                        onClick={() =>
+                          setEditedStock((value) => String(Number(value || 0) + 1))
+                        }
+                        className="btn-muted h-8 w-8"
+                        aria-label="Increase stock"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => saveStock(product._id)}
+                        className="btn-success h-8 w-8"
+                        aria-label="Save stock"
+                      >
+                        <Check size={15} />
+                      </button>
+                      <button
+                        onClick={() => setEditingStockId(null)}
+                        className="btn-muted h-8 w-8"
+                        aria-label="Cancel stock edit"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setEditingStockId(product._id);
+                        setEditedStock(String(product.stock ?? 0));
+                      }}
+                      className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:text-cyan-800 dark:text-white dark:hover:text-cyan-200"
+                    >
+                      {product.stock ?? 0}
+                      <Pencil size={13} />
+                    </button>
+                  )}
+                </td>
+
+                <td className="p-3">
+                  <span
+                    className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                      product.isActive
+                        ? "border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/25 dark:text-emerald-200"
+                        : "border border-red-200 bg-red-50 text-red-700 dark:border-red-900/40 dark:bg-red-950/25 dark:text-red-200"
+                    }`}
+                  >
+                    {product.isActive ? "Active" : "Inactive"}
+                  </span>
+                </td>
+
+                <td className="p-3">
+                  <div className="flex justify-end gap-2">
+                    <Link to={`/admin/products/${product._id}`} className="btn-muted">
+                      Edit
+                    </Link>
+                    {product.isActive && (
+                      <button
+                        onClick={() => deactivateProduct(product._id).then(load)}
+                        className="btn-danger"
+                      >
+                        Deactivate
                       </button>
                     )}
-                  </td>
+                  </div>
+                </td>
+              </tr>
+            ))}
 
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        p.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {p.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
+            {!paginated.length && (
+              <tr>
+                <td colSpan={7} className="p-8 text-center text-slate-500 dark:text-slate-400">
+                  No products found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-                  <td className="p-3">
-                    <div className="flex justify-end gap-2">
-                      <Link
-                        to={`/admin/products/${p._id}`}
-                        className="btn-muted"
-                      >
-                        Edit
-                      </Link>
-                      {p.isActive && (
-                        <button
-                          onClick={() =>
-                            deactivateProduct(p._id).then(load)
-                          }
-                          className="btn-danger"
-                        >
-                          Deactivate
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {!paginated.length && (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
-                    No products found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ================= Mobile Cards ================= */}
-        <div className="grid gap-4 lg:hidden">
-          {paginated.map((p) => (
-            <div
-              key={p._id}
-              className="rounded-xl border bg-white p-4 shadow-sm space-y-2"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold">{p.name}</h3>
-                  <p className="text-xs text-slate-500">
-                    {p.category} • {p.segment}
-                  </p>
-                </div>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs ${
-                    p.isActive
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {p.isActive ? "Active" : "Inactive"}
-                </span>
+      <div className="grid gap-4 lg:hidden">
+        {paginated.map((product) => (
+          <div key={product._id} className="theme-card space-y-3 rounded-lg p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h3 className="break-words font-semibold text-slate-950 dark:text-white">
+                  {product.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {product.category} - {product.segment}
+                </p>
               </div>
-
-              <div className="text-sm font-medium">
-                Price: ₹ {p.price}
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Link to={`/admin/products/${p._id}`} className="btn-muted">
-                  Edit
-                </Link>
-                {p.isActive && (
-                  <button
-                    onClick={() =>
-                      deactivateProduct(p._id).then(load)
-                    }
-                    className="btn-danger"
-                  >
-                    Deactivate
-                  </button>
-                )}
-              </div>
+              <span
+                className={`w-fit shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  product.isActive
+                    ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border border-red-200 bg-red-50 text-red-700"
+                }`}
+              >
+                {product.isActive ? "Active" : "Inactive"}
+              </span>
             </div>
-          ))}
-        </div>
 
-        {/* ================= Pagination ================= */}
-        <div className="flex justify-between items-center text-sm text-slate-600">
-          <span>
-            Page {page} of {totalPages}
-          </span>
+            <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              Price: INR {product.price}
+            </div>
 
-          <div className="flex gap-2">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="btn-muted disabled:opacity-50"
-            >
-              Prev
-            </button>
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="btn-muted disabled:opacity-50"
-            >
-              Next
-            </button>
+            <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              Stock: {product.stock ?? 0}
+            </div>
+
+            <div className="flex flex-wrap justify-end gap-2">
+              <Link to={`/admin/products/${product._id}`} className="btn-muted">
+                Edit
+              </Link>
+              {product.isActive && (
+                <button
+                  onClick={() => deactivateProduct(product._id).then(load)}
+                  className="btn-danger"
+                >
+                  Deactivate
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
 
+      <div className="theme-card flex flex-col gap-3 rounded-lg p-3 text-sm text-slate-600 dark:text-slate-300 sm:flex-row sm:items-center sm:justify-between">
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <div className="flex gap-2 sm:justify-end">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((currentPage) => currentPage - 1)}
+            className="btn-muted disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((currentPage) => currentPage + 1)}
+            className="btn-muted disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

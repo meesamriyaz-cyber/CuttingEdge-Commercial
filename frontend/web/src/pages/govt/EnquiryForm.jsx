@@ -2,11 +2,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../api/client";
+import toast from "react-hot-toast";
 export default function EnquiryForm() {
   const navigate = useNavigate();
   const { state } = useLocation(); // received from product page
 
-  const user = useAuthStore((state) => state.user);
   const accessToken = useAuthStore((state) => state.accessToken);
 
   const [quantity, setQuantity] = useState(1);
@@ -18,7 +18,25 @@ export default function EnquiryForm() {
   const productName = state?.productName;
 
   if (!productId) {
-    return <p>Invalid enquiry request</p>;
+    return (
+      <div className="min-h-screen bg-page px-4 py-12">
+        <div className="theme-card mx-auto max-w-xl rounded-[24px] p-8 text-center">
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            Invalid enquiry request
+          </h1>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            Please select a product before submitting an enquiry.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/products")}
+            className="mt-6 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            Browse products
+          </button>
+        </div>
+      </div>
+    );
   }
 
   async function handleSubmit(e) {
@@ -35,7 +53,7 @@ export default function EnquiryForm() {
         },
         body: JSON.stringify({
           productId,
-          quantity: parseInt(quantity),
+          quantity: parseInt(quantity, 10),
           requirements,
         }),
       });
@@ -43,37 +61,45 @@ export default function EnquiryForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to submit enquiry");
 
-      alert("Enquiry submitted successfully");
-
+      toast.success("Enquiry submitted successfully");
       navigate("/enquiries", { replace: true });
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Failed to submit enquiry");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-surface py-8 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-amber-100 to-orange-100 dark:from-amber-900/20 dark:from-orange-900/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
-            Submit Enquiry
-          </h2>
+    <div className="min-h-screen bg-page px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mx-auto max-w-3xl">
+        <section className="hero-shell rounded-[28px] p-6 sm:p-8">
+          <span className="signal-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            Government enquiry
+          </span>
+          <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-white">
+            Submit product enquiry
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            Share quantity and requirement details so the team can prepare an
+            accurate procurement quote.
+          </p>
+        </section>
 
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-slate-600 mb-2">Product:</p>
-            <p className="font-semibold text-slate-900">{productName}</p>
+        <div className="theme-card mt-8 rounded-[24px] p-6 sm:p-8">
+          <div className="panel-muted mb-6 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Product
+            </p>
+            <p className="mt-2 font-semibold text-slate-900 dark:text-white">
+              {productName}
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
                 Quantity
               </label>
               <input
@@ -81,43 +107,43 @@ export default function EnquiryForm() {
                 min="1"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="theme-input"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
                 Requirements & Specifications
               </label>
               <textarea
                 rows="5"
                 value={requirements}
                 onChange={(e) => setRequirements(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="theme-input"
                 placeholder="Describe your requirements, specifications, delivery location, timeline, etc."
                 required
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
                 {error}
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#ea580c_100%)] px-6 py-3 font-semibold text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
               >
                 {loading ? "Submitting..." : "Submit Enquiry"}
               </button>
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                className="rounded-lg border border-slate-200 bg-white/80 px-6 py-3 font-semibold text-slate-700 transition-colors hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-200"
               >
                 Back
               </button>
