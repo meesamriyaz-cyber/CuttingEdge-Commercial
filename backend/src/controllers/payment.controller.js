@@ -1,10 +1,9 @@
-import { instance, getRazorpayKey, keySecret } from "../utils/razorpay.js";
+import { instance, getRazorpayKey, verifyPaymentSignature } from "../utils/razorpay.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import mongoose from "mongoose";
-import crypto from "crypto";
-import { sendOrderConfirmationEmail } from "../utils/orderEmail.js";
+import { sendOrderConfirmationEmail, sendPaymentFailedEmail } from "../utils/orderEmail.js";
 export const createRazorpayOrderFromCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ user: req.user._id }).populate(
@@ -98,14 +97,7 @@ export const verifyRazorpayPayment = async (req, res) => {
       throw { status: 400, message: "Invalid payment payload" };
     }
 
-    // 🔐 Verify Razorpay signature
-    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expectedSignature = crypto
-      .createHmac("sha256", keySecret)
-      .update(body)
-      .digest("hex");
-
-    if (expectedSignature !== razorpay_signature) {
+    if (!verifyPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature)) {
       throw { status: 400, message: "Payment verification failed" };
     }
 
@@ -189,5 +181,58 @@ export const getKey = async (req, res) => {
     res.status(200).json({ key: getRazorpayKey() });
   } catch (err) {
     res.status(500).json({ message: "Could not fetch Razorpay key" });
+  }
+};
+
+export const reportPaymentFailed = async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, error } = req.body;
+
+    if (!razorpay_order_id) {
+      return res.status(400).json({ message: "razorpay_order_id is required" });
+    }
+
+    const order = await Order.findOne({
+      razorpayOrderId: razorpay_order_id,
+    }).populate("user", "name email");
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.paymentStatus === "PAID") {
+      return res.status(200).json({ message: "Order already paid", orderId: order._id });
+    }
+
+    order.paymentStatus = "FAILED";
+    order.status = "CANCELLED";
+    if (razorpay_payment_id) {
+      order.razorpayPaymentId = razorpay_payment_id;
+    }
+    await order.save();
+
+    const errorDescription =
+      typeof error === "string"
+        ? error
+        : error?.description || error?.reason || "Payment failed";
+
+    try {
+      await sendPaymentFailedEmail({
+        order,
+        user: order.user,
+        error: errorDescription,
+      });
+    } catch (mailErr) {
+      console.error("Payment failed email error:", mailErr.message);
+    }
+
+    return res.json({
+      success: true,
+      message: "Payment failure recorded",
+      orderId: order._id,
+    });
+  } catch (err) {
+    console.error("reportPaymentFailed error:", err);
+    return res.status(500).json({ message: "Could not report payment failure" });
   }
 };

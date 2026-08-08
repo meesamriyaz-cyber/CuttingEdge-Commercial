@@ -41,3 +41,19 @@ export const verifyRazorpayPayment = async (response, shippingAddress) => {
   if (!res.ok) throw new Error(data.message);
   return data;
 };
+
+// Report payment failure to backend (triggers failure email)
+export const reportPaymentFailed = async ({ razorpay_order_id, razorpay_payment_id, error }) => {
+  const res = await fetch(`${API_URL}/payments/razorpay/failure`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({
+      razorpay_order_id,
+      razorpay_payment_id,
+      error,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;
+};

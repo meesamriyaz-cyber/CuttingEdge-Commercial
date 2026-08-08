@@ -12,6 +12,7 @@ import {
   fetchRazorpayKey,
   createRazorpayOrder,
   verifyRazorpayPayment,
+  reportPaymentFailed,
 } from "../../api/payments";
 import { Button } from "../../components/ui";
 
@@ -133,9 +134,20 @@ export default function Checkout() {
 
       const rzp = new Razorpay(options);
 
-      rzp.on("payment.failed", function (response) {
-        setError(`Payment failed: ${response.error.description}`);
+      rzp.on("payment.failed", async function (response) {
+        const errorMessage = response.error?.description || "Payment failed";
+        setError(`Payment failed: ${errorMessage}`);
         setPlacing(false);
+
+        try {
+          await reportPaymentFailed({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            error: response.error,
+          });
+        } catch (emailErr) {
+          console.error("Payment failure email failed:", emailErr);
+        }
       });
 
       rzp.open();

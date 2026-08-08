@@ -3,6 +3,7 @@ import {
   createRazorpayOrderFromCart,
   verifyRazorpayPayment,
   getKey,
+  reportPaymentFailed,
 } from "../controllers/payment.controller.js";
 import {
   requireAuth,
@@ -20,12 +21,18 @@ router.post(
   createRazorpayOrderFromCart,
 );
 
-// Step 3: Verify payment & finalize order
 router.post(
   "/razorpay/verify",
   requireAuth,
   requirePrivateClient,
   verifyRazorpayPayment,
+);
+
+router.post(
+  "/razorpay/failure",
+  requireAuth,
+  requirePrivateClient,
+  reportPaymentFailed,
 );
 
 export default router;

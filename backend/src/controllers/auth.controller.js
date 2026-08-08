@@ -302,11 +302,12 @@ export const registerGovtClient = async (req, res) => {
     const emailDelivery = await sendGovtVerificationEmail(user);
 
     if (!emailDelivery.sent) {
-      await User.findByIdAndDelete(user._id);
-
-      return res.status(502).json({
+      return res.status(201).json({
         message:
-          "Registration could not be completed because the verification email could not be sent. Please try again later.",
+          "Government client registered, but the verification email could not be sent. Please use the resend option after logging in.",
+        user: getSafeUser(user),
+        accessToken,
+        refreshToken,
         emailDelivery: {
           sent: false,
           provider: getEmailProvider(),
@@ -373,6 +374,22 @@ export const verifyGovtCode = async (req, res) => {
     ensureGovtRole(user);
 
     await user.save();
+
+    try {
+      await sendMail({
+        to: user.officialEmail || user.email,
+        subject: "Government Account Verified",
+        text: `Dear ${user.name}, your Cutting Edge government account has been successfully verified. You can now access all government client features.`,
+        html: `
+          <p>Dear ${user.name},</p>
+          <p>Your Cutting Edge government account has been <strong>successfully verified</strong>.</p>
+          <p>You can now log in and access all government client features.</p>
+          <p>Regards,<br/>Cutting Edge Enterprises</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.error("Govt verification success email failed:", mailErr.message);
+    }
 
     res.status(200).json({
       message: "Government account verified successfully",
@@ -479,8 +496,14 @@ export const login = async (req, res) => {
     const refreshToken = generateRefreshToken(user);
 
     let emailDelivery;
+    let emailError;
     if (needsFreshVerificationCode) {
-      emailDelivery = await sendGovtVerificationEmail(user);
+      try {
+        emailDelivery = await sendGovtVerificationEmail(user);
+      } catch (err) {
+        emailError = err.message;
+        emailDelivery = { sent: false, error: err.message };
+      }
     }
 
     // Set HTTP-only cookie for access token (secure, works on refresh)
@@ -507,7 +530,7 @@ export const login = async (req, res) => {
       user: getSafeUser(user),
       verificationRequired,
       emailDelivery: emailDelivery
-        ? { sent: emailDelivery.sent }
+        ? { sent: emailDelivery.sent, error: emailError }
         : undefined,
     });
   } catch (err) {
