@@ -11,6 +11,7 @@ import {
   createServiceQuoteAdmin,
   getAllServiceQuotesAdmin,
   getServiceQuoteByIdAdmin,
+  getServiceQuoteByEnquiryAdmin,
 } from "../controllers/servicesenquiry.controller.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
 import {
@@ -20,8 +21,6 @@ import {
 } from "../controllers/order.controller.js";
 
 const router = Router();
-
-console.log("Admin routes file loaded");
 
 // Admin Orders routes
 router.get("/orders", requireAuth, requireAdmin, getAllOrders);
@@ -64,6 +63,12 @@ router.get(
   requireAuth,
   requireAdmin,
   getAllServiceQuotesAdmin,
+);
+router.get(
+  "/service-quotes/by-enquiry/:enquiryId",
+  requireAuth,
+  requireAdmin,
+  getServiceQuoteByEnquiryAdmin,
 );
 router.get(
   "/service-quotes/:id",

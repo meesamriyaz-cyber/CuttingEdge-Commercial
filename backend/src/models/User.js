@@ -55,6 +55,8 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    lastLogin: Date,
+
     addresses: [
       {
         _id: { type: mongoose.Schema.Types.ObjectId, auto: true },

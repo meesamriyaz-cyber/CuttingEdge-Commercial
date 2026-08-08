@@ -15,6 +15,15 @@ export const generateServiceQuotePDF = async (req, res) => {
       return res.status(404).json({ message: "Service quote not found" });
     }
 
+    const isAdmin = req.user?.roles?.includes("admin");
+    const isOwner = quote.user?._id?.toString() === req.user?._id?.toString();
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        message: "Not authorized to access this service quote",
+      });
+    }
+
     const pdfBuffer = await buildServiceQuotePDFBuffer(quote);
 
     res.setHeader("Content-Type", "application/pdf");

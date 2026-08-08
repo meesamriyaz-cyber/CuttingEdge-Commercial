@@ -13,6 +13,40 @@ const getSegmentForUser = (user) => {
   return user.clientType === "PRIVATE" ? "CONSUMER" : "COMMERCIAL";
 };
 
+const normalizeText = (value) =>
+  typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
+
+const normalizeStock = (value) => {
+  const stock = Number(value);
+  return Number.isFinite(stock) && stock >= 0 ? Math.floor(stock) : 0;
+};
+
+const getProductImageUrl = (product) => {
+  const images = Array.isArray(product?.images)
+    ? product.images
+    : [product?.images].filter(Boolean);
+
+  for (const image of images) {
+    if (typeof image === "string" && image.trim()) {
+      return image.trim();
+    }
+
+    if (typeof image?.url === "string" && image.url.trim()) {
+      return image.url.trim();
+    }
+
+    if (typeof image?.secure_url === "string" && image.secure_url.trim()) {
+      return image.secure_url.trim();
+    }
+
+    if (typeof image?.src === "string" && image.src.trim()) {
+      return image.src.trim();
+    }
+  }
+
+  return "";
+};
+
 /* -------------------------------------------
    GET CATEGORIES (filtered by user segment)
 -------------------------------------------- */
@@ -30,27 +64,31 @@ export const getCategories = async (req, res) => {
       }
     }
 
-    // Get distinct categories with product count and first product image
-    const categories = await Product.aggregate([
-      { $match: query },
-      { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: "$category",
-          count: { $sum: 1 },
-          firstProductImage: { $first: "$images" },
-        },
-      },
-      {
-        $project: {
-          name: "$_id",
-          count: 1,
-          image: { $arrayElemAt: ["$firstProductImage.url", 0] },
-          _id: 0,
-        },
-      },
-      { $sort: { name: 1 } },
-    ]);
+    const products = await Product.find(query)
+      .select("category images createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const categoryMap = new Map();
+
+    products.forEach((product) => {
+      const name = normalizeText(product.category);
+      if (!name) return;
+
+      const current = categoryMap.get(name) || {
+        name,
+        count: 0,
+        image: "",
+      };
+
+      current.count += 1;
+      current.image = current.image || getProductImageUrl(product);
+      categoryMap.set(name, current);
+    });
+
+    const categories = Array.from(categoryMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
 
     res.json(categories);
   } catch (err) {
@@ -69,8 +107,9 @@ export const getProducts = async (req, res) => {
     let query = { isActive: true };
 
     // 🟢 Apply category filter if provided
-    if (category) {
-      query.category = category;
+    const categoryFilter = normalizeText(category);
+    if (categoryFilter) {
+      query.category = categoryFilter;
     }
 
     // ✅ Admin sees full catalog
@@ -140,11 +179,18 @@ export const createProduct = async (req, res) => {
       name,
       description,
       price,
+      stock = 0,
       category,
       sku,
       segment,
       images = [],
     } = req.body;
+
+    const normalizedCategory = normalizeText(category);
+
+    if (!normalizedCategory) {
+      return res.status(400).json({ message: "Category is required" });
+    }
 
     let uploadedImages = [];
 
@@ -166,8 +212,9 @@ export const createProduct = async (req, res) => {
       name,
       description,
       price,
+      stock: normalizeStock(stock),
       sku,
-      category,
+      category: normalizedCategory,
       segment,
       images: uploadedImages,
     });
@@ -188,30 +235,53 @@ export const updateProduct = async (req, res) => {
 
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const { images = [], existingImages = [], ...updates } = req.body;
+    const hasImagePayload =
+      Object.prototype.hasOwnProperty.call(req.body, "images") ||
+      Object.prototype.hasOwnProperty.call(req.body, "existingImages");
+    const { images, existingImages, ...updates } = req.body;
 
-    let uploadedImages = [];
-
-    // Handle existing images (from edit mode)
-    if (existingImages && existingImages.length > 0) {
-      uploadedImages = [...existingImages];
+    if (Object.prototype.hasOwnProperty.call(updates, "stock")) {
+      updates.stock = normalizeStock(updates.stock);
     }
 
-    // Upload new images if provided
-    if (images && images.length > 0) {
-      for (const base64Img of images) {
-        const upload = await cloudinary.uploader.upload(base64Img, {
-          folder: "products",
-        });
+    if (Object.prototype.hasOwnProperty.call(updates, "category")) {
+      const normalizedCategory = normalizeText(updates.category);
 
-        uploadedImages.push({
-          url: upload.secure_url,
-          publicId: upload.public_id,
-        });
+      if (!normalizedCategory) {
+        return res.status(400).json({ message: "Category is required" });
+      }
+
+      updates.category = normalizedCategory;
+    }
+
+    let nextImages = product.images || [];
+
+    if (hasImagePayload) {
+      nextImages = [];
+
+      // Handle existing images (from edit mode)
+      if (Array.isArray(existingImages) && existingImages.length > 0) {
+        nextImages = [...existingImages];
+      }
+
+      // Upload new images if provided
+      if (Array.isArray(images) && images.length > 0) {
+        for (const base64Img of images) {
+          const upload = await cloudinary.uploader.upload(base64Img, {
+            folder: "products",
+          });
+
+          nextImages.push({
+            url: upload.secure_url,
+            publicId: upload.public_id,
+          });
+        }
       }
     }
 
-    product.set({ ...updates, images: uploadedImages });
+    product.set(
+      hasImagePayload ? { ...updates, images: nextImages } : updates,
+    );
 
     await product.save();
 

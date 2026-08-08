@@ -15,8 +15,12 @@ const keySecret = isProduction
 */
 
 const isProduction = process.env.NODE_ENV === "production";
-const keyId = isProduction  ? process.env.RAZORPAY_KEY_ID_TEST : process.env.RAZORPAY_KEY_ID_TEST;
-const keySecret = isProduction  ? process.env.RAZORPAY_KEY_SECRET_TEST: process.env.RAZORPAY_KEY_SECRET_TEST;
+const keyId = isProduction
+  ? process.env.RAZORPAY_KEY_ID_PROD || process.env.RAZORPAY_KEY_ID_TEST
+  : process.env.RAZORPAY_KEY_ID_TEST;
+const keySecret = isProduction
+  ? process.env.RAZORPAY_KEY_SECRET_PROD || process.env.RAZORPAY_KEY_SECRET_TEST
+  : process.env.RAZORPAY_KEY_SECRET_TEST;
 if (!keyId || !keySecret) {
   throw new Error(
     `Razorpay ${isProduction ? "production" : "test"} keys not configured`,

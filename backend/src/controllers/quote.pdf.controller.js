@@ -94,6 +94,15 @@ export const generateQuotePDF = async (req, res) => {
       return res.status(404).json({ message: "Quote not found" });
     }
 
+    const isAdmin = req.user?.roles?.includes("admin");
+    const isOwner = quote.user?._id?.toString() === req.user?._id?.toString();
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        message: "Not authorized to access this quote",
+      });
+    }
+
     const doc = new PDFDocument({ margin: 50, size: "A4" });
 
     res.setHeader("Content-Type", "application/pdf");

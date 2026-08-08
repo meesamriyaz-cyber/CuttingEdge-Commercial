@@ -2,6 +2,32 @@ import Product from "../models/Product.js";
 import Review from "../models/Review.js";
 import mongoose from "mongoose";
 
+const getProductImageUrl = (product) => {
+  const images = Array.isArray(product?.images)
+    ? product.images
+    : [product?.images].filter(Boolean);
+
+  for (const image of images) {
+    if (typeof image === "string" && image.trim()) {
+      return image.trim();
+    }
+
+    if (typeof image?.url === "string" && image.url.trim()) {
+      return image.url.trim();
+    }
+
+    if (typeof image?.secure_url === "string" && image.secure_url.trim()) {
+      return image.secure_url.trim();
+    }
+
+    if (typeof image?.src === "string" && image.src.trim()) {
+      return image.src.trim();
+    }
+  }
+
+  return "";
+};
+
 /**
  * PUBLIC PRODUCT CATALOG
  * - No auth
@@ -50,27 +76,43 @@ export const getPublicProductById = async (req, res) => {
  */
 export const getPublicCategories = async (req, res) => {
   try {
-    const categories = await Product.aggregate([
-      {
-        $match: { isActive: true },
-      },
-      {
-        $group: {
-          _id: "$category",
-          count: { $sum: 1 },
-          averageRating: { $avg: "$rating.average" },
-        },
-      },
-      {
-        $sort: { _id: 1 },
-      },
-    ]);
+    const products = await Product.find({ isActive: true })
+      .select("category images rating createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const categoryMap = new Map();
+
+    products.forEach((product) => {
+      const name =
+        typeof product.category === "string"
+          ? product.category.trim().replace(/\s+/g, " ")
+          : "";
+      if (!name) return;
+
+      const current = categoryMap.get(name) || {
+        name,
+        count: 0,
+        image: "",
+        ratingTotal: 0,
+      };
+
+      current.count += 1;
+      current.ratingTotal += Number(product.rating?.average || 0);
+      current.image = current.image || getProductImageUrl(product);
+      categoryMap.set(name, current);
+    });
+
+    const categories = Array.from(categoryMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
 
     res.json(
-      categories.map(({ _id, count, averageRating }) => ({
-        name: _id,
+      categories.map(({ name, count, ratingTotal, image }) => ({
+        name,
         count,
-        averageRating: averageRating ? Math.round(averageRating * 10) / 10 : 0,
+        image,
+        averageRating: count ? Math.round((ratingTotal / count) * 10) / 10 : 0,
       })),
     );
   } catch (err) {

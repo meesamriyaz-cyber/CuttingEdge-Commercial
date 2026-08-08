@@ -44,7 +44,7 @@ export const createServiceQuote = async (req, res) => {
     }
     quote.attachments.push({
       name: `ServiceQuote-${quote._id}.pdf`,
-      url: `/api/service-quotes/${quote._id}/pdf`,
+      url: `/services/quote/${quote._id}/pdf`,
     });
     await quote.save();
 

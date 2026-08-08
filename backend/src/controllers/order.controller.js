@@ -1,7 +1,7 @@
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
-import { sendMail } from "../utils/email.js"; // or wherever your mail util lives
+import { sendOrderConfirmationEmail } from "../utils/orderEmail.js";
 import mongoose from "mongoose";
 
 // ---------- CREATE ORDER FROM CART ----------
@@ -25,10 +25,14 @@ export const placeOrder = async (req, res) => {
 
     // Build order items (GST-inclusive snapshot)
     const orderItems = cart.items.map((item) => {
-      if (item.product.stock != null && item.quantity > item.product.stock) {
+      const availableStock = Number(item.product.stock || 0);
+      if (item.quantity > availableStock) {
         throw {
           status: 400,
-          message: `Not enough stock for ${item.product.name}`,
+          message:
+            availableStock > 0
+              ? `Only ${availableStock} left in stock for ${item.product.name}`
+              : `${item.product.name} is out of stock`,
         };
       }
 
@@ -74,14 +78,19 @@ export const placeOrder = async (req, res) => {
       { session },
     );
 
-    // decrement stock
+    // decrement stock atomically so concurrent orders cannot oversell
     for (const item of cart.items) {
-      if (item.product.stock != null) {
-        await Product.findByIdAndUpdate(
-          item.product._id,
-          { $inc: { stock: -item.quantity } },
-          { session },
-        );
+      const updatedProduct = await Product.findOneAndUpdate(
+        { _id: item.product._id, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { session, new: true },
+      );
+
+      if (!updatedProduct) {
+        throw {
+          status: 400,
+          message: `Not enough stock for ${item.product.name}`,
+        };
       }
     }
 
@@ -92,14 +101,16 @@ export const placeOrder = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    // send mail (non-blocking)
+    const emailOrder = await Order.findById(order._id)
+      .populate("user", "name email")
+      .populate("items.product", "name price sku");
+
+    // send mail after the transaction so email failures do not block checkout
     try {
-      await sendMail({
-        to: req.user.email,
-        subject: "Order Placed Successfully",
-        text: `Thank you! Your order ${order._id} has been placed.`,
-      });
-    } catch {}
+      await sendOrderConfirmationEmail({ order: emailOrder, user: req.user });
+    } catch (mailErr) {
+      console.error("Order confirmation email failed:", mailErr.message);
+    }
 
     return res.status(201).json({
       message: "Order placed successfully",

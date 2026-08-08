@@ -5,6 +5,9 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    assetsDir: "assets",
+  },
   server: {
     port: 5173,
     // Handle SPA routing - serve index.html for all non-API routes

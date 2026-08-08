@@ -50,17 +50,11 @@ export const createQuoteFromEnquiry = async (req, res) => {
       },
       user: enquiry.user,
     });
-    console.log(
-      "Quote PDF generated, buffer size:",
-      pdfBuffer?.length,
-      "bytes",
-    );
-    console.log("PDF buffer is Buffer:", Buffer.isBuffer(pdfBuffer));
 
     // 3️⃣ Attach PDF for audit
     quote.attachments.push({
       name: `Quote-${quote._id}.pdf`,
-      url: `/quotes/${quote._id}/pdf`,
+      url: `/govt/quotes/${quote._id}/pdf`,
     });
     await quote.save();
 
@@ -148,6 +142,13 @@ export const getQuoteByEnquiry = async (req, res) => {
       return res.status(404).json({ message: "Quote not found" });
     }
 
+    const isAdmin = req.user?.roles?.includes("admin");
+    const isOwner = quote.user?._id?.toString() === req.user?._id?.toString();
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: "Not authorized to access this quote" });
+    }
+
     return res.json(quote);
   } catch (err) {
     console.error(err);
@@ -182,6 +183,15 @@ export const decideQuote = async (req, res) => {
       });
     }
 
+    if (new Date(quote.validityDate) < new Date()) {
+      quote.status = "EXPIRED";
+      await quote.save();
+
+      return res.status(400).json({
+        message: "Quote has expired",
+      });
+    }
+
     quote.status = decision;
     quote.decisionAt = new Date();
     quote.decisionBy = req.user._id;
@@ -207,7 +217,7 @@ export const decideQuote = async (req, res) => {
           ],
         });
       } catch (err) {
-        console.log(
+        console.error(
           "Acceptance notification email failed, but quote was processed:",
           err.message,
         );
@@ -231,7 +241,7 @@ export const decideQuote = async (req, res) => {
 export const getAllQuotes = async (req, res) => {
   try {
     const quotes = await Quote.find()
-      .populate("user", "name email clientType")
+      .populate("user", "name email officialEmail organizationName departmentName clientType")
       .populate({
         path: "enquiry",
         populate: { path: "product", select: "name sku" },
@@ -251,7 +261,7 @@ export const getAllQuotes = async (req, res) => {
 export const getQuoteById = async (req, res) => {
   try {
     const quote = await Quote.findById(req.params.id)
-      .populate("user", "name email")
+      .populate("user", "name email officialEmail organizationName departmentName clientType")
       .populate({
         path: "enquiry",
         populate: { path: "product", select: "name description sku" },
@@ -275,10 +285,12 @@ export const getQuoteByEnquiryAdmin = async (req, res) => {
   try {
     const quote = await Quote.findOne({
       enquiry: req.params.enquiryId,
-    }).populate({
-      path: "enquiry",
-      populate: { path: "product", select: "name description sku" },
-    });
+    })
+      .populate("user", "name email officialEmail organizationName departmentName clientType")
+      .populate({
+        path: "enquiry",
+        populate: { path: "product", select: "name description sku" },
+      });
 
     if (!quote) {
       return res.status(404).json({ message: "Quote not found" });

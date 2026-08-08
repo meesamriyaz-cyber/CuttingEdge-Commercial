@@ -7,6 +7,7 @@ import {
   decideQuote,
   getAllQuotes,
   getQuoteById,
+  getQuoteByEnquiryAdmin,
 } from "../controllers/quote.controller.js";
 
 import {
@@ -15,10 +16,8 @@ import {
   requireGovtVerified,
   requireAdmin,
 } from "../middleware/auth.middleware.js";
-import { getQuoteByEnquiryAdmin,  } from "../controllers/quote.controller.js";
-import { downloadQuotePdf } from "../utils/downloadQuotePdf.js";
 
-import { generateQuotePDF} from "../controllers/quote.pdf.controller.js";
+import { generateQuotePDF } from "../controllers/quote.pdf.controller.js";
 
 const router = Router();
 
@@ -68,8 +67,8 @@ router.post(
 // Admin: view all quotes
 router.get("/", requireAuth, requireAdmin, getAllQuotes);
 
-// Admin: view single quote (READ-ONLY)
-router.get("/:id", requireAuth, requireAdmin, getQuoteById);
+// Authenticated owner or admin: view single quote (READ-ONLY)
+router.get("/:id", requireAuth, getQuoteById);
 
 // Admin: view quote by enquiry ID
 router.get(
@@ -78,8 +77,6 @@ router.get(
   requireAdmin,
   getQuoteByEnquiryAdmin,
 );
-//router.get("/:id/pdf", requireAuth,   downloadQuotePdf);
-
 router.get("/:id/pdf", requireAuth, generateQuotePDF);
 
 export default router;

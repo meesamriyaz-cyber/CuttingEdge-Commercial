@@ -7,6 +7,12 @@ const productSchema = new mongoose.Schema(
     description: { type: String, trim: true },
 
     price: { type: Number, required: true },
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
       gstRate: {
         type: Number,
         default: 18, 
@@ -50,7 +56,7 @@ const productSchema = new mongoose.Schema(
 );
 
 
-productSchema.pre("save", function(next) {
+productSchema.pre("save", function() {
   if (!this.sku) {
     this.sku = `${this.segment.slice(0,3)}-${Date.now()}`;
   }

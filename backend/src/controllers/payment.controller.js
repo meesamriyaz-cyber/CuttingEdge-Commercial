@@ -1,9 +1,10 @@
-import { instance, getRazorpayKey } from "../utils/razorpay.js";
+import { instance, getRazorpayKey, keySecret } from "../utils/razorpay.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import mongoose from "mongoose";
 import crypto from "crypto";
+import { sendOrderConfirmationEmail } from "../utils/orderEmail.js";
 export const createRazorpayOrderFromCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ user: req.user._id }).populate(
@@ -12,6 +13,18 @@ export const createRazorpayOrderFromCart = async (req, res) => {
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    for (const item of cart.items) {
+      const availableStock = Number(item.product.stock || 0);
+      if (item.quantity > availableStock) {
+        return res.status(400).json({
+          message:
+            availableStock > 0
+              ? `Only ${availableStock} left in stock for ${item.product.name}`
+              : `${item.product.name} is out of stock`,
+        });
+      }
     }
 
     const GST_RATE = 18;
@@ -82,22 +95,18 @@ export const verifyRazorpayPayment = async (req, res) => {
       req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return res.status(400).json({ message: "Invalid payment payload" });
+      throw { status: 400, message: "Invalid payment payload" };
     }
 
     // 🔐 Verify Razorpay signature
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const keySecret =
-      process.env.NODE_ENV === "production"
-        ? process.env.RAZORPAY_KEY_SECRET_LIVE
-        : process.env.RAZORPAY_KEY_SECRET_TEST;
     const expectedSignature = crypto
       .createHmac("sha256", keySecret)
       .update(body)
       .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ message: "Payment verification failed" });
+      throw { status: 400, message: "Payment verification failed" };
     }
 
     // 🔍 Fetch existing PENDING order
@@ -106,11 +115,13 @@ export const verifyRazorpayPayment = async (req, res) => {
     }).session(session);
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      throw { status: 404, message: "Order not found" };
     }
 
     if (order.paymentStatus === "PAID") {
       // Idempotency guard
+      await session.abortTransaction();
+      session.endSession();
       return res.json({ success: true, orderId: order._id });
     }
 
@@ -123,13 +134,20 @@ export const verifyRazorpayPayment = async (req, res) => {
     }
     await order.save({ session });
 
-    // 🔻 Reduce stock (reuse existing pattern)
+    // 🔻 Reduce stock atomically so concurrent paid orders cannot oversell
     for (const item of order.items) {
-      await Product.findByIdAndUpdate(
-        item.product,
+      const updatedProduct = await Product.findOneAndUpdate(
+        { _id: item.product, stock: { $gte: item.quantity } },
         { $inc: { stock: -item.quantity } },
-        { session },
+        { session, new: true },
       );
+
+      if (!updatedProduct) {
+        throw {
+          status: 409,
+          message: "Stock changed before payment could be finalized. Please contact support.",
+        };
+      }
     }
 
     // 🧹 Clear cart
@@ -142,6 +160,16 @@ export const verifyRazorpayPayment = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    const emailOrder = await Order.findById(order._id)
+      .populate("user", "name email")
+      .populate("items.product", "name price sku");
+
+    try {
+      await sendOrderConfirmationEmail({ order: emailOrder, user: emailOrder?.user });
+    } catch (mailErr) {
+      console.error("Order confirmation email failed:", mailErr.message);
+    }
+
     return res.json({
       success: true,
       message: "Payment verified and order finalized",
@@ -151,7 +179,9 @@ export const verifyRazorpayPayment = async (req, res) => {
     await session.abortTransaction();
     session.endSession();
     console.error("verifyRazorpayPayment error:", err);
-    return res.status(500).json({ message: "Payment verification failed" });
+    return res.status(err.status || 500).json({
+      message: err.message || "Payment verification failed",
+    });
   }
 };
 export const getKey = async (req, res) => {

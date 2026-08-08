@@ -18,14 +18,34 @@ import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 const app = express();
 
+const envOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+  process.env.CORS_ORIGINS,
+]
+  .filter(Boolean)
+  .flatMap((value) => value.split(","))
+  .map((value) => value.trim())
+  .map((value) => value.replace(/\/$/, ""))
+  .filter(Boolean);
+
 // CORS configuration - allow credentials (cookies)
-const allowedOrigins = [
+const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
   "http://localhost:5176",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5175",
+  "http://127.0.0.1:5176",
   "https://commerce.cuttingedge-enterprises.in",
-];
+  "https://www.commerce.cuttingedge-enterprises.in",
+  "https://cuttingedge-commercial.onrender.com",
+  "https://cuttingedge-commercial-web.onrender.com",
+  "https://cuttingedge-commercial-frontend.onrender.com",
+  ...envOrigins,
+]);
 
 app.use(
   cors({
@@ -33,7 +53,7 @@ app.use(
       // allow requests with no origin (like mobile apps, curl, postman)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      if (allowedOrigins.has(origin.replace(/\/$/, ""))) {
         return callback(null, true);
       } else {
         return callback(new Error("Not allowed by CORS"));

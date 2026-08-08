@@ -112,11 +112,8 @@ export const getEnquiryById = async (req, res) => {
 
 export const getEnquiryByIdAdmin = async (req, res) => {
   try {
-    console.log("getEnquiryByIdAdmin called with ID:", req.params.id);
-
     // Validate ID format before querying
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      console.log("Invalid ObjectId format:", req.params.id);
       return res.status(400).json({ message: "Invalid enquiry id format" });
     }
 
@@ -128,12 +125,9 @@ export const getEnquiryByIdAdmin = async (req, res) => {
       );
 
     if (!enquiry) {
-      console.log("Enquiry not found in database for ID:", req.params.id);
       return res.status(404).json({ message: "Enquiry not found" });
     }
 
-    console.log("Enquiry found:", enquiry._id.toString());
-    console.log("Enquiry data:", JSON.stringify(enquiry, null, 2));
     return res.json(enquiry);
   } catch (err) {
     console.error("getEnquiryByIdAdmin error:", err);

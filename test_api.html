@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .test-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .success {
+            border-left: 4px solid #28a745;
+            background-color: #d4edda;
+        }
+        .error {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Test Dashboard</h1>
+        
+        <div class="test-section">
+            <h3>Backend API Health Check</h3>
+            <button class="test-button" onclick="testBackendHealth()">Check Backend</button>
+            <div id="backend-response" class="response"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Services API - Get All Services</h3>
+            <button class="test-button" onclick="testServicesAPI()">Get Services</button>
+            <div id="services-response" class="response"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Service Enquiry API - Specific Service</h3>
+            <button class="test-button" onclick="testServiceBySlug('office-network-installation')">Office Network</button>
+            <button class="test-button" onclick="testServiceBySlug('amc-maintenance')">AMC Maintenance</button>
+            <button class="test-button" onclick="testServiceBySlug('repairs-troubleshooting')">Repairs</button>
+            <div id="service-response" class="response"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Frontend Build Status</h3>
+            <p>Frontend server running on: <strong>http://localhost:5176/</strong></p>
+            <p>Backend server running on: <strong>http://localhost:5000/</strong></p>
+        </div>
+    </div>
+
+    <script>
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data,
+                    headers: Object.fromEntries(response.headers.entries())
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    status: 0
+                };
+            }
+        }
+
+        function displayResponse(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.className = 'response ' + (result.success ? 'success' : 'error');
+            
+            let html = '';
+            if (result.success) {
+                html = `Status: ${result.status} OK\n`;
+                html += 'Response Headers:\n' + JSON.stringify(result.headers, null, 2) + '\n\n';
+                html += 'Response Data:\n' + JSON.stringify(result.data, null, 2);
+            } else {
+                html = `Error: ${result.status || 'Network Error'}\n`;
+                html += result.error;
+            }
+            
+            element.textContent = html;
+        }
+
+        async function testBackendHealth() {
+            const result = await makeRequest('http://localhost:5000/');
+            displayResponse('backend-response', result);
+        }
+
+        async function testServicesAPI() {
+            const result = await makeRequest('http://localhost:5000/services');
+            displayResponse('services-response', result);
+        }
+
+        async function testServiceBySlug(slug) {
+            const result = await makeRequest(`http://localhost:5000/services/${slug}`);
+            displayResponse('service-response', result);
+        }
+
+        // Auto-run health check
+        window.addEventListener('load', () => {
+            testBackendHealth();
+            setTimeout(testServicesAPI, 500);
+        });
+    </script>
+</body>
+</html>

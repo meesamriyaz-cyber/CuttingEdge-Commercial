@@ -7,6 +7,7 @@ import {
   login,
   refreshToken,
   verifyGovtCode,
+  resendGovtVerificationCode,
   logout,
 } from "../controllers/auth.controller.js";
 
@@ -18,6 +19,7 @@ router.post("/register/govt", registerGovtClient);
 router.post("/login", login);
 router.post("/refresh", refreshToken);
 router.post("/verify", requireAuth, verifyGovtCode);
+router.post("/verify/resend", requireAuth, resendGovtVerificationCode);
 router.post("/logout", logout);
 
 export default router;

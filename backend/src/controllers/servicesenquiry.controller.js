@@ -155,7 +155,18 @@ export const createServiceQuoteAdmin = async (req, res) => {
       user: enquiry.user,
     });
 
+    if (!quote.attachments) {
+      quote.attachments = [];
+    }
+    quote.attachments.push({
+      name: `ServiceQuote-${quote._id}.pdf`,
+      url: `/services/quote/${quote._id}/pdf`,
+    });
+    await quote.save();
+
     // Send email to customer with PDF attachment
+    let emailSent = false;
+    let emailError = null;
     try {
       await sendMail({
         to: enquiry.user.officialEmail || enquiry.user.email,
@@ -180,13 +191,19 @@ Admin Team`,
           },
         ],
       });
+      emailSent = true;
     } catch (emailErr) {
       console.error("Email failed:", emailErr);
+      emailError = emailErr.message;
     }
 
     return res.status(201).json({
-      message: "Quote created successfully",
+      message: emailSent
+        ? "Quote created and emailed successfully"
+        : "Quote created, but email failed to send",
       quote,
+      emailSent,
+      emailError,
     });
   } catch (err) {
     console.error("Create quote error:", err);
@@ -227,6 +244,28 @@ export const getServiceQuoteByIdAdmin = async (req, res) => {
     return res.json(quote);
   } catch (err) {
     console.error("Admin fetch quote error:", err);
+    return res.status(500).json({ message: "Could not fetch quote" });
+  }
+};
+
+export const getServiceQuoteByEnquiryAdmin = async (req, res) => {
+  try {
+    const quote = await ServiceQuote.findOne({
+      enquiry: req.params.enquiryId,
+    })
+      .populate({
+        path: "enquiry",
+        populate: { path: "service", select: "name category description" },
+      })
+      .populate("user", "name email officialEmail organizationName phone");
+
+    if (!quote) {
+      return res.status(404).json({ message: "Quote not found" });
+    }
+
+    return res.json(quote);
+  } catch (err) {
+    console.error("Admin fetch quote by enquiry error:", err);
     return res.status(500).json({ message: "Could not fetch quote" });
   }
 };

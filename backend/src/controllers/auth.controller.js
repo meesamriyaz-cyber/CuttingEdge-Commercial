@@ -1,11 +1,184 @@
 import User from "../models/User.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
-import { sendMail } from "../utils/email.js";
+import { getEmailProvider, sendMail } from "../utils/email.js";
+
+const VERIFICATION_CODE_TTL_MINUTES = 15;
+
+const normalizeEmail = (value) =>
+  typeof value === "string" ? value.trim().toLowerCase() : "";
+
+const DEFAULT_OFFICIAL_EMAIL_SUFFIXES = ["gov.in", "nic.in"];
+
+const DEFAULT_BLOCKED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "googlemail.com",
+  "yahoo.com",
+  "yahoo.co.in",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "msn.com",
+  "icloud.com",
+  "me.com",
+  "aol.com",
+  "proton.me",
+  "protonmail.com",
+  "zoho.com",
+  "rediffmail.com",
+];
+
+const parseDomainList = (value) =>
+  String(value || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase().replace(/^@/, ""))
+    .filter(Boolean);
+
+const getEmailDomain = (email) => {
+  const parts = normalizeEmail(email).split("@");
+  return parts.length === 2 ? parts[1] : "";
+};
+
+const domainMatches = (domain, allowedDomains) =>
+  allowedDomains.some(
+    (allowed) => domain === allowed || domain.endsWith(`.${allowed}`),
+  );
+
+const getOfficialEmailPolicy = () => {
+  const allowedFromEnv = parseDomainList(process.env.GOVT_EMAIL_ALLOWED_DOMAINS);
+  const blockedFromEnv = parseDomainList(process.env.GOVT_EMAIL_BLOCKED_DOMAINS);
+
+  return {
+    allowedDomains: [
+      ...new Set([...DEFAULT_OFFICIAL_EMAIL_SUFFIXES, ...allowedFromEnv]),
+    ],
+    blockedDomains: [
+      ...new Set([...DEFAULT_BLOCKED_EMAIL_DOMAINS, ...blockedFromEnv]),
+    ],
+  };
+};
+
+const validateOfficialGovtEmail = (email) => {
+  const domain = getEmailDomain(email);
+  const { allowedDomains, blockedDomains } = getOfficialEmailPolicy();
+
+  if (!domain || !email.includes("@")) {
+    return {
+      valid: false,
+      message: "Enter a valid official government email address",
+    };
+  }
+
+  if (domainMatches(domain, blockedDomains)) {
+    return {
+      valid: false,
+      message:
+        "Public email providers are not accepted for government registration. Use your department-issued official email.",
+    };
+  }
+
+  if (!domainMatches(domain, allowedDomains)) {
+    return {
+      valid: false,
+      message: `Official email must use an approved government domain such as ${allowedDomains
+        .map((item) => `@${item}`)
+        .join(", ")}.`,
+    };
+  }
+
+  return { valid: true, domain };
+};
+
+const createVerificationCode = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
+
+const setGovtVerificationCode = (user) => {
+  user.verificationCode = createVerificationCode();
+  user.verificationCodeExpires = new Date(
+    Date.now() + VERIFICATION_CODE_TTL_MINUTES * 60 * 1000,
+  );
+};
+
+const ensureGovtRole = (user) => {
+  if (user.clientType !== "PUBLIC") return false;
+
+  const roles = Array.isArray(user.roles) ? user.roles : [];
+  const nextRoles = roles.filter((role) => role !== "private_client");
+
+  if (!nextRoles.includes("public_sector_client")) {
+    nextRoles.push("public_sector_client");
+  }
+
+  const changed =
+    nextRoles.length !== roles.length ||
+    nextRoles.some((role, index) => role !== roles[index]);
+
+  if (changed) {
+    user.roles = nextRoles;
+  }
+
+  return changed;
+};
+
+const getSafeUser = (user) => {
+  const safeUser = user.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
+  delete safeUser.verificationCode;
+  delete safeUser.verificationCodeExpires;
+  return safeUser;
+};
+
+const sendGovtVerificationEmail = async (user) => {
+  if (!user.officialEmail) {
+    return { sent: false, error: "Official email is missing" };
+  }
+
+  try {
+    const result = await sendMail({
+      to: user.officialEmail,
+      subject: "Government Account Verification",
+      text: `Your Cutting Edge government account verification code is ${user.verificationCode}. This code will expire in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
+      html: `
+        <p>Dear ${user.name},</p>
+        <p>Your Cutting Edge government account verification code is:</p>
+        <p style="font-size:24px;font-weight:700;letter-spacing:4px">${user.verificationCode}</p>
+        <p>This code will expire in ${VERIFICATION_CODE_TTL_MINUTES} minutes.</p>
+        <p>If you did not request this account, please ignore this email.</p>
+      `,
+    });
+
+    const accepted = Array.isArray(result.accepted)
+      ? result.accepted.map((email) => email.toLowerCase())
+      : [];
+    const recipientAccepted = accepted.includes(user.officialEmail.toLowerCase());
+
+    if (!recipientAccepted) {
+      console.error("Government verification email was not accepted:", {
+        to: user.officialEmail,
+        accepted: result.accepted,
+        rejected: result.rejected,
+        response: result.response,
+      });
+
+      return {
+        sent: false,
+        error: `${getEmailProvider()} did not accept the official email recipient`,
+      };
+    }
+
+    return {
+      sent: true,
+      provider: result.provider || getEmailProvider(),
+      messageId: result.messageId,
+    };
+  } catch (err) {
+    console.error("Government verification email failed:", err.message);
+    return { sent: false, error: err.message };
+  }
+};
 
 /**
  * =========================
@@ -14,11 +187,21 @@ import { sendMail } from "../utils/email.js";
  */
 export const registerPrivateClient = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { password } = req.body;
+    const name = req.body.name?.trim();
+    const email = normalizeEmail(req.body.email);
+
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Name, email, and password are required" });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res
+        .status(400)
+        .json({ message: "An account with this email already exists" });
     }
 
     const user = await User.create({
@@ -35,12 +218,17 @@ export const registerPrivateClient = async (req, res) => {
 
     res.status(201).json({
       message: "Private client registered successfully",
-      user,
+      user: getSafeUser(user),
       accessToken,
       refreshToken,
     });
   } catch (err) {
     console.error(err);
+    if (err?.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "An account with this email already exists" });
+    }
     res.status(500).json({ message: "Registration failed" });
   }
 };
@@ -52,51 +240,98 @@ export const registerPrivateClient = async (req, res) => {
  */
 export const registerGovtClient = async (req, res) => {
   try {
-    const { name, email, officialEmail, password } = req.body;
+    const { password } = req.body;
+    const name = req.body.name?.trim();
+    const departmentName = req.body.departmentName?.trim();
+    const email = normalizeEmail(req.body.email);
+    const officialEmail = normalizeEmail(req.body.officialEmail);
+
+    if (!name || !email || !officialEmail || !password || !departmentName) {
+      return res.status(400).json({
+        message:
+          "Name, email, password, department, and official email are required",
+      });
+    }
+
+    const officialEmailValidation = validateOfficialGovtEmail(officialEmail);
+    if (!officialEmailValidation.valid) {
+      return res.status(400).json({
+        message: officialEmailValidation.message,
+      });
+    }
 
     const existingUser = await User.findOne({
-      $or: [{ email }, { officialEmail }],
+      $or: [
+        { email },
+        { email: officialEmail },
+        { officialEmail: email },
+        { officialEmail },
+      ],
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      const message =
+        existingUser.email === email
+          ? "An account with this login email already exists"
+          : existingUser.officialEmail === officialEmail
+            ? "This official email is already linked to an account"
+            : "An account already exists for these email details";
+
+      return res.status(400).json({ message });
     }
 
-    const verificationCode = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
-
-    const user = await User.create({
+    const user = new User({
       name,
       email,
       officialEmail,
+      departmentName,
       password,
       clientType: "PUBLIC",
       govtValidationStatus: "PENDING",
       emailVerified: false,
-      verificationCode,
-      verificationCodeExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+      roles: ["public_sector_client"],
     });
 
-    // TODO: send verificationCode to officialEmail
+    setGovtVerificationCode(user);
+    ensureGovtRole(user);
+    await user.save();
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
-    await sendMail({
-      to: officialEmail,
-      subject: "Government Account Verification",
-      text: `Your verification code is: ${verificationCode}. This code will expire in 10 minutes.`,
-    });
+    const emailDelivery = await sendGovtVerificationEmail(user);
+
+    if (!emailDelivery.sent) {
+      await User.findByIdAndDelete(user._id);
+
+      return res.status(502).json({
+        message:
+          "Registration could not be completed because the verification email could not be sent. Please try again later.",
+        emailDelivery: {
+          sent: false,
+          provider: getEmailProvider(),
+          error: emailDelivery.error,
+        },
+      });
+    }
 
     res.status(201).json({
       message: "Government client registered. Verification code sent.",
-      user,
+      user: getSafeUser(user),
       accessToken,
       refreshToken,
+      emailDelivery: {
+        sent: true,
+        provider: emailDelivery.provider,
+      },
     });
   } catch (err) {
     console.error(err);
+    if (err?.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "An account already exists for these email details" });
+    }
     res.status(500).json({ message: "Registration failed" });
   }
 };
@@ -108,7 +343,7 @@ export const registerGovtClient = async (req, res) => {
  */
 export const verifyGovtCode = async (req, res) => {
   try {
-    const { code } = req.body;
+    const code = String(req.body.code || "").trim();
     const userId = req.user._id;
 
     const user = await User.findById(userId);
@@ -135,16 +370,58 @@ export const verifyGovtCode = async (req, res) => {
     user.emailVerified = true;
     user.verificationCode = null;
     user.verificationCodeExpires = null;
+    ensureGovtRole(user);
 
     await user.save();
 
     res.status(200).json({
       message: "Government account verified successfully",
-      user: user,
+      user: getSafeUser(user),
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Verification failed" });
+  }
+};
+
+/**
+ * ===============================
+ * RESEND GOVERNMENT VERIFY CODE
+ * ===============================
+ */
+export const resendGovtVerificationCode = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user || user.clientType !== "PUBLIC") {
+      return res.status(400).json({ message: "Invalid government client" });
+    }
+
+    if (user.govtValidationStatus === "VERIFIED") {
+      return res.status(400).json({ message: "Account is already verified" });
+    }
+
+    setGovtVerificationCode(user);
+    ensureGovtRole(user);
+    await user.save();
+
+    const emailDelivery = await sendGovtVerificationEmail(user);
+
+    if (!emailDelivery.sent) {
+      return res.status(502).json({
+        message:
+          "Verification code was generated, but email delivery failed. Please contact support or try again later.",
+      });
+    }
+
+    res.status(200).json({
+      message: `Verification code sent to ${user.officialEmail}`,
+      user: getSafeUser(user),
+      emailDelivery: { sent: true },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Could not resend verification code" });
   }
 };
 
@@ -165,7 +442,11 @@ export const login = async (req, res) => {
 
     // 🔑 Normalize email input
 
-    const user = await User.findOne({ email }).select("+password");
+    const normalizedEmail = normalizeEmail(email);
+
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+password",
+    );
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -176,11 +457,31 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    ensureGovtRole(user);
+    user.lastLogin = new Date();
 
     const verificationRequired =
       user.clientType === "PUBLIC" && user.govtValidationStatus === "PENDING";
+
+    const needsFreshVerificationCode =
+      verificationRequired &&
+      (!user.verificationCode ||
+        !user.verificationCodeExpires ||
+        user.verificationCodeExpires < Date.now());
+
+    if (needsFreshVerificationCode) {
+      setGovtVerificationCode(user);
+    }
+
+    await user.save();
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    let emailDelivery;
+    if (needsFreshVerificationCode) {
+      emailDelivery = await sendGovtVerificationEmail(user);
+    }
 
     // Set HTTP-only cookie for access token (secure, works on refresh)
     // Note: sameSite: 'none' needed for cross-origin in development
@@ -203,8 +504,11 @@ export const login = async (req, res) => {
       message: "Login successful",
       accessToken,
       refreshToken,
-      user,
+      user: getSafeUser(user),
       verificationRequired,
+      emailDelivery: emailDelivery
+        ? { sent: emailDelivery.sent }
+        : undefined,
     });
   } catch (err) {
     console.error("Login error:", err);
@@ -241,7 +545,7 @@ export const refreshToken = async (req, res) => {
 
     res.status(200).json({
       accessToken: newAccessToken,
-      user: user,
+      user: getSafeUser(user),
     });
   } catch (err) {
     console.error("Refresh token error:", err);
