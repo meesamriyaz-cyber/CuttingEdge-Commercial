@@ -2,6 +2,11 @@ import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import { sendOrderConfirmationEmail } from "../utils/orderEmail.js";
+import {
+  isServiceablePincode,
+  getDistanceForPincode,
+  calculateDeliveryCharge,
+} from "../utils/delivery.js";
 import mongoose from "mongoose";
 
 // ---------- CREATE ORDER FROM CART ----------
@@ -11,8 +16,22 @@ export const placeOrder = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { shippingAddress } = req.body;
+    const { shippingAddress, pincode } = req.body;
 
+    const cleanPincode = String(pincode || "").trim();
+
+    if (!cleanPincode) {
+      throw { status: 400, message: "Pincode is required" };
+    }
+
+    if (!isServiceablePincode(cleanPincode)) {
+      throw {
+        status: 400,
+        message: "Sorry, we do not deliver to this pincode yet. We currently serve Kashmir Division only.",
+      };
+    }
+
+    const distanceKm = getDistanceForPincode(cleanPincode);
     const cart = await Cart.findOne({ user: req.user._id })
       .populate("items.product")
       .session(session);
@@ -55,6 +74,8 @@ export const placeOrder = async (req, res) => {
     const cgst = totalTax / 2;
     const sgst = totalTax / 2;
 
+    const deliveryCharge = calculateDeliveryCharge(distanceKm, inclusiveTotal);
+
     const pricing = {
       baseAmount: taxableAmount,
       discountAmount: 0,
@@ -62,7 +83,7 @@ export const placeOrder = async (req, res) => {
       cgst,
       sgst,
       totalTax,
-      grandTotal: inclusiveTotal,
+      grandTotal: inclusiveTotal + (deliveryCharge || 0),
     };
 
     const [order] = await Order.create(
@@ -73,6 +94,10 @@ export const placeOrder = async (req, res) => {
           totalAmount: inclusiveTotal,
           pricing, // ✅ backend-authoritative
           shippingAddress,
+          pincode: cleanPincode,
+          deliveryCharge: deliveryCharge || 0,
+          distanceKm,
+          isServiceable: true,
         },
       ],
       { session },
@@ -115,6 +140,9 @@ export const placeOrder = async (req, res) => {
     return res.status(201).json({
       message: "Order placed successfully",
       orderId: order._id,
+      deliveryCharge: deliveryCharge || 0,
+      distanceKm,
+      grandTotal: pricing.grandTotal,
     });
   } catch (err) {
     await session.abortTransaction();

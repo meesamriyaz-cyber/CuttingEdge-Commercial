@@ -60,6 +60,25 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    pincode: {
+      type: String,
+      required: true,
+    },
+
+    deliveryCharge: {
+      type: Number,
+      default: 0,
+    },
+
+    distanceKm: {
+      type: Number,
+    },
+
+    isServiceable: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );

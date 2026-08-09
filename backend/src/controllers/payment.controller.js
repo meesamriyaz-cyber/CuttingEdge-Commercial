@@ -4,8 +4,15 @@ import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import mongoose from "mongoose";
 import { sendOrderConfirmationEmail, sendPaymentFailedEmail } from "../utils/orderEmail.js";
+import {
+  isServiceablePincode,
+  getDistanceForPincode,
+  calculateDeliveryCharge,
+} from "../utils/delivery.js";
 export const createRazorpayOrderFromCart = async (req, res) => {
   try {
+    const { pincode } = req.body;
+
     const cart = await Cart.findOne({ user: req.user._id }).populate(
       "items.product",
     );
@@ -41,6 +48,22 @@ export const createRazorpayOrderFromCart = async (req, res) => {
       0,
     );
 
+    // 🔑 Pincode / delivery validation
+    const cleanPincode = String(pincode || "").trim();
+
+    if (!cleanPincode) {
+      return res.status(400).json({ message: "Pincode is required" });
+    }
+
+    if (!isServiceablePincode(cleanPincode)) {
+      return res.status(400).json({
+        message: "Sorry, we do not deliver to this pincode yet. We currently serve Kashmir Division only.",
+      });
+    }
+
+    const distanceKm = getDistanceForPincode(cleanPincode);
+    const deliveryCharge = calculateDeliveryCharge(distanceKm, inclusiveTotal);
+
     // GST breakdown (same logic as order.controller.js)
     const taxableAmount = (inclusiveTotal * 100) / (100 + GST_RATE);
     const totalTax = inclusiveTotal - taxableAmount;
@@ -52,12 +75,14 @@ export const createRazorpayOrderFromCart = async (req, res) => {
       cgst: totalTax / 2,
       sgst: totalTax / 2,
       totalTax,
-      grandTotal: inclusiveTotal,
+      grandTotal: inclusiveTotal + (deliveryCharge || 0),
     };
+
+    const orderAmount = Math.round((inclusiveTotal + (deliveryCharge || 0)) * 100);
 
     // 🔑 Create Razorpay order
     const razorpayOrder = await instance.orders.create({
-      amount: Math.round(inclusiveTotal * 100), // paise
+      amount: orderAmount,
       currency: "INR",
       receipt: `order_${Date.now()}`,
       payment_capture: 1,
@@ -72,6 +97,10 @@ export const createRazorpayOrderFromCart = async (req, res) => {
       status: "PLACED",
       paymentStatus: "PENDING",
       razorpayOrderId: razorpayOrder.id,
+      pincode: cleanPincode,
+      deliveryCharge: deliveryCharge || 0,
+      distanceKm,
+      isServiceable: true,
     });
 
     return res.json({
@@ -79,6 +108,9 @@ export const createRazorpayOrderFromCart = async (req, res) => {
       razorpayOrderId: razorpayOrder.id,
       orderId: order._id,
       amount: razorpayOrder.amount,
+      deliveryCharge: deliveryCharge || 0,
+      distanceKm,
+      grandTotal: pricing.grandTotal,
     });
   } catch (err) {
     console.error("Create Razorpay order error:", err);

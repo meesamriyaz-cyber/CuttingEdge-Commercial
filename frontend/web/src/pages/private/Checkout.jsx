@@ -14,6 +14,7 @@ import {
   verifyRazorpayPayment,
   reportPaymentFailed,
 } from "../../api/payments";
+import { checkDelivery } from "../../api/delivery";
 import { Button } from "../../components/ui";
 
 export default function Checkout() {
@@ -26,15 +27,47 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState(null);
+  const [checkingDelivery, setCheckingDelivery] = useState(false);
 
   useEffect(() => {
     if (!cart) fetchCart();
   }, [cart, fetchCart]);
 
+  useEffect(() => {
+    if (selectedAddress?.pincode) {
+      checkPincodeDelivery(selectedAddress.pincode);
+    } else {
+      setDeliveryInfo(null);
+    }
+  }, [selectedAddress]);
+
+  async function checkPincodeDelivery(pincode) {
+    setCheckingDelivery(true);
+    setError("");
+    try {
+      const orderTotal = cart?.pricing?.grandTotal || 0;
+      const data = await checkDelivery(pincode, orderTotal);
+      setDeliveryInfo(data);
+    } catch (err) {
+      setDeliveryInfo({
+        serviceable: false,
+        message: err.message || "Could not check delivery availability",
+      });
+    } finally {
+      setCheckingDelivery(false);
+    }
+  }
+
   async function placeCODOrder() {
     if (!cart?.items?.length) return;
     if (!selectedAddress) {
       setError("Please select a delivery address");
+      return;
+    }
+
+    if (deliveryInfo && !deliveryInfo.serviceable) {
+      setError(deliveryInfo.message || "This pincode is not serviceable");
       return;
     }
 
@@ -50,6 +83,7 @@ export default function Checkout() {
         },
         body: JSON.stringify({
           paymentMethod: "cod",
+          pincode: selectedAddress.pincode,
           shippingAddress: `${selectedAddress.label}: ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}, Phone: ${selectedAddress.phone}`,
         }),
       });
@@ -76,6 +110,11 @@ export default function Checkout() {
       return;
     }
 
+    if (deliveryInfo && !deliveryInfo.serviceable) {
+      setError(deliveryInfo.message || "This pincode is not serviceable");
+      return;
+    }
+
     setPlacing(true);
     setError("");
 
@@ -84,12 +123,12 @@ export default function Checkout() {
     try {
       const Razorpay = await loadRazorpayScript();
       const razorpayKey = await fetchRazorpayKey();
-      const orderData = await createRazorpayOrder();
+      const orderData = await createRazorpayOrder(selectedAddress.pincode);
 
       const options = {
         key: razorpayKey,
         amount: orderData.amount,
-        currency: orderData.currency,
+        currency: orderData.currency || "INR",
         name: "Cutting Edge Enterprises",
         description: "Order Payment",
         order_id: orderData.razorpayOrderId,
@@ -162,6 +201,12 @@ export default function Checkout() {
       setError("Please select a delivery address");
       return;
     }
+
+    if (deliveryInfo && !deliveryInfo.serviceable) {
+      setError(deliveryInfo.message || "This pincode is not serviceable");
+      return;
+    }
+
     if (paymentMethod === "cod") {
       placeCODOrder();
     } else {
@@ -284,6 +329,27 @@ export default function Checkout() {
                     </p>
                   </div>
                 )}
+
+                {checkingDelivery && (
+                  <p className="mt-2 text-sm text-slate-500">Checking delivery availability...</p>
+                )}
+
+                {deliveryInfo && !checkingDelivery && (
+                  <div
+                    className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+                      deliveryInfo.serviceable
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:text-emerald-200"
+                        : "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200"
+                    }`}
+                  >
+                    {deliveryInfo.message}
+                    {deliveryInfo.serviceable && deliveryInfo.distanceKm != null && (
+                      <span className="ml-2 text-xs opacity-80">
+                        (~{deliveryInfo.distanceKm} km from warehouse)
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="theme-card rounded-[24px] p-5 sm:p-6">
@@ -340,10 +406,19 @@ export default function Checkout() {
             </div>
 
             <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-              <OrderSummary />
+              <OrderSummary
+                deliveryCharge={deliveryInfo?.deliveryCharge || 0}
+                distanceKm={deliveryInfo?.distanceKm}
+              />
               <div className="theme-card rounded-[24px] p-5">
                 <Button
-                  disabled={placing || !cart?.items?.length || !selectedAddress}
+                  disabled={
+                    placing ||
+                    checkingDelivery ||
+                    !cart?.items?.length ||
+                    !selectedAddress ||
+                    (deliveryInfo && !deliveryInfo.serviceable)
+                  }
                   onClick={handlePlaceOrder}
                   className="w-full"
                 >

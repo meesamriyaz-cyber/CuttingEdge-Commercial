@@ -7,7 +7,7 @@ const currencyFormatter = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 2,
 });
 
-export default function OrderSummary() {
+export default function OrderSummary({ deliveryCharge = 0, distanceKm }) {
   const { pricing } = useCartStore();
 
   const {
@@ -18,6 +18,8 @@ export default function OrderSummary() {
     totalTax = 0,
     grandTotal = 0,
   } = pricing || {};
+
+  const totalPayable = grandTotal + deliveryCharge;
 
   return (
     <div className="theme-card rounded-[24px] p-6 space-y-4">
@@ -45,8 +47,24 @@ export default function OrderSummary() {
           <Row label="Total tax" value={totalTax} />
         </div>
 
+        {deliveryCharge > 0 && (
+          <div className="border-t border-slate-200/80 pt-3 dark:border-slate-800">
+            <Row
+              label={
+                distanceKm != null
+                  ? `Delivery charge (${distanceKm} km)`
+                  : "Delivery charge"
+              }
+              value={deliveryCharge}
+            />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Orders below ₹1,000 incur delivery charges based on distance.
+            </p>
+          </div>
+        )}
+
         <div className="rounded-2xl bg-slate-950 px-4 py-3 text-white dark:bg-cyan-950/55">
-          <Row label="Amount payable" value={grandTotal} primary />
+          <Row label="Amount payable" value={totalPayable} primary />
         </div>
       </div>
 

@@ -20,10 +20,11 @@ export const fetchRazorpayKey = async () => {
 };
 
 // Create Razorpay order from cart
-export const createRazorpayOrder = async () => {
+export const createRazorpayOrder = async (pincode) => {
   const res = await fetch(`${API_URL}/payments/razorpay/create-order`, {
     method: "POST",
     headers: getHeaders(),
+    body: JSON.stringify({ pincode }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message);

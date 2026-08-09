@@ -16,6 +16,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
+import deliveryRoutes from "./routes/delivery.routes.js";
 const app = express();
 
 const envOrigins = [
@@ -93,6 +94,7 @@ app.use("/wishlist", wishlistRoutes);
 
 app.use("/services", serviceRoutes);
 app.use("/payments", paymentRoutes);
+app.use("/delivery", deliveryRoutes);
 
 // Health check endpoint
 app.get("/", (req, res) => {
