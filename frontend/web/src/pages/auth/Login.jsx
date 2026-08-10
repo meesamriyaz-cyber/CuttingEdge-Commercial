@@ -3,13 +3,9 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
-  Building2,
   Eye,
   EyeOff,
-  LifeBuoy,
   Package,
-  PackageSearch,
-  ShieldCheck,
 } from "lucide-react";
 import { loginApi } from "../../api/auth";
 import { useAuthStore } from "../../store/authStore";
@@ -20,24 +16,6 @@ import {
   heroSideVariants,
   formSideVariants,
 } from "../../utils/animations";
-
-const ACCESS_POINTS = [
-  {
-    icon: PackageSearch,
-    label: "Products",
-    text: "Browse and order",
-  },
-  {
-    icon: Building2,
-    label: "Procurement",
-    text: "Enquiries and quotes",
-  },
-  {
-    icon: LifeBuoy,
-    label: "Services",
-    text: "Requests and support",
-  },
-];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -110,10 +88,9 @@ export default function Login() {
             </Motion.div>
 
             <Motion.div variants={formSideVariants}>
-              <div className="theme-card rounded-lg p-6 sm:p-8 lg:p-10">
+              <div className="auth-form-transparent rounded-lg p-6 sm:p-8 lg:p-10">
                 <div className="mb-7">
                   <div className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                    <ShieldCheck size={13} />
                     Secure access
                   </div>
 
@@ -126,7 +103,7 @@ export default function Login() {
                         Sign in
                       </h1>
                       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Continue your customer workspace in one place.
+                        Welcome back. Continue to your workspace.
                       </p>
                     </div>
                   </div>
@@ -159,7 +136,7 @@ export default function Login() {
                 </AnimatePresence>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="panel-muted space-y-4 p-4 sm:p-5">
+                  <div className="field-3d space-y-4">
                     <Input
                       label="Email address"
                       type="email"
@@ -199,23 +176,6 @@ export default function Login() {
                   </Button>
                 </form>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  {ACCESS_POINTS.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <div key={item.label} className="auth-access-tile">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                          <Icon size={16} className="text-cyan-700 dark:text-cyan-300" />
-                          {item.label}
-                        </div>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                          {item.text}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
                 <div className="mt-7 border-t border-slate-200/80 pt-5 dark:border-slate-800">
                   <p className="text-center text-sm text-slate-500 dark:text-slate-400">
                     New here?{" "}
@@ -226,11 +186,6 @@ export default function Login() {
                       Create an account
                     </Link>
                   </p>
-                </div>
-
-                <div className="mt-5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <ShieldCheck size={14} className="text-cyan-600 dark:text-cyan-300" />
-                  One sign-in supports private commerce, public procurement, and service workflows.
                 </div>
               </div>
             </Motion.div>

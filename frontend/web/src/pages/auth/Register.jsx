@@ -3,12 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
-  Building2,
-  ClipboardCheck,
-  LifeBuoy,
-  PackageSearch,
-  ShieldCheck,
   UserRound,
+  Building2,
 } from "lucide-react";
 import { registerApi } from "../../api/auth";
 import HeroLeftContent from "../../components/HeroLeftContent";
@@ -23,32 +19,14 @@ const ACCOUNT_TYPES = [
   {
     id: "PRIVATE",
     title: "Private customer",
-    description: "Cart, checkout, orders, wishlist, and post-purchase support.",
+    description: "Cart, checkout, orders, and support.",
     icon: UserRound,
   },
   {
     id: "PUBLIC",
     title: "Government customer",
-    description: "Procurement enquiries, quotations, and institutional workflow tracking.",
+    description: "Procurement enquiries, quotations, and institutional workflow.",
     icon: Building2,
-  },
-];
-
-const SETUP_POINTS = [
-  {
-    icon: PackageSearch,
-    label: "Catalogue",
-    text: "Products and categories",
-  },
-  {
-    icon: ClipboardCheck,
-    label: "Workflow",
-    text: "Orders or quotations",
-  },
-  {
-    icon: LifeBuoy,
-    label: "Support",
-    text: "Services and follow-up",
   },
 ];
 
@@ -118,10 +96,9 @@ export default function Register() {
             </Motion.div>
 
             <Motion.div variants={formSideVariants}>
-              <div className="theme-card rounded-lg p-6 sm:p-8 lg:p-10">
+              <div className="auth-form-transparent rounded-lg p-6 sm:p-8 lg:p-10">
                 <div className="mb-7">
                   <div className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                    <ShieldCheck size={13} />
                     Account setup
                   </div>
 
@@ -129,8 +106,8 @@ export default function Register() {
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
                       Create your account
                     </h1>
-                    <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                      Choose the workflow that fits your organization and get access to products, services, and the right post-login experience.
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                      Choose your account type and get started in minutes.
                     </p>
                   </div>
                 </div>
@@ -193,7 +170,7 @@ export default function Register() {
                     })}
                   </div>
 
-                  <div className="panel-muted space-y-4 p-4 sm:p-5">
+                  <div className="field-3d space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Input
                         label="Full name"
@@ -223,7 +200,7 @@ export default function Register() {
                   </div>
 
                   {clientType === "PUBLIC" && (
-                    <div className="panel-muted space-y-4 p-4 sm:p-5">
+                    <div className="field-3d space-y-4">
                       <div>
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                           Procurement contact details
@@ -247,7 +224,7 @@ export default function Register() {
                           placeholder="name@department.gov.in"
                           value={officialEmail}
                           onChange={(e) => setOfficialEmail(e.target.value)}
-                          helperText="Use a department-issued government email. Public mailboxes such as Gmail, Yahoo, and Outlook are not accepted."
+                          helperText="Use a department-issued government email. Public mailboxes are not accepted."
                           required
                         />
                       </div>
@@ -263,29 +240,6 @@ export default function Register() {
                     Create Account
                     {!loading && <ArrowRight size={16} />}
                   </Button>
-
-                  {clientType === "PUBLIC" && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Government accounts require an approved official domain and email code verification before procurement features are enabled.
-                    </p>
-                  )}
-
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {SETUP_POINTS.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <div key={item.label} className="auth-access-tile">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                            <Icon size={16} className="text-cyan-700 dark:text-cyan-300" />
-                            {item.label}
-                          </div>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            {item.text}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
                 </form>
 
                 <div className="mt-7 border-t border-slate-200/80 pt-5 dark:border-slate-800">
