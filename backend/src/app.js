@@ -17,6 +17,8 @@ import addressRoutes from "./routes/address.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import deliveryRoutes from "./routes/delivery.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import passwordResetRoutes from "./routes/passwordReset.routes.js";
 const app = express();
 
 const envOrigins = [
@@ -95,6 +97,8 @@ app.use("/wishlist", wishlistRoutes);
 app.use("/services", serviceRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/delivery", deliveryRoutes);
+app.use("/admin/users", userRoutes);
+app.use("/auth/password", passwordResetRoutes);
 
 // Health check endpoint
 app.get("/", (req, res) => {

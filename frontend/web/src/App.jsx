@@ -48,6 +48,8 @@ export default function App() {
       "/",
       "/login",
       "/register",
+      "/forgot-password",
+      "/reset-password",
       "/products-guest",
       "/services",
     ];

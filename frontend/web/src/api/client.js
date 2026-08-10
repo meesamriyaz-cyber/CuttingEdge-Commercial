@@ -59,24 +59,23 @@ export async function apiRequest(path, options = {}) {
   if (!res.ok) {
     // Handle 401 - Unauthorized (expired or invalid token)
     if (res.status === 401) {
-      // Clear auth store
-      try {
-        useAuthStore.getState().expireSession();
-      } catch (e) {
-        // Fallback - clear localStorage directly
-        localStorage.removeItem("session");
-      }
+      const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
 
-      // Redirect to login page
-      if (typeof window !== "undefined") {
-        window.location.href = "/login?expired=true";
-      }
+      // Only redirect if user is not already on a public auth page
+      if (!publicPaths.some((path) => currentPath === path || currentPath.startsWith(path))) {
+        try {
+          useAuthStore.getState().expireSession();
+        } catch (e) {
+          localStorage.removeItem("session");
+        }
 
-      // Throw error to stop further processing
-      throw new Error("Session expired. Please log in again.");
+        if (typeof window !== "undefined") {
+          window.location.href = "/login?expired=true";
+        }
+      }
     }
 
-    // convert various server responses into a thrown Error with message
     const message =
       (payload && (payload.message || payload.error)) ||
       res.statusText ||

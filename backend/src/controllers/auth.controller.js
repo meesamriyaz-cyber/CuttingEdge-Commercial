@@ -474,6 +474,13 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({
+        message: "Your account has been deactivated. Please contact support for assistance.",
+        code: "ACCOUNT_DEACTIVATED",
+      });
+    }
+
     ensureGovtRole(user);
     user.lastLogin = new Date();
 

@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingBag,
+  UserRound,
   Wrench,
 } from "lucide-react";
 
@@ -13,6 +14,7 @@ const navItems = [
   { label: "Dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Products", to: "/admin/products", icon: Package },
   { label: "Orders", to: "/admin/orders", icon: ShoppingBag },
+  { label: "Users", to: "/admin/users", icon: UserRound },
   { label: "Govt Enquiries", to: "/admin/enquiries", icon: ClipboardList },
   { label: "Quotes", to: "/admin/quotes", icon: FileText },
   { label: "Services", to: "/admin/service-enquiries", icon: Wrench },

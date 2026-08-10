@@ -16,6 +16,7 @@ import {
   heroSideVariants,
   formSideVariants,
 } from "../../utils/animations";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -64,7 +65,12 @@ export default function Login() {
         navigate("/", { replace: true });
       }
     } catch (err) {
-      setError(err.message || "Login failed");
+      const message = err.message || "Login failed";
+      setError(message);
+
+      if (err.status === 403 || err.payload?.code === "ACCOUNT_DEACTIVATED") {
+        toast.error(message, { duration: 6000 });
+      }
     } finally {
       setLoading(false);
     }
@@ -175,6 +181,15 @@ export default function Login() {
                     {!loading && <ArrowRight size={16} />}
                   </Button>
                 </form>
+
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <Link
+                    to="/forgot-password"
+                    className="font-semibold text-cyan-700 transition-colors hover:text-orange-600 dark:text-cyan-300 dark:hover:text-orange-300"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
 
                 <div className="mt-7 border-t border-slate-200/80 pt-5 dark:border-slate-800">
                   <p className="text-center text-sm text-slate-500 dark:text-slate-400">

@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema(
       // Pure admin users have no clientType and only ["admin"] role
     },
 
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     emailVerified: {
       type: Boolean,
       default: false,
@@ -77,6 +82,9 @@ const userSchema = new mongoose.Schema(
         addedAt: { type: Date, default: Date.now },
       },
     ],
+
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   { timestamps: true },
 );

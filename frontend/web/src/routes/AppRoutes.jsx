@@ -51,6 +51,9 @@ import ServiceList from "../pages/services/ServicesList";
 import ProductDetailsGuest from "../pages/products/ProductDetailsGuest";
 import ServiceEnquiry from "../pages/services/ServiceEnquiry";
 import ServiceDetail from "../pages/services/ServiceDetail";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+import AdminUsers from "../pages/admin/AdminUsers";
 
 export default function AppRoutes() {
   const user = useAuthStore((state) => state.user);
@@ -60,6 +63,8 @@ export default function AppRoutes() {
       {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/products-guest" element={<ProductListGuest />} />
       <Route path="/products-guest/:id" element={<ProductDetailsGuest />} />
       <Route path="/services" element={<ServiceList />} />
@@ -418,6 +423,16 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <AdminRoute>
               <AdminServiceQuoteDetails />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <AdminUsers />
             </AdminRoute>
           </ProtectedRoute>
         }
