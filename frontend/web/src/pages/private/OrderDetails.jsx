@@ -349,7 +349,7 @@ export default function OrderDetails() {
           {/* Status Banner */}
           <div className={`rounded-xl border p-6 mb-6 ${status.color}`}>
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-white/50 rounded-xl">
+              <div className="p-2 bg-white/50 dark:bg-slate-800/50 rounded-xl">
                 <StatusIcon className="w-6 h-6" />
               </div>
               <div>

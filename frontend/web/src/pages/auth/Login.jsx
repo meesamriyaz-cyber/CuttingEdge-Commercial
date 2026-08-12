@@ -86,9 +86,9 @@ export default function Login() {
       <div className="mx-auto w-full max-w-6xl">
         <div className="hero-shell overflow-hidden rounded-lg p-2 shadow-[0_28px_64px_-44px_rgba(8,16,29,0.48)] sm:p-3">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <Motion.div
+             <Motion.div
               variants={heroSideVariants}
-              className="hidden rounded-lg tech-panel px-8 py-10 lg:block"
+              className="hidden rounded-lg auth-form-transparent px-8 py-10 lg:block"
             >
               <HeroLeftContent hideCTA clientType="PRIVATE" />
             </Motion.div>

@@ -285,7 +285,7 @@ export default function AdminProductForm({ mode }) {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-3 bg-white p-4 rounded-md border"
+        className="space-y-3 bg-white dark:bg-slate-800 p-4 rounded-md border border-slate-200 dark:border-slate-700"
       >
         <input
           name="name"

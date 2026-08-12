@@ -133,27 +133,27 @@ export default function AdminServiceEnquiryDetails() {
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="border rounded p-4 bg-white">
-          <h3 className="font-medium mb-1">Customer</h3>
-          <p className="text-sm">
+        <div className="border rounded p-4 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <h3 className="font-medium mb-1 text-slate-900 dark:text-white">Customer</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {enquiry.user?.organizationName || enquiry.user?.name}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {enquiry.user?.officialEmail || enquiry.user?.email}
           </p>
           {enquiry.user?.phone && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Phone: {enquiry.user.phone}
             </p>
           )}
         </div>
 
-        <div className="border rounded p-4 bg-white">
-          <h3 className="font-medium mb-1">Service</h3>
-          <p className="text-sm">
+        <div className="border rounded p-4 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <h3 className="font-medium mb-1 text-slate-900 dark:text-white">Service</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {enquiry.service?.name || enquiry.serviceNameSnapshot}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Category: {enquiry.service?.category || "N/A"}
           </p>
         </div>

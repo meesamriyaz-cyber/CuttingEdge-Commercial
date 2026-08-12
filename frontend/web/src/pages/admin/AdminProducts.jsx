@@ -157,9 +157,9 @@ export default function AdminProducts() {
         </div>
       </section>
 
-      <div className="theme-card hidden overflow-hidden rounded-lg lg:block">
+      <div className="theme-card hidden overflow-hidden rounded-lg lg:block border border-slate-200 dark:border-slate-700">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50/80 dark:bg-slate-950/45">
+          <thead className="bg-slate-50/80 dark:bg-slate-800/60">
             <tr>
               {["Name", "Category", "Segment", "Price", "Status", "Actions"].map((heading) => (
                 <th
@@ -176,7 +176,7 @@ export default function AdminProducts() {
             {paginated.map((product) => (
               <tr
                 key={product._id}
-                className="border-t border-slate-200/75 transition hover:bg-cyan-50/45 dark:border-cyan-950/45 dark:hover:bg-slate-900/55"
+                className="border-t border-slate-200/75 dark:border-slate-700/75 transition hover:bg-cyan-50/45 dark:hover:bg-slate-700/40"
               >
                 <td className="p-3">
                   <div className="font-semibold text-slate-950 dark:text-white">

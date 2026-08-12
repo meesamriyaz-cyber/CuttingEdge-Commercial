@@ -42,7 +42,7 @@ export default function Checkout() {
 
   return (
     <RoleGate allow={["PRIVATE"]}>
-      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-8">
+      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900 py-8">
         <div className="max-w-5xl mx-auto px-4 grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
@@ -50,21 +50,21 @@ export default function Checkout() {
             </h2>
 
             {(!Array.isArray(cart?.items) || !cart.items.length) && (
-              <p className="text-slate-600">Your cart is empty.</p>
+              <p className="text-slate-600 dark:text-slate-300">Your cart is empty.</p>
             )}
 
             {Array.isArray(cart?.items) &&
               cart.items.map((item) => (
                 <div
                   key={item.product._id}
-                  className="bg-white rounded-lg shadow p-4"
+                  className="bg-white dark:bg-slate-900 rounded-lg shadow p-4 border border-slate-200 dark:border-slate-700"
                 >
-                  <p className="font-medium">{item.product.name}</p>
-                  <p className="text-sm text-slate-500">Qty: {item.quantity}</p>
+                  <p className="font-medium text-slate-900 dark:text-white">{item.product.name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Qty: {item.quantity}</p>
                 </div>
               ))}
 
-            {error && <p className="text-red-600 text-sm">{error}</p>}
+            {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
           </div>
 
           <div className="space-y-4">

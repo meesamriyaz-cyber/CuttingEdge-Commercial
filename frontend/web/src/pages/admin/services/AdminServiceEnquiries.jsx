@@ -60,34 +60,34 @@ export default function AdminServiceEnquiries() {
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full mx-auto" />
-              <p className="mt-2 text-slate-600">Loading enquiries…</p>
+              <p className="mt-2 text-slate-600 dark:text-slate-300">Loading enquiries…</p>
             </div>
           ) : enquiries.length === 0 ? (
-            <div className="p-8 text-center text-slate-600">
+            <div className="p-8 text-center text-slate-600 dark:text-slate-300">
               No service enquiries found.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[700px] text-sm">
-                <thead className="bg-slate-100">
+                <thead className="bg-slate-100 dark:bg-slate-700/50">
                   <tr>
-                    <th className="p-4 text-left">ID</th>
-                    <th className="p-4 text-left">Customer</th>
-                    <th className="p-4 text-left">Service</th>
-                    <th className="p-4 text-left">Status</th>
-                    <th className="p-4 text-left">Date</th>
-                    <th className="p-4 text-right">Action</th>
+                    <th className="p-4 text-left text-slate-600 dark:text-slate-300">ID</th>
+                    <th className="p-4 text-left text-slate-600 dark:text-slate-300">Customer</th>
+                    <th className="p-4 text-left text-slate-600 dark:text-slate-300">Service</th>
+                    <th className="p-4 text-left text-slate-600 dark:text-slate-300">Status</th>
+                    <th className="p-4 text-left text-slate-600 dark:text-slate-300">Date</th>
+                    <th className="p-4 text-right text-slate-600 dark:text-slate-300">Action</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {enquiries.map((enq) => (
-                    <tr key={enq._id} className="border-t hover:bg-slate-50">
-                      <td className="p-4 font-medium">
+                    <tr key={enq._id} className="border-t border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                      <td className="p-4 font-medium text-slate-900 dark:text-white">
                         {enq._id.slice(-8).toUpperCase()}
                       </td>
 

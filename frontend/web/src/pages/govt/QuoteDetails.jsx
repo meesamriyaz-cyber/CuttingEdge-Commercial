@@ -194,12 +194,12 @@ export default function QuoteDetails() {
 
   return (
     <RoleGate allow={["PUBLIC"]} showFallback>
-      <div className="min-h-screen bg-gray-100 py-8 px-4 print:py-0 print:px-0 print:bg-white">
+      <div className="min-h-screen bg-gray-100 dark:bg-slate-900 py-8 px-4 print:py-0 print:px-0 print:bg-white">
         {/* Action Buttons - Hidden when printing */}
         <div className="max-w-4xl mx-auto mb-6 flex flex-col gap-3 sm:flex-row print:hidden">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg shadow hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -221,7 +221,7 @@ export default function QuoteDetails() {
         </div>
 
         {/* Quote Container */}
-        <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none">
+        <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 shadow-lg print:shadow-none">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white p-4 sm:p-8 print:bg-orange-600 print:from-orange-600 print:to-orange-600">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -242,54 +242,54 @@ export default function QuoteDetails() {
           </div>
 
           {/* Quote Details */}
-          <div className="border-b border-gray-200 p-4 sm:p-8">
+          <div className="border-b border-gray-200 dark:border-slate-700 p-4 sm:p-8">
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8">
               {/* Bill To */}
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">
                   Quotation For
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="font-semibold text-gray-900 text-lg">
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-lg">
+                  <div className="font-semibold text-gray-900 dark:text-white text-lg">
                     {buyer.name}
                   </div>
-                  <div className="text-gray-600 mt-1">{buyer.address}</div>
+                  <div className="text-gray-600 dark:text-slate-300 mt-1">{buyer.address}</div>
                 </div>
               </div>
 
               {/* Quote Info */}
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">
                   Quote Details
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-lg space-y-2">
                   <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                    <span className="text-gray-600">Quote Number:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-slate-300">Quote Number:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {quote._id.slice(-8).toUpperCase()}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                    <span className="text-gray-600">Quote Date:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-slate-300">Quote Date:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {new Date(quote.createdAt).toLocaleDateString("en-IN")}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                    <span className="text-gray-600">Valid Until:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-slate-300">Valid Until:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {new Date(quote.validityDate).toLocaleDateString("en-IN")}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                    <span className="text-gray-600">Status:</span>
+                    <span className="text-gray-600 dark:text-slate-300">Status:</span>
                     <span
                       className={`font-semibold ${
                         displayStatus === "ACCEPTED"
-                          ? "text-green-600"
+                          ? "text-green-600 dark:text-green-400"
                           : displayStatus === "REJECTED" || displayStatus === "EXPIRED"
-                            ? "text-red-600"
-                            : "text-blue-600"
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-blue-600 dark:text-blue-400"
                       }`}
                     >
                       {displayStatus}
@@ -305,20 +305,20 @@ export default function QuoteDetails() {
             <div className="overflow-x-auto">
             <table className="w-full min-w-[680px]">
               <thead>
-                <tr className="bg-gray-100 border-b-2 border-gray-300">
-                  <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <tr className="bg-gray-100 dark:bg-slate-700/50 border-b-2 border-gray-300 dark:border-slate-600">
+                  <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">
                     #
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">
                     Item Description
                   </th>
-                  <th className="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-center text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">
                     HSN
                   </th>
-                  <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">
                     Qty
                   </th>
-                  <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">
                     Rate (₹)
                   </th>
                   <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -326,26 +326,26 @@ export default function QuoteDetails() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50">
-                  <td className="py-4 px-4 text-gray-900">1</td>
-                  <td className="py-4 px-4 text-gray-900 font-medium">
+              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                <tr className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">1</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">
                     {product?.name ||
                       enquiry?.requirements ||
                       "Product / Service"}
                   </td>
-                  <td className="py-4 px-4 text-center text-gray-600">
+                  <td className="py-4 px-4 text-center text-gray-600 dark:text-slate-300">
                     {product?.hsn || "N/A"}
                   </td>
-                  <td className="py-4 px-4 text-right text-gray-900">
+                  <td className="py-4 px-4 text-right text-gray-900 dark:text-white">
                     {enquiry?.quantity || 1}
                   </td>
-                  <td className="py-4 px-4 text-right text-gray-900">
+                  <td className="py-4 px-4 text-right text-gray-900 dark:text-white">
                     {baseAmount.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                     })}
                   </td>
-                  <td className="py-4 px-4 text-right text-gray-900 font-medium">
+                  <td className="py-4 px-4 text-right text-gray-900 dark:text-white font-medium">
                     {baseAmount.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                     })}
@@ -403,85 +403,85 @@ export default function QuoteDetails() {
                       })}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1 text-gray-600 sm:flex-row sm:justify-between">
-                    <span>SGST (9%)</span>
-                    <span className="font-medium">
-                      ₹
-                      {pricing.sgst?.toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </span>
-                  </div>
-                  {pricing.discountAmount > 0 && (
-                    <div className="flex flex-col gap-1 text-green-600 sm:flex-row sm:justify-between">
-                      <span>Discount</span>
-                      <span className="font-medium">
-                        -₹
-                        {pricing.discountAmount?.toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </span>
-                    </div>
-                  )}
-                  <div className="border-t-2 border-gray-300 pt-3 mt-3">
-                    <div className="flex flex-col gap-1 text-lg font-bold text-gray-900 sm:flex-row sm:justify-between">
-                      <span>Grand Total</span>
-                      <span>
-                        ₹
-                        {pricing.grandTotal?.toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    Amount in Words:{" "}
-                    {numberToWords(Math.round(pricing.grandTotal))} Rupees Only
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                   <div className="flex flex-col gap-1 text-gray-600 dark:text-slate-300 sm:flex-row sm:justify-between">
+                     <span>SGST (9%)</span>
+                     <span className="font-medium">
+                       ₹
+                       {pricing.sgst?.toLocaleString("en-IN", {
+                         minimumFractionDigits: 2,
+                       })}
+                     </span>
+                   </div>
+                   {pricing.discountAmount > 0 && (
+                     <div className="flex flex-col gap-1 text-green-600 dark:text-green-400 sm:flex-row sm:justify-between">
+                       <span>Discount</span>
+                       <span className="font-medium">
+                         -₹
+                         {pricing.discountAmount?.toLocaleString("en-IN", {
+                           minimumFractionDigits: 2,
+                         })}
+                       </span>
+                     </div>
+                   )}
+                   <div className="border-t-2 border-gray-300 dark:border-slate-600 pt-3 mt-3">
+                     <div className="flex flex-col gap-1 text-lg font-bold text-gray-900 dark:text-white sm:flex-row sm:justify-between">
+                       <span>Grand Total</span>
+                       <span>
+                         ₹
+                         {pricing.grandTotal?.toLocaleString("en-IN", {
+                           minimumFractionDigits: 2,
+                         })}
+                       </span>
+                     </div>
+                   </div>
+                   <div className="text-xs text-gray-500 dark:text-slate-400 mt-2">
+                     Amount in Words:{" "}
+                     {numberToWords(Math.round(pricing.grandTotal))} Rupees Only
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
 
-          {/* Bank Details & Authorization */}
-          <div className="grid grid-cols-1 gap-6 px-4 pb-6 sm:grid-cols-2 sm:gap-8 sm:px-8 sm:pb-8">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-bold text-gray-900 mb-3">Bank Details</h4>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>
-                  <span className="font-medium">Bank:</span> UCO Bank
-                </div>
-                <div>
-                  <span className="font-medium">Account No:</span>{" "}
-                  01230210004975
-                </div>
-                <div>
-                  <span className="font-medium">IFSC:</span> UCBA0000123
-                </div>
-                <div>
-                  <span className="font-medium">Branch:</span> Srinagar
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between">
-              <div className="text-left sm:text-right">
-                <div className="text-sm text-gray-600 mb-8">
-                  Authorized Signatory
-                </div>
-                <div className="border-t-2 border-gray-400 inline-block pt-2">
-                  <div className="text-sm text-gray-900 font-medium">
-                    For {seller.name}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+           {/* Bank Details & Authorization */}
+           <div className="grid grid-cols-1 gap-6 px-4 pb-6 sm:grid-cols-2 sm:gap-8 sm:px-8 sm:pb-8">
+             <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-lg">
+               <h4 className="font-bold text-gray-900 dark:text-white mb-3">Bank Details</h4>
+               <div className="text-sm text-gray-600 dark:text-slate-300 space-y-1">
+                 <div>
+                   <span className="font-medium">Bank:</span> UCO Bank
+                 </div>
+                 <div>
+                   <span className="font-medium">Account No:</span>{" "}
+                   01230210004975
+                 </div>
+                 <div>
+                   <span className="font-medium">IFSC:</span> UCBA0000123
+                 </div>
+                 <div>
+                   <span className="font-medium">Branch:</span> Srinagar
+                 </div>
+               </div>
+             </div>
+             <div className="flex flex-col justify-between">
+               <div className="text-left sm:text-right">
+                 <div className="text-sm text-gray-600 dark:text-slate-300 mb-8">
+                   Authorized Signatory
+                 </div>
+                 <div className="border-t-2 border-gray-400 dark:border-slate-500 inline-block pt-2">
+                   <div className="text-sm text-gray-900 dark:text-white font-medium">
+                     For {seller.name}
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
 
           {/* Action Buttons for Quote Decision - Hidden when printing */}
           {canDecide && (
             <div className="px-4 pb-6 sm:px-8 sm:pb-8 print:hidden">
-              <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-                <h4 className="font-bold text-gray-900 mb-4">Quote Actions</h4>
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                <h4 className="font-bold text-gray-900 dark:text-white mb-4">Quote Actions</h4>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
                     onClick={() => decide("ACCEPTED")}
@@ -504,15 +504,15 @@ export default function QuoteDetails() {
 
           {!canDecide && quote.status === "SENT" && isExpired && (
             <div className="px-4 pb-6 sm:px-8 sm:pb-8 print:hidden">
-              <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+              <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6 text-sm text-red-700 dark:text-red-300">
                 This quote has expired and can no longer be accepted or rejected.
               </div>
             </div>
           )}
 
           {/* Terms & Footer */}
-          <div className="bg-gray-50 px-4 py-6 sm:px-8 border-t border-gray-200">
-            <div className="text-xs text-gray-500 space-y-2">
+          <div className="bg-gray-50 dark:bg-slate-700/50 px-4 py-6 sm:px-8 border-t border-gray-200 dark:border-slate-700">
+            <div className="text-xs text-gray-500 dark:text-slate-400 space-y-2">
               <p>
                 <span className="font-semibold">Terms & Conditions:</span>
               </p>
@@ -531,8 +531,8 @@ export default function QuoteDetails() {
                 </li>
               </ol>
             </div>
-            <div className="text-center mt-6 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
+            <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-slate-600">
+              <p className="text-sm text-gray-600 dark:text-slate-300">
                 Thank you for your interest! For any queries, contact us at
                 enquiry@cuttingedge-enterprises.in
               </p>

@@ -23,7 +23,7 @@ export default function OrderSuccess() {
         <div className="mx-auto max-w-3xl">
           <div className="hero-shell rounded-[28px] overflow-hidden">
             <div className="bg-[linear-gradient(135deg,#08101d_0%,#0f4c61_62%,#16a34a_100%)] px-8 py-10 text-center text-white">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white text-emerald-600 shadow-lg">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-lg">
                 <CheckCircle2 className="h-10 w-10" />
               </div>
               <h1 className="text-3xl font-bold">Order placed successfully</h1>

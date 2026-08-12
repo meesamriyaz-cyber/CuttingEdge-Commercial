@@ -78,19 +78,19 @@ export default function AdminEnquiries() {
 
                 <tbody>
                   {enquiries.map((enq) => (
-                    <tr key={enq._id} className="border-t hover:bg-slate-50">
-                      <td className="p-4 font-medium">
+                    <tr key={enq._id} className="border-t border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                      <td className="p-4 font-medium text-slate-900 dark:text-white">
                         {enq._id.slice(-8).toUpperCase()}
                       </td>
 
                       <td className="p-4">
-                        <div className="font-medium">
+                        <div className="font-medium text-slate-900 dark:text-white">
                           {enq.user?.organizationName ||
                             enq.user?.departmentName ||
                             enq.user?.name ||
                             "Government Dept"}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
                           {enq.user?.officialEmail || enq.user?.email}
                         </div>
                       </td>
@@ -99,13 +99,13 @@ export default function AdminEnquiries() {
                         <div className="flex items-center gap-1">
                           {enq.user?.clientType === "PRIVATE" ? (
                             <>
-                              <ShoppingBag className="w-4 h-4 text-slate-400" />
-                              <span className="text-sm">Private</span>
+                              <ShoppingBag className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                              <span className="text-sm text-slate-600 dark:text-slate-300">Private</span>
                             </>
                           ) : enq.user?.clientType === "PUBLIC" ? (
                             <>
-                              <Building2 className="w-4 h-4 text-slate-400" />
-                              <span className="text-sm">Govt</span>
+                              <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                              <span className="text-sm text-slate-600 dark:text-slate-300">Govt</span>
                             </>
                           ) : (
                             <>

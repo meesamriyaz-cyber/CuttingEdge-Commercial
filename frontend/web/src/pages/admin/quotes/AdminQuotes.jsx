@@ -32,10 +32,10 @@ export default function AdminQuotes() {
         Government Quotes
       </h2>
 
-      <div className="hidden overflow-x-auto rounded-md border bg-white md:block">
+      <div className="hidden overflow-x-auto rounded-md border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 md:block">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="bg-slate-50 text-slate-600">
+            <tr className="bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
               <th className="p-2 text-left">Quote #</th>
               <th className="p-2 text-left">Department</th>
               <th className="p-2 text-left">Amount</th>
@@ -47,7 +47,7 @@ export default function AdminQuotes() {
           <tbody>
             {loading && (
               <tr>
-                <td className="p-4 text-center" colSpan={5}>
+                <td className="p-4 text-center text-slate-600 dark:text-slate-300" colSpan={5}>
                   Loading...
                 </td>
               </tr>
@@ -55,7 +55,7 @@ export default function AdminQuotes() {
 
             {!loading && quoteRows.length === 0 && (
               <tr>
-                <td className="p-4 text-center text-slate-500" colSpan={5}>
+                <td className="p-4 text-center text-slate-500 dark:text-slate-400" colSpan={5}>
                   No quotes found
                 </td>
               </tr>

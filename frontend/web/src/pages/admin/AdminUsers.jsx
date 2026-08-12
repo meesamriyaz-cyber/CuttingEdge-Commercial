@@ -196,7 +196,7 @@ export default function AdminUsers() {
               )}
               {!loading && users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                     No users found.
                   </td>
                 </tr>
@@ -214,7 +214,7 @@ export default function AdminUsers() {
                     </td>
                     <td className="py-3 text-slate-600 dark:text-slate-300">{user.email}</td>
                     <td className="py-3">
-                      <span className="rounded-full border border-slate-200 bg-white/70 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300">
+                      <span className="rounded-full border border-slate-200 bg-white/70 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                         {user.clientType === "PUBLIC" ? "Govt" : "Private"}
                       </span>
                     </td>

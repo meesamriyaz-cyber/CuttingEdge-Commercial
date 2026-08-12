@@ -3,8 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cutting Edge Enterprises</title>
+    <script>
+      (function() {
+        try {
+          const stored = localStorage.getItem('theme-storage');
+          let theme = 'system';
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed && parsed.theme) {
+              theme = parsed.theme;
+            }
+          }
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark = theme === 'dark' || (theme === 'system' && prefersDark);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          }
+          const themeColor = isDark ? '#07111f' : '#ffffff';
+          let meta = document.querySelector('meta[name="theme-color"]');
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.setAttribute('name', 'theme-color');
+            document.head.appendChild(meta);
+          }
+          meta.setAttribute('content', themeColor);
+        } catch (e) {
+          // ignore
+        }
+      })();
+    </script>
+    <style>
+      #root {
+        overflow-x: hidden;
+        max-width: 100vw;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

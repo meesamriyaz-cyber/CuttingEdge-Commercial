@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 export const useThemeStore = create(
   persist(
     (set, get) => ({
-      theme: "light", // 'light' | 'dark' | 'system'
+      theme: "system", // 'light' | 'dark' | 'system'
       isDark: false,
 
       setTheme: (theme) => {
@@ -39,8 +39,19 @@ export const useThemeStore = create(
 
       // Initialize theme on mount
       initTheme: () => {
-        const { theme } = get();
-        get().setTheme(theme);
+        try {
+          const stored = localStorage.getItem("theme-storage");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed && parsed.theme) {
+              get().setTheme(parsed.theme);
+              return;
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+        get().setTheme("system");
       },
     }),
     {

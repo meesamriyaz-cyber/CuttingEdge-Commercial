@@ -91,36 +91,36 @@ export default function AdminServiceQuoteCreate() {
         Create Service Quote for Enquiry #{enquiry._id.slice(-6).toUpperCase()}
       </h2>
 
-      <div className="border rounded-md p-3 bg-white">
-        <h3 className="font-medium mb-1">Customer</h3>
-        <p className="text-sm">
+      <div className="border rounded-md p-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <h3 className="font-medium mb-1 text-slate-900 dark:text-white">Customer</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           {enquiry.user?.organizationName || enquiry.user?.name}
         </p>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           {enquiry.user?.officialEmail || enquiry.user?.email}
         </p>
       </div>
 
-      <div className="border rounded-md p-3 bg-white">
-        <h3 className="font-medium mb-1">Service</h3>
-        <p className="text-sm">
+      <div className="border rounded-md p-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <h3 className="font-medium mb-1 text-slate-900 dark:text-white">Service</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           {enquiry.service?.name || enquiry.serviceNameSnapshot}
         </p>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Category: {enquiry.service?.category || "N/A"}
         </p>
       </div>
 
-      <div className="border rounded-md p-3 bg-white">
-        <h3 className="font-medium mb-1">Requirements</h3>
-        <p className="text-sm text-slate-700 whitespace-pre-line">
+      <div className="border rounded-md p-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <h3 className="font-medium mb-1 text-slate-900 dark:text-white">Requirements</h3>
+        <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">
           {enquiry.requirementDetails || "No requirements provided."}
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-3 bg-white p-3 border rounded-md"
+        className="space-y-3 bg-white dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700 rounded-md"
       >
         <h3 className="font-medium">Quote Details</h3>
 
