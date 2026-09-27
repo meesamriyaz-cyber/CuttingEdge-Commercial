@@ -213,13 +213,6 @@ const SERVICE_PREVIEWS = [
   },
 ];
 
-const GUEST_PROCESS_STEPS = [
-  "Browse",
-  "Sign in",
-  "Order or enquire",
-  "Track updates",
-];
-
 const CATEGORY_PROMPTS = [
   "Computers",
   "Laptops",
