@@ -1250,7 +1250,10 @@ export default function Home() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                      Services from XAD InfoTech Solutions
+                      Services from{" "}
+                      <span className="relative inline-block bg-gradient-to-r from-cyan-700 via-cyan-600 to-orange-500 bg-clip-text font-extrabold tracking-tight text-transparent drop-shadow-sm dark:from-cyan-300 dark:via-cyan-200 dark:to-orange-300">
+                        XAD InfoTech Solutions
+                      </span>
                     </h2>
                     <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-300">
                       20+ Years of IT Service Experience in J&K
