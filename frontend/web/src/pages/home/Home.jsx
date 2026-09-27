@@ -1263,10 +1263,14 @@ export default function Home() {
                       20+ Years of IT Service Experience in J&K
                     </p>
                     <p className="mt-3 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      Our service partner, <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
-                      brings more than two decades of IT service experience in J&K. For Cutting Edge customers, that means
-                      experienced local support beyond delivery — from installation and maintenance to troubleshooting,
+                      Cutting Edge brings product supply and professional services together with the technical expertise
+                      of <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>.
+                      With more than two decades of IT service experience in J&K, our integrated team supports customers
+                      across the technology lifecycle — from installation and deployment to maintenance, troubleshooting,
                       repairs, and ongoing technical assistance.
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      One relationship. From purchase to ongoing support.
                     </p>
                   </div>
                   <Link
