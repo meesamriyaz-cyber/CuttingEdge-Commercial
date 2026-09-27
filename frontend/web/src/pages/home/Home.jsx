@@ -1256,14 +1256,10 @@ export default function Home() {
                       20+ Years of IT Service Experience in J&K
                     </p>
                     <p className="mt-3 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      Cutting Edge brings product supply and professional services together with the technical expertise
-                      of <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>.
-                      With more than two decades of IT service experience in J&K, our integrated team supports customers
-                      across the technology lifecycle — from installation and deployment to maintenance, troubleshooting,
-                      repairs, and ongoing technical assistance.
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      One relationship. From purchase to ongoing support.
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">Technology backed by experience.</span>{" "}
+                      Cutting Edge combines trusted product supply with the 20+ years of IT service expertise of
+                      <span className="font-semibold text-slate-800 dark:text-slate-100"> XAD InfoTech Solutions</span>,
+                      delivering support from installation and deployment through maintenance, repairs, and beyond.
                     </p>
                   </div>
                   <Link
