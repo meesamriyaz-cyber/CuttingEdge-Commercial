@@ -1277,7 +1277,7 @@ export default function Home() {
 
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Supporting leading technology brands
+                    Authorised Service Centre for
                   </span>
                   {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon", "and more"].map((brand, index) => (
                     <span
