@@ -1256,15 +1256,17 @@ export default function Home() {
               <div className="relative z-10">
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div>
-                    <span className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide">
-                      Professional Services
-                    </span>
-                    <h2 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                      Support that keeps work moving — before and after purchase
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+                      Services from XAD InfoTech Solutions
                     </h2>
-                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      From installation and maintenance to post-sale support, you have an experienced service partner
-                      in J&K to help keep your technology working long after delivery.
+                    <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-300">
+                      20+ Years of IT Service Experience in J&K
+                    </p>
+                    <p className="mt-3 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                      Our service partner, <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
+                      brings more than two decades of IT service experience in J&K. For Cutting Edge customers, that means
+                      experienced local support beyond delivery — from installation and maintenance to troubleshooting,
+                      repairs, and ongoing technical assistance.
                     </p>
                   </div>
                   <Link
