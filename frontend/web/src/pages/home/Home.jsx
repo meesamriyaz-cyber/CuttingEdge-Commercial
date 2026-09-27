@@ -1276,60 +1276,31 @@ export default function Home() {
                   </Link>
                 </div>
 
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  {SERVICE_PREVIEWS.map((service) => (
-                    <Link
-                      key={service.title}
-                      to="/services"
-                      className="group grid gap-4 rounded-lg border border-slate-200/80 bg-white/72 p-4 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-white/88 dark:border-cyan-950/50 dark:bg-slate-950/35 dark:hover:border-cyan-800 sm:grid-cols-[132px_1fr]"
-                    >
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="h-28 w-full rounded-lg object-cover"
-                      />
-                      <div className="min-w-0 self-center">
-                        <h3 className="text-base font-bold text-slate-950 group-hover:text-cyan-700 dark:text-white dark:group-hover:text-cyan-300">
-                          {service.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                          {service.description}
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {service.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-full border border-cyan-200/70 bg-cyan-50/70 px-2.5 py-1 text-xs font-semibold text-cyan-800 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-200"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="mt-5 rounded-lg border border-cyan-200/80 bg-white/60 p-4 dark:border-cyan-900/50 dark:bg-slate-950/30">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="mt-5 rounded-lg border border-cyan-200/80 bg-white/60 p-5 shadow-sm dark:border-cyan-900/50 dark:bg-slate-950/30">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/80 bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-800 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-200">
                           <LifeBuoy className="h-3.5 w-3.5" />
-                          Service Partner
+                          Backed by XAD InfoTech Solutions
                         </span>
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           20+ years of service experience in J&K
                         </span>
                       </div>
 
-                      <h3 className="mt-3 text-lg font-bold text-slate-900 dark:text-white sm:text-xl">
-                        Your purchase is backed by local service expertise.
+                      <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+                        The support behind your purchase.
                       </h3>
-                      <p className="mt-1.5 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                        <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
-                        our service partner in J&K, brings more than two decades of IT service experience across
-                        leading technology brands.
+                      <p className="mt-2 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        When you buy from Cutting Edge, support does not end when your product is delivered.
+                        Our service partner, <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
+                        brings more than two decades of IT service experience in J&K, helping customers with
+                        installation, maintenance, troubleshooting, repairs, and ongoing technical support.
+                      </p>
+                      <p className="mt-2 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        With service experience across leading technology brands, you have experienced local support
+                        when you need it — giving you greater confidence before, during, and after your purchase.
                       </p>
                     </div>
 
@@ -1347,6 +1318,45 @@ export default function Home() {
                         </span>
                       ))}
                     </div>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    From service expertise to practical support
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {SERVICE_PREVIEWS.map((service) => (
+                      <Link
+                        key={service.title}
+                        to="/services"
+                        className="group grid gap-4 rounded-lg border border-slate-200/80 bg-white/72 p-4 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-white/88 dark:border-cyan-950/50 dark:bg-slate-950/35 dark:hover:border-cyan-800 sm:grid-cols-[132px_1fr]"
+                      >
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          className="h-28 w-full rounded-lg object-cover"
+                        />
+                        <div className="min-w-0 self-center">
+                          <h3 className="text-base font-bold text-slate-950 group-hover:text-cyan-700 dark:text-white dark:group-hover:text-cyan-300">
+                            {service.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            {service.description}
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {service.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="rounded-full border border-cyan-200/70 bg-cyan-50/70 px-2.5 py-1 text-xs font-semibold text-cyan-800 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-200"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
