@@ -1278,49 +1278,22 @@ export default function Home() {
                   </Link>
                 </div>
 
-                <div className="mt-5 rounded-lg border border-cyan-200/80 bg-white/60 p-5 shadow-sm dark:border-cyan-900/50 dark:bg-slate-950/30">
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/80 bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-800 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-200">
-                          <LifeBuoy className="h-3.5 w-3.5" />
-                          Backed by XAD InfoTech Solutions
-                        </span>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                          20+ years of service experience in J&K
-                        </span>
-                      </div>
-
-                      <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
-                        The support behind your purchase.
-                      </h3>
-                      <p className="mt-2 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                        When you buy from Cutting Edge, support does not end when your product is delivered.
-                        Our service partner, <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
-                        brings more than two decades of IT service experience in J&K, helping customers with
-                        installation, maintenance, troubleshooting, repairs, and ongoing technical support.
-                      </p>
-                      <p className="mt-2 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                        With service experience across leading technology brands, you have experienced local support
-                        when you need it — giving you greater confidence before, during, and after your purchase.
-                      </p>
-                    </div>
-
-                    <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-sm lg:justify-end">
-                      {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon", "and more"].map((brand, index) => (
-                        <span
-                          key={brand}
-                          className={
-                            index === 6
-                              ? "rounded-full border border-orange-200/80 bg-orange-50/70 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300"
-                              : "rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300"
-                          }
-                        >
-                          {brand}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                <div className="mt-5 flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    Supporting leading technology brands
+                  </span>
+                  {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon", "and more"].map((brand, index) => (
+                    <span
+                      key={brand}
+                      className={
+                        index === 6
+                          ? "rounded-full border border-orange-200/80 bg-orange-50/70 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300"
+                          : "rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300"
+                      }
+                    >
+                      {brand}
+                    </span>
+                  ))}
                 </div>
 
                 <div className="mt-5">
