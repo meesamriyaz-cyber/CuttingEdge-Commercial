@@ -1260,20 +1260,20 @@ export default function Home() {
                       Professional Services
                     </span>
                     <h2 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                      Support that keeps work moving
+                      Support that keeps work moving — before and after purchase
                     </h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      Pick a service, send the requirement, and track follow-up from one place.
+                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                      From installation and maintenance to post-sale support, you have an experienced service partner
+                      in J&K to help keep your technology working long after delivery.
                     </p>
                   </div>
-                  <Button
-                    variant="secondary"
+                  <Link
                     to="/services"
-                    className="self-start md:self-auto"
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-4 py-3 text-sm font-bold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-cyan-700 dark:hover:text-cyan-300"
                   >
                     Explore Services
-                    <ArrowRight size={16} />
-                  </Button>
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
 
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -1309,58 +1309,46 @@ export default function Home() {
                     </Link>
                   ))}
                 </div>
-              </div>
-            </Motion.section>
 
-            <Motion.section
-              data-section
-              className="hero-shell w-[90%] max-w-7xl mx-auto rounded-lg p-5 sm:p-6 lg:p-7"
-              variants={containerVariants}
-            >
-              <div className="relative z-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide">
-                      <LifeBuoy className="h-3.5 w-3.5" />
-                      Service Partner
-                    </span>
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                      20+ years of service experience in J&K
-                    </span>
-                  </div>
+                <div className="mt-5 rounded-lg border border-cyan-200/80 bg-white/60 p-4 dark:border-cyan-900/50 dark:bg-slate-950/30">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/80 bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-800 dark:border-cyan-900/50 dark:bg-cyan-950/25 dark:text-cyan-200">
+                          <LifeBuoy className="h-3.5 w-3.5" />
+                          Service Partner
+                        </span>
+                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          20+ years of service experience in J&K
+                        </span>
+                      </div>
 
-                  <h2 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                    Post-sale support, close to home
-                  </h2>
-                  <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    Through <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
-                    our service partner in J&K, customers have access to experienced IT service support after their
-                    purchase. With more than two decades of service experience across leading technology brands,
-                    support does not have to stop at delivery.
-                  </p>
+                      <h3 className="mt-3 text-lg font-bold text-slate-900 dark:text-white sm:text-xl">
+                        Your purchase is backed by local service expertise.
+                      </h3>
+                      <p className="mt-1.5 max-w-4xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        <span className="font-semibold text-slate-800 dark:text-slate-100">XAD InfoTech Solutions</span>,
+                        our service partner in J&K, brings more than two decades of IT service experience across
+                        leading technology brands.
+                      </p>
+                    </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon"].map((brand) => (
-                      <span
-                        key={brand}
-                        className="rounded-full border border-slate-200/80 bg-white/70 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300"
-                      >
-                        {brand}
-                      </span>
-                    ))}
-                    <span className="rounded-full border border-orange-200/80 bg-orange-50/70 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300">
-                      and more
-                    </span>
+                    <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-sm lg:justify-end">
+                      {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon", "and more"].map((brand, index) => (
+                        <span
+                          key={brand}
+                          className={
+                            index === 6
+                              ? "rounded-full border border-orange-200/80 bg-orange-50/70 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300"
+                              : "rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300"
+                          }
+                        >
+                          {brand}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                <Link
-                  to="/services"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-4 py-3 text-sm font-bold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-cyan-700 dark:hover:text-cyan-300"
-                >
-                  Explore Services
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
               </div>
             </Motion.section>
 
