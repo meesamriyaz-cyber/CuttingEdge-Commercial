@@ -1341,43 +1341,6 @@ export default function Home() {
               </div>
             </Motion.section>
 
-            <Motion.section
-              data-section
-              className="hero-shell w-[90%] max-w-7xl mx-auto rounded-lg p-5 sm:p-6 lg:p-7"
-              variants={containerVariants}
-            >
-              <div className="relative z-10 grid gap-5 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-                <div>
-                  <span className="signal-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide">
-                    Simple Process
-                  </span>
-                  <h2 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                    Clear next steps
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    A short flow for products, services, enquiries, and updates.
-                  </p>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-4">
-                  {GUEST_PROCESS_STEPS.map((step, index) => (
-                    <div
-                      key={step}
-                      className="rounded-lg border border-slate-200/80 bg-white/72 p-3 shadow-sm backdrop-blur dark:border-cyan-950/50 dark:bg-slate-950/35"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-950 text-sm font-bold text-white dark:bg-cyan-500 dark:text-slate-950">
-                          {index + 1}
-                        </span>
-                        <CheckCircle2 size={17} className="text-orange-600 dark:text-orange-300" />
-                      </div>
-                      <p className="mt-3 text-sm font-bold text-slate-800 dark:text-slate-100">
-                        {step}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Motion.section>
           </>
         )}
       </Motion.div>
