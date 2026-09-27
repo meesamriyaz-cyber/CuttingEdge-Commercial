@@ -1271,22 +1271,25 @@ export default function Home() {
                   </Link>
                 </div>
 
-                <div className="mt-5 flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Authorised Service Centre for
-                  </span>
-                  {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon", "and more"].map((brand, index) => (
-                    <span
-                      key={brand}
-                      className={
-                        index === 6
-                          ? "rounded-full border border-orange-200/80 bg-orange-50/70 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300"
-                          : "rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-cyan-950/50 dark:bg-slate-950/35 dark:text-slate-300"
-                      }
-                    >
-                      {brand}
+                <div className="mt-5 rounded-lg border border-cyan-200/80 bg-gradient-to-r from-cyan-50/80 via-white/80 to-orange-50/60 p-4 shadow-md shadow-cyan-900/10 dark:border-cyan-900/50 dark:from-cyan-950/25 dark:via-slate-950/45 dark:to-orange-950/15 dark:shadow-black/20">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                    <span className="shrink-0 text-sm font-extrabold uppercase tracking-[0.12em] text-cyan-800 drop-shadow-sm dark:text-cyan-200">
+                      Authorised Service Centre for
                     </span>
-                  ))}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {["DELL", "HP", "ASUS", "Lenovo", "TVS-E", "Canon"].map((brand) => (
+                        <span
+                          key={brand}
+                          className="rounded-full border border-white/80 bg-white/90 px-3 py-1.5 text-xs font-extrabold tracking-wide text-slate-800 shadow-sm shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:shadow-black/20"
+                        >
+                          {brand}
+                        </span>
+                      ))}
+                      <span className="rounded-full border border-orange-200/80 bg-orange-50/90 px-3 py-1.5 text-xs font-bold text-orange-700 shadow-sm dark:border-orange-900/50 dark:bg-orange-950/30 dark:text-orange-300">
+                        + more
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-5">
