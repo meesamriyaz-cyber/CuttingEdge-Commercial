@@ -1294,9 +1294,6 @@ export default function Home() {
                 </div>
 
                 <div className="mt-5">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    From service expertise to practical support
-                  </p>
                   <div className="grid gap-4 md:grid-cols-2">
                     {SERVICE_PREVIEWS.map((service) => (
                       <Link
